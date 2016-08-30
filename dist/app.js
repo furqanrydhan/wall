@@ -27113,11 +27113,11 @@
 
 	var _chatInput2 = _interopRequireDefault(_chatInput);
 
-	var _giphyBrowser = __webpack_require__(284);
+	var _giphyBrowser = __webpack_require__(285);
 
 	var _giphyBrowser2 = _interopRequireDefault(_giphyBrowser);
 
-	var _roster = __webpack_require__(289);
+	var _roster = __webpack_require__(290);
 
 	var _roster2 = _interopRequireDefault(_roster);
 
@@ -27143,26 +27143,86 @@
 
 	    _this.state = {
 	      page: "home",
+	      currentThread: [],
 	      me: {},
 	      threadName: ""
 	    };
+	    _this.store = {};
 	    _this.navigate = _this.navigate.bind(_this);
+	    _this.handleEventUpdate = _this.handleEventUpdate.bind(_this);
+	    _this.getOldMessages = _this.getOldMessages.bind(_this);
+	    _this.onThreadPresenceEvent = _this.onThreadPresenceEvent.bind(_this);
 	    return _this;
 	  }
 
 	  _createClass(App, [{
+	    key: 'getOldMessages',
+	    value: function getOldMessages(thread_id, count, offset) {
+	      var that = this;
+	      Bebo.Db.get('dm_' + thread_id, { count: count }, function (err, data) {
+	        if (err) {
+	          console.log('error getting list');
+	          return;
+	        }
+	        // TODO merge and sort
+	        var list = data.result.reverse();
+	        that.store[thread_id] = list;
+	        if (that.state.page === thread_id) {
+	          that.setState({ currentThread: list });
+	        }
+	      });
+	    }
+	  }, {
+	    key: 'handleEventUpdate',
+	    value: function handleEventUpdate(data) {
+	      console.log("New event", data);
+	      if (data.message) {
+	        this.handleMessageEvent(data.message);
+	      } else if (data.presence) {
+	        this.handlePresenceUpdates(data.presence);
+	      }
+	    }
+	  }, {
+	    key: 'handlePresenceUpdates',
+	    value: function handlePresenceUpdates(presence) {
+	      if (this.onPresenceUpdate) {
+	        this.onThreadPresenceUpdate(presence);
+	      }
+	    }
+	  }, {
+	    key: 'onThreadPresenceEvent',
+	    value: function onThreadPresenceEvent(callback) {
+	      this.onThreadPresenceUpdate = callback;
+	    }
+	  }, {
+	    key: 'handleMessageEvent',
+	    value: function handleMessageEvent(message) {
+	      if (message.thread_id === this.state.page) {
+	        this.getOldMessages(message.thread_id, 55, 0);
+	      }
+	    }
+	  }, {
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
 	      var that = this;
 	      Bebo.User.getAsync("me").then(function (user) {
 	        that.setState({ me: user });
 	      });
+	      Bebo.onEvent(this.handleEventUpdate);
 	    }
 	  }, {
 	    key: 'navigate',
 	    value: function navigate(page, threadName) {
 	      threadName === threadName || "";
-	      this.setState({ page: page, threadName: threadName });
+
+	      var currentThread = [];
+	      if (page !== 'home') {
+	        this.getOldMessages(page, 50, 0);
+	        if (this.store[page]) {
+	          currentThread = this.store[page];
+	        }
+	      }
+	      this.setState({ page: page, threadName: threadName, currentThread: currentThread });
 	    }
 	  }, {
 	    key: 'render',
@@ -27170,7 +27230,7 @@
 	      if (this.state.page === "home") {
 	        return _react2.default.createElement(_roster2.default, { me: this.state.me, navigate: this.navigate });
 	      } else {
-	        return _react2.default.createElement(_dmThread2.default, { me: this.state.me, navigate: this.navigate, thread_id: this.state.page, threadName: this.state.threadName });
+	        return _react2.default.createElement(_dmThread2.default, { messages: this.state.currentThread, me: this.state.me, navigate: this.navigate, onPresenceEvent: this.onThreadPresenceEvent, thread_id: this.state.page, threadName: this.state.threadName });
 	      }
 	    }
 	  }]);
@@ -27222,16 +27282,15 @@
 	      maxCount: 50,
 	      scrolledPastFirstMessage: false,
 	      isScrolling: false,
-	      messages: [],
 	      unloadedMessages: [],
 	      usersTypingCount: 0
 	    };
 	    _this.usersTyping = {};
-	    _this.getOldMessages = _this.getOldMessages.bind(_this);
+	    // this.getOldMessages = this.getOldMessages.bind(this);
 	    _this.handleScroll = _this.handleScroll.bind(_this);
-	    _this.handleEventUpdate = _this.handleEventUpdate.bind(_this);
-	    _this.handleMessageEvent = _this.handleMessageEvent.bind(_this);
-	    _this.addNewMessages = _this.addNewMessages.bind(_this);
+	    // this.handleEventUpdate = this.handleEventUpdate.bind(this);
+	    // this.handleMessageEvent = this.handleMessageEvent.bind(this);
+	    // this.addNewMessages = this.addNewMessages.bind(this);
 	    _this.handlePresenceUpdates = _this.handlePresenceUpdates.bind(_this);
 	    _this.scrollChatToBottom = _this.scrollChatToBottom.bind(_this);
 	    _this.handleNewMessage = _this.handleNewMessage.bind(_this);
@@ -27247,22 +27306,9 @@
 	  _createClass(ChatList, [{
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
-	      this.getOldMessages();
-	      Bebo.onEvent(this.handleEventUpdate);
-	    }
-	  }, {
-	    key: 'getOldMessages',
-	    value: function getOldMessages() {
-	      var _this2 = this;
-
-	      Bebo.Db.get('dm_' + this.props.thread_id, { count: 50 }, function (err, data) {
-	        if (err) {
-	          console.log('error getting list');
-	          return;
-	        }
-	        var list = data.result.reverse();
-	        _this2.setState({ messages: list });
-	      });
+	      // this.props.getOldMessages(this.props.thread_id, 50, 0);
+	      // Bebo.onEvent(this.handleEventUpdate);
+	      this.props.onPresenceEvent(this.handlePresenceUpdates);
 	    }
 	  }, {
 	    key: 'handleScroll',
@@ -27278,41 +27324,47 @@
 	        this.scrollChatToBottom();
 	      }
 	    }
-	  }, {
-	    key: 'handleEventUpdate',
-	    value: function handleEventUpdate(data) {
-	      if (data.message) {
-	        this.handleMessageEvent(data.message);
-	      } else if (data.presence) {
-	        this.handlePresenceUpdates(data.presence);
-	      }
-	    }
-	  }, {
-	    key: 'handleMessageEvent',
-	    value: function handleMessageEvent(message) {
-	      if (!this.state.scrolledPastFirstMessage) {
-	        this.addNewMessages([message]);
-	        if (message.user_id === this.props.actingUser.user_id) {
-	          this.scrollChatToBottom();
-	        }
-	      } else {
-	        var messages = this.state.unloadedMessages;
-	        messages.push(message);
-	        this.setState({ unloadedMessages: messages });
-	      }
-	    }
-	  }, {
-	    key: 'addNewMessages',
-	    value: function addNewMessages(arr) {
-	      var messages = this.state.messages.concat(arr);
-	      this.setState({
-	        messages: messages,
-	        unloadedMessages: []
-	      });
-	    }
+
+	    // componentWillReceiveProps(nextProps) {
+	    //   if (nextProps.newMessages) {
+	    //     for (var i=0; i< nextProps.newMessages.length; i++) {
+	    //       var msg = nextProps.newMessages[i];
+	    //     }
+
+	    //   }
+	    // }
+
+	    // handleEventUpdate(data) {
+	    //   if (data.message) {
+	    //     this.handleMessageEvent(data.message);
+	    //   } else if (data.presence) {
+	    //     this.handlePresenceUpdates(data.presence);
+	    //   }
+	    // }
+
+	    // handleMessageEvent(message) {
+	    //   if (!this.state.scrolledPastFirstMessage) {
+	    //     this.addNewMessages([message]);
+	    //     if (message.user_id === this.props.actingUser.user_id) { this.scrollChatToBottom(); }
+	    //   } else {
+	    //     const messages = this.state.unloadedMessages;
+	    //     messages.push(message);
+	    //     this.setState({ unloadedMessages: messages });
+	    //   }
+	    // }
+
+	    // addNewMessages(arr) {
+	    //   const messages = this.state.messages.concat(arr);
+	    //   this.setState({
+	    //     messages,
+	    //     unloadedMessages: [],
+	    //   });
+	    // }
+
 	  }, {
 	    key: 'handlePresenceUpdates',
 	    value: function handlePresenceUpdates(user) {
+
 	      if (user.started_typing === this.props.actingUser.user_id || user.stopped_typing === this.props.actingUser.user_id) {
 	        return;
 	      }
@@ -27338,6 +27390,7 @@
 	  }, {
 	    key: 'scrollChatToBottom',
 	    value: function scrollChatToBottom() {
+
 	      if (this.state.unloadedMessages.length > 0) {
 	        this.addNewMessages(this.state.unloadedMessages);
 	      }
@@ -27400,14 +27453,14 @@
 	  }, {
 	    key: 'renderChatList',
 	    value: function renderChatList() {
-	      var _this3 = this;
+	      var _this2 = this;
 
-	      if (this.state.messages && this.state.messages.length > 0) {
+	      if (this.props.messages && this.props.messages.length > 0) {
 	        return _react2.default.createElement(
 	          'ul',
 	          { ref: 'chats', className: 'chat-list--inner--list' },
-	          this.state.messages.map(function (i) {
-	            return _react2.default.createElement(_chatItem2.default, { handleNewMessage: _this3.handleNewMessage, item: i, key: i.id });
+	          this.props.messages.map(function (i) {
+	            return _react2.default.createElement(_chatItem2.default, { handleNewMessage: _this2.handleNewMessage, item: i, key: i.id });
 	          })
 	        );
 	      }
@@ -27420,6 +27473,7 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
+
 	      var count = this.state.usersTypingCount;
 	      return _react2.default.createElement(
 	        'div',
@@ -41739,6 +41793,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _helper = __webpack_require__(284);
+
+	var _helper2 = _interopRequireDefault(_helper);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -41766,6 +41824,8 @@
 	    _this.stoppedTyping = _this.stoppedTyping.bind(_this);
 	    _this.resetTextarea = _this.resetTextarea.bind(_this);
 	    _this.handleActionGIF = _this.handleActionGIF.bind(_this);
+	    _this.broadcastChat = _this.broadcastChat.bind(_this);
+	    _this.handleSendChat = _this.handleSendChat.bind(_this);
 	    return _this;
 	  }
 
@@ -41837,7 +41897,7 @@
 	          username: this.props.actingUser.username,
 	          user_id: this.props.actingUser.user_id,
 	          message: text,
-	          users: []
+	          users: [_helper2.default.getPartnerFromThreadId(this.props.actingUser, this.props.thread_id)]
 	        };
 
 	        // TODO mention stuff in users[]
@@ -41854,6 +41914,17 @@
 	      this.setState({ messageText: '' });
 	    }
 	  }, {
+	    key: 'notifyUser',
+	    value: function notifyUser(users, msg) {
+	      // TODO: "send you 3 messages ( text ...);
+	      console.log('notifying user: ', users, msg);
+	      Bebo.Notification.users('⚡️' + this.props.actingUser.username + ': ', msg, users, { rate_limit_key: "test_" + (_.join(users, ":") + '_' + Math.floor(Date.now() / 1000 / 60 / 60)) }, function (err, data) {
+	        if (err) {
+	          console.error('error sending notification', err);
+	        }
+	      });
+	    }
+	  }, {
 	    key: 'broadcastChat',
 	    value: function broadcastChat(err, data) {
 	      if (err) {
@@ -41861,13 +41932,9 @@
 	        return;
 	      }
 	      var m = data.result[0];
-	      Bebo.Notification.broadcast('{{{user.username}}}:', m.message, { rate_limit_key: m.user_id + '_' + Math.floor(Date.now() / 1000 / 60 / 60) }, function (error, resp) {
-	        if (error) {
-	          return console.log('error sending notification', error);
-	        }
-	        return console.log('resp', resp); // an object containing success
-	      });
-	      Bebo.emitEvent({ message: m });
+	      this.notifyUser(m.users, m.message);
+	      console.log("message from db", m);
+	      Bebo.emitEvent({ message: { thread_id: this.props.thread_id, "newMsg": 1, "dm_id": m.id } });
 	      // TODO check if any user is in str
 	    }
 	  }, {
@@ -41946,6 +42013,89 @@
 
 /***/ },
 /* 284 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Helper = function () {
+	  function Helper() {
+	    _classCallCheck(this, Helper);
+	  }
+
+	  _createClass(Helper, null, [{
+	    key: 'isThisMyThreadId',
+	    value: function isThisMyThreadId(me, thread_id) {
+	      /*
+	        Accepts: 1 thread ID
+	        Returns: (boolean) true or false, do I have permission to view this thread ID
+	       */
+	      console.log('is this my thread id? ...');
+	      var first_user_id = thread_id.split('_')[0];
+	      var second_user_id = thread_id.split('_')[1];
+	      if (first_user_id === me.user_id || second_user_id === me.user_id) {
+	        console.log('this is my thread');
+	        return true;
+	      } else {
+	        console.log('this is not my thread');
+	        return false;
+	      }
+	    }
+	  }, {
+	    key: 'getPartnerFromThreadId',
+	    value: function getPartnerFromThreadId(me, thread_id) {
+	      var first_user_id = thread_id.split('_')[0];
+	      var second_user_id = thread_id.split('_')[1];
+	      if (first_user_id === me.user_id) {
+	        return second_user_id;
+	      } else {
+	        return first_user_id;
+	      }
+	    }
+	  }, {
+	    key: 'mkThreadId',
+	    value: function mkThreadId(me, to_user_id) {
+	      var from_user_id = me.user_id;
+	      /*
+	      Function: assemble thread ID
+	      Accepts: 2 user IDs ("from" user and "to" user)
+	      Returns: one thread ID, a merged combination of the 2 user IDs passed in
+	       WARNING IMPORTANT CRUCIAL PAY ATTENTION:
+	      This must *ALWAYS* be constructed by sorting ascending alphanumeric order (0-1A-Za-z).
+	      E.g., if users 818aldldf8a83819 and acczz6z555z are talking, the thread id would be '818aldldf8a83819_acczz6z555z'.
+	      To do otherwise will cause thread fragmentation. Kthx :)
+	       */
+	      /*
+	      Example: 
+	      ["405ec4d48ae14b2da1c7b461b59b2c62", "a060a8da26e546f9a590af38646d893e", "3ce12196cba745c4ae97e36f25dfb71e", "0f3ca38a2c3545e08dff9fa0d5e30d21", "b79293693a7f48228cf8972d6ee3d14d"]
+	      will become
+	      ["0f3ca38a2c3545e08dff9fa0d5e30d21", "3ce12196cba745c4ae97e36f25dfb71e", "405ec4d48ae14b2da1c7b461b59b2c62", "a060a8da26e546f9a590af38646d893e", "b79293693a7f48228cf8972d6ee3d14d"]
+	       */
+	      var users = new Array(from_user_id, to_user_id); // doesnt matter what order these are passed in, since were sorting
+	      users.sort(function (a, b) {
+	        if (a < b) return -1;
+	        if (a > b) return 1;
+	        return 0;
+	      });
+	      var thread_id = users[0] + "_" + users[1]; // ex result: 405ec4d48ae14b2da1c7b461b59b2c62_b79293693a7f48228cf8972d6ee3d14d
+	      return thread_id;
+	    }
+	  }]);
+
+	  return Helper;
+	}();
+
+	exports.default = Helper;
+
+/***/ },
+/* 285 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -41960,15 +42110,15 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _giphyGif = __webpack_require__(285);
+	var _giphyGif = __webpack_require__(286);
 
 	var _giphyGif2 = _interopRequireDefault(_giphyGif);
 
-	var _Fetch = __webpack_require__(286);
+	var _Fetch = __webpack_require__(287);
 
 	var _Fetch2 = _interopRequireDefault(_Fetch);
 
-	var _reactCluster = __webpack_require__(288);
+	var _reactCluster = __webpack_require__(289);
 
 	var _reactCluster2 = _interopRequireDefault(_reactCluster);
 
@@ -42224,7 +42374,7 @@
 	exports.default = GiphyBrowser;
 
 /***/ },
-/* 285 */
+/* 286 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -42342,7 +42492,7 @@
 	exports.default = GiphyGif;
 
 /***/ },
-/* 286 */
+/* 287 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -42357,7 +42507,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	__webpack_require__(287);
+	__webpack_require__(288);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -42423,7 +42573,7 @@
 	exports.default = Fetch;
 
 /***/ },
-/* 287 */
+/* 288 */
 /***/ function(module, exports) {
 
 	(function(self) {
@@ -42862,7 +43012,7 @@
 
 
 /***/ },
-/* 288 */
+/* 289 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function webpackUniversalModuleDefinition(root, factory) {
@@ -43205,7 +43355,7 @@
 	;
 
 /***/ },
-/* 289 */
+/* 290 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -43224,7 +43374,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _helper = __webpack_require__(290);
+	var _helper = __webpack_require__(284);
 
 	var _helper2 = _interopRequireDefault(_helper);
 
@@ -43447,89 +43597,6 @@
 	exports.default = Roster;
 
 /***/ },
-/* 290 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var Helper = function () {
-	  function Helper() {
-	    _classCallCheck(this, Helper);
-	  }
-
-	  _createClass(Helper, null, [{
-	    key: 'isThisMyThreadId',
-	    value: function isThisMyThreadId(me, thread_id) {
-	      /*
-	        Accepts: 1 thread ID
-	        Returns: (boolean) true or false, do I have permission to view this thread ID
-	       */
-	      console.log('is this my thread id? ...');
-	      first_user_id = thread_id.split('_')[0];
-	      second_user_id = thread_id.split('_')[1];
-	      if (first_user_id === me.user_id || second_user_id === me.user_id) {
-	        console.log('this is my thread');
-	        return true;
-	      } else {
-	        console.log('this is not my thread');
-	        return false;
-	      }
-	    }
-	  }, {
-	    key: 'getPartnerFromThreadId',
-	    value: function getPartnerFromThreadId(me, thread_id) {
-	      first_user_id = thread_id.split('_')[0];
-	      second_user_id = thread_id.split('_')[1];
-	      if (first_user_id === me.user_id) {
-	        return second_user_id;
-	      } else {
-	        return first_user_id;
-	      }
-	    }
-	  }, {
-	    key: 'mkThreadId',
-	    value: function mkThreadId(me, to_user_id) {
-	      var from_user_id = me.user_id;
-	      /*
-	      Function: assemble thread ID
-	      Accepts: 2 user IDs ("from" user and "to" user)
-	      Returns: one thread ID, a merged combination of the 2 user IDs passed in
-	       WARNING IMPORTANT CRUCIAL PAY ATTENTION:
-	      This must *ALWAYS* be constructed by sorting ascending alphanumeric order (0-1A-Za-z).
-	      E.g., if users 818aldldf8a83819 and acczz6z555z are talking, the thread id would be '818aldldf8a83819_acczz6z555z'.
-	      To do otherwise will cause thread fragmentation. Kthx :)
-	       */
-	      /*
-	      Example: 
-	      ["405ec4d48ae14b2da1c7b461b59b2c62", "a060a8da26e546f9a590af38646d893e", "3ce12196cba745c4ae97e36f25dfb71e", "0f3ca38a2c3545e08dff9fa0d5e30d21", "b79293693a7f48228cf8972d6ee3d14d"]
-	      will become
-	      ["0f3ca38a2c3545e08dff9fa0d5e30d21", "3ce12196cba745c4ae97e36f25dfb71e", "405ec4d48ae14b2da1c7b461b59b2c62", "a060a8da26e546f9a590af38646d893e", "b79293693a7f48228cf8972d6ee3d14d"]
-	       */
-	      var users = new Array(from_user_id, to_user_id); // doesnt matter what order these are passed in, since were sorting
-	      users.sort(function (a, b) {
-	        if (a < b) return -1;
-	        if (a > b) return 1;
-	        return 0;
-	      });
-	      var thread_id = users[0] + "_" + users[1]; // ex result: 405ec4d48ae14b2da1c7b461b59b2c62_b79293693a7f48228cf8972d6ee3d14d
-	      return thread_id;
-	    }
-	  }]);
-
-	  return Helper;
-	}();
-
-	exports.default = Helper;
-
-/***/ },
 /* 291 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -43650,7 +43717,7 @@
 
 	var _chatInput2 = _interopRequireDefault(_chatInput);
 
-	var _giphyBrowser = __webpack_require__(284);
+	var _giphyBrowser = __webpack_require__(285);
 
 	var _giphyBrowser2 = _interopRequireDefault(_giphyBrowser);
 
@@ -43726,13 +43793,13 @@
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'chat-upper', style: this.state.mode === 'gif' ? { transform: 'translate3d(40vw,0,0)' } : {} },
-	          _react2.default.createElement(_chatList2.default, { blurChat: this.blurInput, actingUser: this.props.me, threadId: this.props.thread_id }),
+	          _react2.default.createElement(_chatList2.default, { messages: this.props.messages, blurChat: this.blurInput, onPresenceEvent: this.props.onPresenceEvent, actingUser: this.props.me, thread_id: this.props.thread_id }),
 	          _react2.default.createElement(_chatBackground2.default, null)
 	        ),
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'chat-lower', style: this.state.mode === 'gif' ? { transform: 'translate3d(40vw,0,0)' } : {} },
-	          _react2.default.createElement(_chatInput2.default, { blurChat: this.state.blurInput, actingUser: this.props.me, switchMode: this.handleSwitchMode, setChatInputState: this.blurInput })
+	          _react2.default.createElement(_chatInput2.default, { blurChat: this.state.blurInput, actingUser: this.props.me, thread_id: this.props.thread_id, switchMode: this.handleSwitchMode, setChatInputState: this.blurInput })
 	        ),
 	        (giphyOpen || giphyClosing || this.state.mode === 'gif') && _react2.default.createElement(_giphyBrowser2.default, { style: giphyOpen ? { transform: 'translate3d(0,0,0)' } : {}, actingUser: this.state.actingUser, switchMode: this.handleSwitchMode })
 	      );

@@ -10,16 +10,15 @@ class ChatList extends React.Component {
       maxCount: 50,
       scrolledPastFirstMessage: false,
       isScrolling: false,
-      messages: [],
       unloadedMessages: [],
       usersTypingCount: 0,
     };
     this.usersTyping = {};
-    this.getOldMessages = this.getOldMessages.bind(this);
+    // this.getOldMessages = this.getOldMessages.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
-    this.handleEventUpdate = this.handleEventUpdate.bind(this);
-    this.handleMessageEvent = this.handleMessageEvent.bind(this);
-    this.addNewMessages = this.addNewMessages.bind(this);
+    // this.handleEventUpdate = this.handleEventUpdate.bind(this);
+    // this.handleMessageEvent = this.handleMessageEvent.bind(this);
+    // this.addNewMessages = this.addNewMessages.bind(this);
     this.handlePresenceUpdates = this.handlePresenceUpdates.bind(this);
     this.scrollChatToBottom = this.scrollChatToBottom.bind(this);
     this.handleNewMessage = this.handleNewMessage.bind(this);
@@ -32,19 +31,9 @@ class ChatList extends React.Component {
   }
 
   componentWillMount() {
-    this.getOldMessages();
-    Bebo.onEvent(this.handleEventUpdate);
-  }
-
-  getOldMessages() {
-    Bebo.Db.get('dm_' + this.props.thread_id, { count: 50 }, (err, data) => {
-      if (err) {
-        console.log('error getting list');
-        return;
-      }
-      const list = data.result.reverse();
-      this.setState({ messages: list });
-    });
+    // this.props.getOldMessages(this.props.thread_id, 50, 0);
+    // Bebo.onEvent(this.handleEventUpdate);
+    this.props.onPresenceEvent(this.handlePresenceUpdates);
   }
 
   handleScroll() {
@@ -60,35 +49,44 @@ class ChatList extends React.Component {
     }
   }
 
-  handleEventUpdate(data) {
-    if (data.message) {
-      this.handleMessageEvent(data.message);
-    } else if (data.presence) {
-      this.handlePresenceUpdates(data.presence);
-    }
-  }
+  // componentWillReceiveProps(nextProps) {
+  //   if (nextProps.newMessages) {
+  //     for (var i=0; i< nextProps.newMessages.length; i++) {
+  //       var msg = nextProps.newMessages[i];
+  //     }
 
-  handleMessageEvent(message) {
-    if (!this.state.scrolledPastFirstMessage) {
-      this.addNewMessages([message]);
-      if (message.user_id === this.props.actingUser.user_id) { this.scrollChatToBottom(); }
-    } else {
-      const messages = this.state.unloadedMessages;
-      messages.push(message);
-      this.setState({ unloadedMessages: messages });
-    }
-  }
+  //   }
+  // }
 
+  // handleEventUpdate(data) {
+  //   if (data.message) {
+  //     this.handleMessageEvent(data.message);
+  //   } else if (data.presence) {
+  //     this.handlePresenceUpdates(data.presence);
+  //   }
+  // }
 
-  addNewMessages(arr) {
-    const messages = this.state.messages.concat(arr);
-    this.setState({
-      messages,
-      unloadedMessages: [],
-    });
-  }
+  // handleMessageEvent(message) {
+  //   if (!this.state.scrolledPastFirstMessage) {
+  //     this.addNewMessages([message]);
+  //     if (message.user_id === this.props.actingUser.user_id) { this.scrollChatToBottom(); }
+  //   } else {
+  //     const messages = this.state.unloadedMessages;
+  //     messages.push(message);
+  //     this.setState({ unloadedMessages: messages });
+  //   }
+  // }
+
+  // addNewMessages(arr) {
+  //   const messages = this.state.messages.concat(arr);
+  //   this.setState({
+  //     messages,
+  //     unloadedMessages: [],
+  //   });
+  // }
 
   handlePresenceUpdates(user) {
+
     if (user.started_typing === this.props.actingUser.user_id || user.stopped_typing === this.props.actingUser.user_id) {
       return;
     }
@@ -105,11 +103,14 @@ class ChatList extends React.Component {
       this.updatePresence();
     }
   }
+
   updatePresence() {
     const usersTypingCount = Object.keys(this.usersTyping).length;
     this.setState({ usersTypingCount });
   }
+
   scrollChatToBottom() {
+
     if (this.state.unloadedMessages.length > 0) {
       this.addNewMessages(this.state.unloadedMessages);
     }
@@ -119,7 +120,6 @@ class ChatList extends React.Component {
       scrolledPastFirstMessage: false,
     });
   }
-
 
   handleNewMessage() {
     if (!this.state.scrolledPastFirstMessage) {
@@ -154,9 +154,9 @@ class ChatList extends React.Component {
   }
 
   renderChatList() {
-    if (this.state.messages && this.state.messages.length > 0) {
+    if (this.props.messages && this.props.messages.length > 0) {
       return (<ul ref="chats" className="chat-list--inner--list">
-        {this.state.messages.map((i) => <ChatItem handleNewMessage={this.handleNewMessage} item={i} key={i.id} />)}
+        {this.props.messages.map((i) => <ChatItem handleNewMessage={this.handleNewMessage} item={i} key={i.id} />)}
       </ul>);
     }
     return (<ul className="chat-list--inner--list">
@@ -165,6 +165,7 @@ class ChatList extends React.Component {
   }
 
   render() {
+
     const count = this.state.usersTypingCount;
     return (<div className="chat-list">
       {this.renderMessagesBadge()}

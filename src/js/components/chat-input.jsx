@@ -1,4 +1,5 @@
 import React from 'react';
+import Helper from '../helper.js';
 
 
 class ChatInput extends React.Component {
@@ -16,6 +17,8 @@ class ChatInput extends React.Component {
     this.stoppedTyping = this.stoppedTyping.bind(this);
     this.resetTextarea = this.resetTextarea.bind(this);
     this.handleActionGIF = this.handleActionGIF.bind(this);
+    this.broadcastChat = this.broadcastChat.bind(this);
+    this.handleSendChat = this.handleSendChat.bind(this);
   }
 
 
@@ -78,7 +81,7 @@ class ChatInput extends React.Component {
         username: this.props.actingUser.username,
         user_id: this.props.actingUser.user_id,
         message: text,
-        users: [],
+        users: [Helper.getPartnerFromThreadId(this.props.actingUser, this.props.thread_id)],
       };
 
       // TODO mention stuff in users[]
@@ -92,19 +95,30 @@ class ChatInput extends React.Component {
   resetTextarea() {
     this.setState({ messageText: '' });
   }
+
+  notifyUser(users, msg) {
+    // TODO: "send you 3 messages ( text ...);
+    console.log('notifying user: ', users, msg);
+    Bebo.Notification.users('⚡️' + this.props.actingUser.username + ': ',
+      msg,
+      users,
+      { rate_limit_key: "test_" + `${_.join(users, ":")}_${Math.floor(Date.now() / 1000 / 60 / 60)}` }
+      , function(err, data) {
+          if (err) {
+            console.error('error sending notification', err);
+          }
+      });
+  }
+
   broadcastChat(err, data) {
     if (err) {
       console.log('error', err);
       return;
     }
     const m = data.result[0];
-    Bebo.Notification.broadcast('{{{user.username}}}:', m.message, { rate_limit_key: `${m.user_id}_${Math.floor(Date.now() / 1000 / 60 / 60)}` }, (error, resp) => {
-      if (error) {
-        return console.log('error sending notification', error);
-      }
-      return console.log('resp', resp); // an object containing success
-    });
-    Bebo.emitEvent({ message: m });
+    this.notifyUser(m.users, m.message);
+    console.log("message from db", m);
+    Bebo.emitEvent({ message: {thread_id: this.props.thread_id, "newMsg": 1, "dm_id": m.id }});
     // TODO check if any user is in str
   }
 
