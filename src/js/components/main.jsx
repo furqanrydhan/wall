@@ -30,6 +30,7 @@ class App extends React.Component {
         console.log('error getting list');
         return;
       }
+      
       // TODO merge and sort
       const list = data.result.reverse();
       that.store[thread_id] = list;
@@ -60,7 +61,8 @@ class App extends React.Component {
 
   handleMessageEvent(message) {
     if (message.thread_id === this.state.page) {
-      this.getOldMessages(message.thread_id, 55, 0);
+      var count = Math.max(this.state.currentThread.length, 50) + 1;
+      this.getOldMessages(message.thread_id, count, 0);
     }
   }
   

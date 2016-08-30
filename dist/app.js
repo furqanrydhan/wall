@@ -27164,6 +27164,7 @@
 	          console.log('error getting list');
 	          return;
 	        }
+
 	        // TODO merge and sort
 	        var list = data.result.reverse();
 	        that.store[thread_id] = list;
@@ -27198,7 +27199,8 @@
 	    key: 'handleMessageEvent',
 	    value: function handleMessageEvent(message) {
 	      if (message.thread_id === this.state.page) {
-	        this.getOldMessages(message.thread_id, 55, 0);
+	        var count = Math.max(this.state.currentThread.length, 50) + 1;
+	        this.getOldMessages(message.thread_id, count, 0);
 	      }
 	    }
 	  }, {
@@ -27283,7 +27285,8 @@
 	      scrolledPastFirstMessage: false,
 	      isScrolling: false,
 	      unloadedMessages: [],
-	      usersTypingCount: 0
+	      usersTypingCount: 0,
+	      newMsgCnt: 0
 	    };
 	    _this.usersTyping = {};
 	    // this.getOldMessages = this.getOldMessages.bind(this);
@@ -27308,7 +27311,30 @@
 	    value: function componentWillMount() {
 	      // this.props.getOldMessages(this.props.thread_id, 50, 0);
 	      // Bebo.onEvent(this.handleEventUpdate);
+	      this.setState({ scrolledPastFirstMessage: false, newMsgCnt: 0 });
 	      this.props.onPresenceEvent(this.handlePresenceUpdates);
+	    }
+	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this.handleNewMessage();
+	    }
+	  }, {
+	    key: 'componentWillUpdate',
+	    value: function componentWillUpdate(prevProps, prevState) {
+	      // TODO: only look at messages not from me
+	      var newMsgCnt = prevProps.messages.length - this.props.messages.length;
+	      if (prevProps.messages.length > 0 && this.state.newMsgCnt !== newMsgCnt) {
+	        console.log("Setting newMsgCnt", prevProps.messages.length, this.props.messages.length);
+	        this.setState({ newMsgCnt: newMsgCnt });
+	      }
+	    }
+	  }, {
+	    key: 'componentDidUpdate',
+	    value: function componentDidUpdate(prevProps, prevState) {
+	      if (this.state.newMsgCnt > 0) {
+	        this.handleNewMessage();
+	      }
 	    }
 	  }, {
 	    key: 'handleScroll',
@@ -27319,7 +27345,7 @@
 	      var diff = list.scrollHeight - list.offsetHeight - item.clientHeight;
 
 	      if (list.scrollTop <= diff && !this.state.scrolledPastFirstMessage) {
-	        this.setState({ scrolledPastFirstMessage: true });
+	        this.setState({ scrolledPastFirstMessage: true, newMsgCnt: 0 });
 	      } else if (list.scrollTop >= diff && this.state.scrolledPastFirstMessage) {
 	        this.scrollChatToBottom();
 	      }
@@ -27394,7 +27420,9 @@
 	      if (this.state.unloadedMessages.length > 0) {
 	        this.addNewMessages(this.state.unloadedMessages);
 	      }
-	      this.refs.chatListInner.scrollTop = this.refs.chatListInner.scrollHeight;
+	      if (this.refs.chatListInner) {
+	        this.refs.chatListInner.scrollTop = this.refs.chatListInner.scrollHeight;
+	      }
 
 	      this.setState({
 	        scrolledPastFirstMessage: false
@@ -27403,6 +27431,7 @@
 	  }, {
 	    key: 'handleNewMessage',
 	    value: function handleNewMessage() {
+	      console.log("scrolledPastFirstMessage", this.state.scrolledPastFirstMessage);
 	      if (!this.state.scrolledPastFirstMessage) {
 	        this.scrollChatToBottom();
 	      }
@@ -27423,14 +27452,14 @@
 	  }, {
 	    key: 'renderMessagesBadge',
 	    value: function renderMessagesBadge() {
-	      if (this.state.unloadedMessages.length > 0) {
+	      if (this.state.newMsgCnt > 0) {
 	        return _react2.default.createElement(
 	          'div',
 	          { className: 'chat-list--unseen-messages', onClick: this.scrollChatToBottom },
 	          _react2.default.createElement(
 	            'span',
 	            { className: 'chat-list--unseen-messages--text' },
-	            this.state.unloadedMessages.length + ' New Messages'
+	            this.state.newMsgCnt + ' New Messages'
 	          )
 	        );
 	      }
@@ -27562,7 +27591,7 @@
 	  }, {
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
-	      this.props.handleNewMessage();
+	      // this.props.handleNewMessage();
 	    }
 	  }, {
 	    key: 'handleImageLoaded',
@@ -43748,6 +43777,7 @@
 	    };
 	    _this.blurInput = _this.blurInput.bind(_this);
 	    _this.handleSwitchMode = _this.handleSwitchMode.bind(_this);
+	    _this.home = _this.home.bind(_this);
 	    return _this;
 	  }
 
@@ -43781,6 +43811,11 @@
 	      }
 	    }
 	  }, {
+	    key: 'home',
+	    value: function home() {
+	      this.props.navigate("home");
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var giphyOpen = this.state.open === true;
@@ -43790,8 +43825,21 @@
 	        { className: 'chat' },
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'chat-thread-name' },
-	          this.props.threadName
+	          { className: 'chat-header' },
+	          _react2.default.createElement(
+	            'div',
+	            { onClick: this.home },
+	            _react2.default.createElement(
+	              'b',
+	              null,
+	              '<'
+	            )
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'chat-thread-name' },
+	            this.props.threadName
+	          )
 	        ),
 	        _react2.default.createElement(
 	          'div',

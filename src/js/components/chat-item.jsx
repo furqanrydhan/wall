@@ -25,7 +25,7 @@ class ChatItem extends React.Component {
   }
 
   componentDidMount() {
-    this.props.handleNewMessage();
+    // this.props.handleNewMessage();
   }
 
   handleImageLoaded() {

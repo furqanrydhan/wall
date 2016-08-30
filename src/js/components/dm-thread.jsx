@@ -16,6 +16,7 @@ class Thread extends React.Component {
     };
     this.blurInput = this.blurInput.bind(this);
     this.handleSwitchMode = this.handleSwitchMode.bind(this);
+    this.home = this.home.bind(this);
   }
 
   componentWillMount() {
@@ -42,12 +43,18 @@ class Thread extends React.Component {
       });
     }
   }
+  home() {
+    this.props.navigate("home");
+  }
 
   render() {
     const giphyOpen = this.state.open === true;
     const giphyClosing = this.state.closing === true;
     return (<div className="chat">
-      <div className="chat-thread-name">{this.props.threadName}</div>
+      <div className="chat-header">
+        <div onClick={this.home} ><b>&lt;</b></div>
+        <div className="chat-thread-name">{this.props.threadName}</div>
+      </div>
       <div className="chat-upper" style={this.state.mode === 'gif' ? { transform: 'translate3d(40vw,0,0)' } : {}}>
         <ChatList messages = {this.props.messages} blurChat={this.blurInput} onPresenceEvent={this.props.onPresenceEvent} actingUser={this.props.me} thread_id={this.props.thread_id} />
         <ChatBackground />

@@ -12,6 +12,7 @@ class ChatList extends React.Component {
       isScrolling: false,
       unloadedMessages: [],
       usersTypingCount: 0,
+      newMsgCnt: 0,
     };
     this.usersTyping = {};
     // this.getOldMessages = this.getOldMessages.bind(this);
@@ -33,7 +34,27 @@ class ChatList extends React.Component {
   componentWillMount() {
     // this.props.getOldMessages(this.props.thread_id, 50, 0);
     // Bebo.onEvent(this.handleEventUpdate);
+    this.setState({scrolledPastFirstMessage: false, newMsgCnt: 0});
     this.props.onPresenceEvent(this.handlePresenceUpdates);
+  }
+
+  componentDidMount() {
+    this.handleNewMessage();
+  }
+
+  componentWillUpdate(prevProps, prevState) {
+    // TODO: only look at messages not from me
+    var newMsgCnt = prevProps.messages.length - this.props.messages.length;
+    if (prevProps.messages.length > 0 && this.state.newMsgCnt !== newMsgCnt) {
+      console.log("Setting newMsgCnt", prevProps.messages.length, this.props.messages.length);
+      this.setState({newMsgCnt: newMsgCnt});
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.newMsgCnt > 0) {
+      this.handleNewMessage();
+    }
   }
 
   handleScroll() {
@@ -43,7 +64,7 @@ class ChatList extends React.Component {
     const diff = list.scrollHeight - list.offsetHeight - item.clientHeight;
 
     if (list.scrollTop <= diff && !this.state.scrolledPastFirstMessage) {
-      this.setState({ scrolledPastFirstMessage: true });
+      this.setState({ scrolledPastFirstMessage: true , newMsgCnt: 0});
     } else if (list.scrollTop >= diff && this.state.scrolledPastFirstMessage) {
       this.scrollChatToBottom();
     }
@@ -114,7 +135,9 @@ class ChatList extends React.Component {
     if (this.state.unloadedMessages.length > 0) {
       this.addNewMessages(this.state.unloadedMessages);
     }
-    this.refs.chatListInner.scrollTop = this.refs.chatListInner.scrollHeight;
+    if (this.refs.chatListInner) {
+      this.refs.chatListInner.scrollTop = this.refs.chatListInner.scrollHeight;
+    }
 
     this.setState({
       scrolledPastFirstMessage: false,
@@ -122,6 +145,7 @@ class ChatList extends React.Component {
   }
 
   handleNewMessage() {
+    console.log("scrolledPastFirstMessage", this.state.scrolledPastFirstMessage);
     if (!this.state.scrolledPastFirstMessage) {
       this.scrollChatToBottom();
     }
@@ -138,9 +162,9 @@ class ChatList extends React.Component {
   }
 
   renderMessagesBadge() {
-    if (this.state.unloadedMessages.length > 0) {
+    if (this.state.newMsgCnt > 0) {
       return (<div className="chat-list--unseen-messages" onClick={this.scrollChatToBottom}>
-        <span className="chat-list--unseen-messages--text">{`${this.state.unloadedMessages.length} New Messages`}</span>
+        <span className="chat-list--unseen-messages--text">{`${this.state.newMsgCnt} New Messages`}</span>
       </div>);
     }
     return null;
