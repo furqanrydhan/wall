@@ -12,43 +12,40 @@ class Roster extends React.Component {
       online: [],
       offline: [],
     };
-    this.poll = this.poll.bind(this);
+    this.viewerUpdate= this.viewerUpdate.bind(this);
     this.componentWillMount = this.componentWillMount.bind(this);
+    Bebo.onViewerUpdate(this.viewerUpdate);
   }
 
-  poll() {
-    var that = this;
-    Bebo.getStreamFullAsync()
-      .then(function(stream) {
-        var resync = false;
-        var rosterList = _.values(that.roster);
-        var l = rosterList.length;
-        for (var i=0; i< l; i++) {
-          rosterList[i].online = false;
-        }
-        var roster = that.roster;
-        var l = stream.viewer_ids.length;
-        for (var i=0; i< l; i++) {
-          var viewer_id = stream.viewer_ids[i];
-          if (viewer_id === that.props.me.user_id) {
-            continue;
-          } else if (roster[viewer_id]) {
-            roster[viewer_id].online = true;
-          } else {
-            resync = true;
-          }
-        }
-        var online = _.filter(_.values(roster), {online: true});
-        var offline = _.filter(_.values(roster), {online: false});
-        that.setState({online: online,
-                       offline: offline});
-        if (resync === true) {
-          if (that.pollTimer) {
-            clearInterval(that.pollTimer);
-          }
-          _.defer(that.componentWillMount);
-        }
-      });
+  viewerUpdate(viewer_ids) {
+    var resync = false;
+    var rosterList = _.values(this.roster);
+    var l = rosterList.length;
+    for (var i=0; i< l; i++) {
+      rosterList[i].online = false;
+    }
+    var roster = this.roster;
+    var l = viewer_ids.length;
+    for (var i=0; i< l; i++) {
+      var viewer_id = viewer_ids[i];
+      if (viewer_id === this.props.me.user_id) {
+        continue;
+      } else if (roster[viewer_id]) {
+        roster[viewer_id].online = true;
+      } else {
+        resync = true;
+      }
+    }
+    var online = _.filter(_.values(roster), {online: true});
+    var offline = _.filter(_.values(roster), {online: false});
+    this.setState({online: online,
+                   offline: offline});
+    if (resync === true) {
+      if (this.pollTimer) {
+        clearInterval(this.pollTimer);
+      }
+      _.defer(this.componentWillMount);
+    }
   }
 
   componentWillMount() {
