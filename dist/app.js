@@ -41840,6 +41840,9 @@
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {
+	      if (nextProps.blurChat === this.props.blurChat) {
+	        return;
+	      }
 	      if (nextProps.blurChat) {
 	        this.refs.textarea.blur();
 	      } else if (!nextProps.blurChat) {
