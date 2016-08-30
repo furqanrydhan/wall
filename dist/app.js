@@ -27322,7 +27322,6 @@
 	  }, {
 	    key: 'componentWillUpdate',
 	    value: function componentWillUpdate(prevProps, prevState) {
-	      // TODO: only look at messages not from me
 	      var newMsgCnt = prevProps.messages.length - this.props.messages.length;
 	      if (prevProps.messages.length > 0 && this.state.newMsgCnt !== newMsgCnt) {
 	        console.log("Setting newMsgCnt", prevProps.messages.length, this.props.messages.length);
