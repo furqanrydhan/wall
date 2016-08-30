@@ -27,7 +27,7 @@ class Helper {
     }
   }
 
-  static assembleThreadId(me, to_user_id) {
+  static mkThreadId(me, to_user_id) {
     var from_user_id = me.user_id;
     /*
     Function: assemble thread ID

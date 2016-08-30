@@ -57,8 +57,17 @@
 
 	  Bebo.onReady(function () {
 	    Bebo.User.getAsync = Promise.promisify(Bebo.User.get);
-	    Bebo.getRosterAsync = Promise.promisify(Bebo.getRoster);
-	    Bebo.getStreamFullAsync = Promise.promisify(Bebo.getStreamFull);
+	    Bebo.getRosterAsync = Bebo.getStreamFullAsync = Promise.promisify(Bebo.getStreamFull);
+	    var getRosterAsync = Promise.promisify(Bebo.getRoster);
+	    Bebo.getRosterAsync = function () {
+	      return getRosterAsync().then(function (json) {
+	        if (json.code != 200) {
+	          throw new Error("Not 200");
+	        } else {
+	          return json.result;
+	        }
+	      });
+	    };
 	    App.init();
 	  });
 	});
@@ -27112,7 +27121,7 @@
 
 	var _roster2 = _interopRequireDefault(_roster);
 
-	var _dmThread = __webpack_require__(291);
+	var _dmThread = __webpack_require__(292);
 
 	var _dmThread2 = _interopRequireDefault(_dmThread);
 
@@ -43212,6 +43221,10 @@
 
 	var _helper2 = _interopRequireDefault(_helper);
 
+	var _rosterItem = __webpack_require__(291);
+
+	var _rosterItem2 = _interopRequireDefault(_rosterItem);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -43230,7 +43243,9 @@
 
 	    _this.state = {
 	      page: "home",
-	      actingUser: {}
+	      me: {},
+	      online: [],
+	      offline: []
 	    };
 	    return _this;
 	  }
@@ -43238,46 +43253,108 @@
 	  _createClass(Roster, [{
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
+	      console.log("Roster.componentWillMount");
 	      var that = this;
-	      var props = { me: Bebo.User.getAsync,
-	        roster: Bebo.getRosterAsync,
-	        stream: Bebo.getStreamFullAsync };
-	      _bluebird2.default.props(props, function (props) {
+	      var props = { me: Bebo.User.getAsync("me"),
+	        roster: Bebo.getRosterAsync(),
+	        stream: Bebo.getStreamFullAsync() };
+	      _bluebird2.default.props(props).then(function (data) {
+	        console.log("Roster.componentWillMount - got data", data);
 	        // var online = new Set(stream.viewer_ids);
 	        var roster = {};
-	        var l = props.roster.length;
+	        var l = data.roster.length;
 	        for (var i = 0; i < l; i++) {
-	          var user = props.roster[i];
+	          var user = data.roster[i];
 	          user.online = false;
 	          roster[user.user_id] = user;
+	          roster[user.user_id].thread_id = _helper2.default.mkThreadId(props.me, user.user_id);
 	        }
-	        l = props.stream.viewer_ids.length;
+	        l = data.stream.viewer_ids.length;
 	        for (var i = 0; i < l; i++) {
-	          var viewer_id = props.stream.viewer_ids[i];
+	          var viewer_id = data.stream.viewer_ids[i];
 	          roster[viewer_id].online = true;
 	        }
+	        delete roster[data.me.user_id];
 	        that.roster = roster;
-	        that.roster[props.me.user_id].is_self = true;
 	        var online = _.filter(_.values(roster), { online: true });
 	        var offline = _.filter(_.values(roster), { online: false });
-	        that.setState({ actingUser: props.me,
+	        that.setState({ me: data.me,
 	          online: online,
-	          offine: offline });
+	          offline: offline });
 	      });
 	    }
 	  }, {
 	    key: 'renderOnline',
 	    value: function renderOnline() {
 	      return this.state.online.map(function (i) {
-	        return _react2.default.createElement(RosterItem, { unread: i.unread, thread_id: i.thread_id, image_url: i.thread_id, online: i.online, username: i.username });
+	        return _react2.default.createElement(_rosterItem2.default, { key: i.thread_id, unread: i.unread, thread_id: i.thread_id, image_url: i.image_url, online: i.online, username: i.username });
 	      });
 	    }
 	  }, {
 	    key: 'renderOffline',
 	    value: function renderOffline() {
 	      return this.state.offline.map(function (i) {
-	        return _react2.default.createElement(RosterItem, { unread: i.unread, thread_id: i.thread_id, image_url: i.thread_id, online: i.online, username: i.username });
+	        return _react2.default.createElement(_rosterItem2.default, { key: i.thread_id, unread: i.unread, thread_id: i.thread_id, image_url: i.image_url, online: i.online, username: i.username });
 	      });
+	    }
+	  }, {
+	    key: 'onUserNameChange',
+	    value: function onUserNameChange(e) {
+	      console.log("FIXME - username changed", e);
+	    }
+	  }, {
+	    key: 'renderMe',
+	    value: function renderMe() {
+	      if (!this.state.me || !this.state.me.user_id) {
+	        return _react2.default.createElement(
+	          'div',
+	          { className: 'roster-me' },
+	          _react2.default.createElement('div', { className: 'roster-list-item--settings' }),
+	          _react2.default.createElement(
+	            'span',
+	            { className: 'edit-settings edit' },
+	            _react2.default.createElement('img', { src: 'assets/img/settings.svg', className: 'edit-icon' }),
+	            _react2.default.createElement('img', { src: 'assets/img/ok.svg', className: 'save-icon' })
+	          )
+	        );
+	      }
+
+	      var username = "";
+	      var username = _react2.default.createElement(
+	        'span',
+	        { className: 'roster-list-item--user--name' },
+	        this.state.me.username,
+	        ' ',
+	        _react2.default.createElement('span', { className: 'circle' })
+	      );
+	      if (this.state.editUsername) {
+	        username = _react2.default.createElement(
+	          'span',
+	          { className: 'roster-list-item--user--name' },
+	          _react2.default.createElement('input', { type: 'text', className: 'roster-list-item--user--name--edit', name: 'username', value: this.state.me.username, onChange: this.onUserNameChange })
+	        );
+	      }
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'roster-me' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'roster-list-item--image' },
+	          _react2.default.createElement('img', { src: this.state.me.image_url })
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'roster-list-item--user' },
+	          username
+	        ),
+	        _react2.default.createElement('div', { className: 'roster-list-item--settings' }),
+	        _react2.default.createElement(
+	          'span',
+	          { className: 'edit-settings edit' },
+	          _react2.default.createElement('img', { src: 'assets/img/settings.svg', className: 'edit-icon' }),
+	          _react2.default.createElement('img', { src: 'assets/img/ok.svg', className: 'save-icon' })
+	        )
+	      );
 	    }
 	  }, {
 	    key: 'render',
@@ -43285,16 +43362,7 @@
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'roster' },
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'roster-me' },
-	          _react2.default.createElement(
-	            'span',
-	            { className: 'edit-settings edit' },
-	            _react2.default.createElement('img', { src: 'assets/img/settings.svg', className: 'edit-icon' }),
-	            _react2.default.createElement('img', { src: 'assets/img/ok.svg', className: 'save-icon' })
-	          )
-	        ),
+	        this.renderMe(),
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'roster-header roster-online-header' },
@@ -43377,8 +43445,8 @@
 	      }
 	    }
 	  }, {
-	    key: 'assembleThreadId',
-	    value: function assembleThreadId(me, to_user_id) {
+	    key: 'mkThreadId',
+	    value: function mkThreadId(me, to_user_id) {
 	      var from_user_id = me.user_id;
 	      /*
 	      Function: assemble thread ID
@@ -43413,6 +43481,93 @@
 
 /***/ },
 /* 291 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(5);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var RosterItem = function (_React$Component) {
+	  _inherits(RosterItem, _React$Component);
+
+	  function RosterItem() {
+	    _classCallCheck(this, RosterItem);
+
+	    var _this = _possibleConstructorReturn(this, (RosterItem.__proto__ || Object.getPrototypeOf(RosterItem)).call(this));
+
+	    _this.state = {};
+	    return _this;
+	  }
+
+	  _createClass(RosterItem, [{
+	    key: "render",
+	    value: function render() {
+
+	      var badge = _react2.default.createElement(
+	        "div",
+	        { className: "roster-list-item--user--chat-badge" },
+	        _react2.default.createElement("img", { src: "assets/img/icDM.png" })
+	      );
+	      if (this.props.unread) {
+	        badge = _react2.default.createElement(
+	          "div",
+	          { className: "roster-list-item--user--chat-badge unread-badge" },
+	          "1"
+	        );
+	      }
+	      var widget = "";
+	      var online = "";
+	      if (this.props.online) {
+	        online = _react2.default.createElement("span", { className: "circle" });
+	      }
+	      return _react2.default.createElement(
+	        "div",
+	        { className: "roster-list-item roster-list-item--content", "data-thread-id": this.props.thread_id },
+	        _react2.default.createElement(
+	          "div",
+	          { className: "roster-list-item--image" },
+	          _react2.default.createElement("img", { src: this.props.image_url })
+	        ),
+	        _react2.default.createElement(
+	          "div",
+	          { className: "roster-list-item--user" },
+	          _react2.default.createElement(
+	            "span",
+	            { className: "roster-list-item--user--name" },
+	            this.props.username,
+	            " ",
+	            online
+	          ),
+	          _react2.default.createElement("span", { className: "roster-list-item--user--desc" })
+	        ),
+	        badge
+	      );
+	    }
+	  }]);
+
+	  return RosterItem;
+	}(_react2.default.Component);
+
+	exports.default = RosterItem;
+
+/***/ },
+/* 292 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
