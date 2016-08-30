@@ -15,7 +15,6 @@ class ChatList extends React.Component {
       usersTypingCount: 0,
     };
     this.usersTyping = {};
-
     this.getOldMessages = this.getOldMessages.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
     this.handleEventUpdate = this.handleEventUpdate.bind(this);
@@ -38,7 +37,7 @@ class ChatList extends React.Component {
   }
 
   getOldMessages() {
-    Bebo.Db.get('messages', { count: 50 }, (err, data) => {
+    Bebo.Db.get('dm_' + this.props.thread_id, { count: 50 }, (err, data) => {
       if (err) {
         console.log('error getting list');
         return;

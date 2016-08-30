@@ -12,15 +12,30 @@ class App extends React.Component {
     super();
     this.state = {
       page: "home",
-      actingUser: {},
+      me: {},
+      threadName: "",
     };
+    this.navigate = this.navigate.bind(this);
+  }
+  
+  componentWillMount() {
+    var that = this;
+    Bebo.User.getAsync("me")
+      .then(function(user) {
+        that.setState({me: user});
+      });
+  }
+
+  navigate(page, threadName) {
+    threadName === threadName || "";
+    this.setState({page: page, threadName: threadName});
   }
 
   render() {
     if (this.state.page === "home") {
-      return <Roster navigate={this.navigate} ></Roster>
+      return <Roster me={this.state.me} navigate={this.navigate} ></Roster>
     } else {
-      return <DirectMessageThread thread_id={this.state.thread_id}/>
+      return <DirectMessageThread me={this.state.me} navigate={this.navigate} thread_id={this.state.page} threadName={this.state.threadName}/>
     }
   }
 }

@@ -9,11 +9,11 @@ class Roster extends React.Component {
     super();
     this.state = {
       page: "home",
-      me: {},
       online: [],
       offline: [],
     };
-    this.poll = _.bind(this.poll, this);
+    this.poll = this.poll.bind(this);
+    this.componentWillMount = this.componentWillMount.bind(this);
   }
 
   poll() {
@@ -30,7 +30,7 @@ class Roster extends React.Component {
         var l = stream.viewer_ids.length;
         for (var i=0; i< l; i++) {
           var viewer_id = stream.viewer_ids[i];
-          if (viewer_id === that.state.me.user_id) {
+          if (viewer_id === that.props.me.user_id) {
             continue;
           } else if (roster[viewer_id]) {
             roster[viewer_id].online = true;
@@ -46,7 +46,7 @@ class Roster extends React.Component {
           if (that.pollTimer) {
             clearInterval(that.pollTimer);
           }
-          _.defer(that.componentWillMount.bind(that));
+          _.defer(that.componentWillMount);
         }
       });
   }
@@ -57,8 +57,7 @@ class Roster extends React.Component {
     // });
     console.log("Roster.componentWillMount");
     var that = this;
-    var props = { me: Bebo.User.getAsync("me"),
-                  roster: Bebo.getRosterAsync(),
+    var props = { roster: Bebo.getRosterAsync(),
                   stream: Bebo.getStreamFullAsync() };
     Promise.props(props)
       .then(function (data) {
@@ -70,19 +69,18 @@ class Roster extends React.Component {
         var user = data.roster[i];
         user.online = false;
         roster[user.user_id] = user;
-        roster[user.user_id].thread_id = Helper.mkThreadId(props.me, user.user_id);
+        roster[user.user_id].thread_id = Helper.mkThreadId(that.props.me, user.user_id);
       }
       l = data.stream.viewer_ids.length;
       for (var i=0; i< l; i++) {
         var viewer_id = data.stream.viewer_ids[i];
         roster[viewer_id].online = true;
       }
-      delete roster[data.me.user_id];
+      delete roster[that.props.me.user_id];
       that.roster = roster;
       var online = _.filter(_.values(roster), {online: true});
       var offline = _.filter(_.values(roster), {online: false});
-      that.setState({me: data.me,
-                     online: online,
+      that.setState({online: online,
                      offline: offline});
       that.pollTimer = setInterval(that.poll, 1000);
     });
@@ -90,21 +88,22 @@ class Roster extends React.Component {
 
   renderOnline() {
     return this.state.online.map(
-      (i) => <RosterItem key={i.thread_id} unread={i.unread} thread_id={i.thread_id} image_url={i.image_url} online={i.online} username={i.username}/>
+      (i) => <RosterItem key={i.thread_id} unread={i.unread} thread_id={i.thread_id} image_url={i.image_url} online={i.online} username={i.username} navigate={this.props.navigate}/>
     )
   }
 
   renderOffline() {
     return this.state.offline.map(
-      (i) => <RosterItem key={i.thread_id} unread={i.unread} thread_id={i.thread_id} image_url={i.image_url} online={i.online} username={i.username}/>
+      (i) => <RosterItem key={i.thread_id} unread={i.unread} thread_id={i.thread_id} image_url={i.image_url} online={i.online} username={i.username} navigate={this.props.navigate}/>
     )
   }
 
   onUserNameChange(e) {
+    // FIXME
     console.log("FIXME - username changed", e);
   }
   renderMe() {
-    if (! this.state.me || ! this.state.me.user_id) {
+    if (! this.props.me || ! this.props.me.user_id) {
       return (
         <div className="roster-me">
           <div className="roster-list-item--settings"></div>
@@ -117,18 +116,18 @@ class Roster extends React.Component {
     }
 
     var username = "";
-    var username = <span className="roster-list-item--user--name">{this.state.me.username} <span className="circle"></span></span>;
+    var username = <span className="roster-list-item--user--name">{this.props.me.username} <span className="circle"></span></span>;
     if (this.state.editUsername) {
       username = (
         <span className="roster-list-item--user--name">
-          <input type="text" className="roster-list-item--user--name--edit" name="username" value={this.state.me.username} onChange={this.onUserNameChange}/>
+          <input type="text" className="roster-list-item--user--name--edit" name="username" value={this.props.me.username} onChange={this.onUserNameChange}/>
         </span>
       )
     }
     return (
       <div className="roster-me">
         <div className="roster-list-item--image">
-          <img src={this.state.me.image_url}/>
+          <img src={this.props.me.image_url}/>
         </div>
         <div className="roster-list-item--user">
           {username}

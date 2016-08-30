@@ -8,7 +8,6 @@ class ChatInput extends React.Component {
     this.state = {
       messageText: '',
       isTyping: false,
-      user: null,
     };
     this.handleInputFocus = this.handleInputFocus.bind(this);
     this.handleInputBlur = this.handleInputBlur.bind(this);
@@ -21,10 +20,6 @@ class ChatInput extends React.Component {
 
 
   componentWillMount() {
-    // do a get on -> http://api.giphy.com/v1/gifs/trending?api_key=dc6zaTOxFJmzCZ
-    Bebo.User.getUser('me', (err, data) => {
-      this.setState({ user: data });
-    });
   }
 
   componentDidMount() {
@@ -54,9 +49,9 @@ class ChatInput extends React.Component {
     clearTimeout(this.isTypingTimeout);
     if (!this.state.isTyping) {
       this.setState({ isTyping: true });
-      Bebo.emitEvent({ presence: { started_typing: this.state.user.user_id } });
+      Bebo.emitEvent({ presence: { started_typing: this.props.actingUser.user_id, thread_id: this.props.thread_id} });
       this.typingInterval = setInterval(() => {
-        Bebo.emitEvent({ presence: { started_typing: this.state.user.user_id } });
+        Bebo.emitEvent({ presence: { started_typing: this.props.actingUser.user_id , thread_id: this.props.thread_id} });
       }, 3000);
     }
     this.isTypingTimeout = setTimeout(this.stoppedTyping, 3000);
@@ -69,7 +64,7 @@ class ChatInput extends React.Component {
 
   stoppedTyping() {
     clearInterval(this.typingInterval);
-    Bebo.emitEvent({ presence: { stopped_typing: this.state.user.user_id } });
+    Bebo.emitEvent({ presence: { stopped_typing: this.props.actingUser.user_id, thread_id: this.props.thread_id} });
     this.setState({ isTyping: false });
   }
 
@@ -80,15 +75,15 @@ class ChatInput extends React.Component {
     if (text.length > 0) {
       const message = {
         type: 'message',
-        username: this.state.user.username,
-        user_id: this.state.user.user_id,
+        username: this.props.actingUser.username,
+        user_id: this.props.actingUser.user_id,
         message: text,
         users: [],
       };
 
       // TODO mention stuff in users[]
 
-      Bebo.Db.save('messages', message, this.broadcastChat);
+      Bebo.Db.save('dm_' + this.props.thread_id, message, this.broadcastChat);
       this.resetTextarea();
     } else {
       console.warn('no message, returning');

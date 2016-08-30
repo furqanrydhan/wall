@@ -8,6 +8,11 @@ class RosterItem extends React.Component {
     };
   }
 
+  navigate(e) {
+    console.log("Nav", e);
+    this.props.navigate(e.currentTarget.dataset.threadId, e.currentTarget.dataset.userName);
+  }
+
   render() {
 
     var badge = <div className="roster-list-item--user--chat-badge"><img src="assets/img/icDM.png"/></div>;
@@ -20,7 +25,7 @@ class RosterItem extends React.Component {
       online = <span className="circle"></span>;
     }
     return (
-      <div className="roster-list-item roster-list-item--content" data-thread-id={this.props.thread_id}>
+      <div className="roster-list-item roster-list-item--content" data-user-name={this.props.username} data-thread-id={this.props.thread_id} onClick={this.navigate.bind(this)}>
         <div className="roster-list-item--image">
           <img src={this.props.image_url}/>
         </div>
@@ -32,6 +37,5 @@ class RosterItem extends React.Component {
       </div>
     )
   }
-
 }
 export default RosterItem;

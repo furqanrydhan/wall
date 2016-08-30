@@ -27143,18 +27143,34 @@
 
 	    _this.state = {
 	      page: "home",
-	      actingUser: {}
+	      me: {},
+	      threadName: ""
 	    };
+	    _this.navigate = _this.navigate.bind(_this);
 	    return _this;
 	  }
 
 	  _createClass(App, [{
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      var that = this;
+	      Bebo.User.getAsync("me").then(function (user) {
+	        that.setState({ me: user });
+	      });
+	    }
+	  }, {
+	    key: 'navigate',
+	    value: function navigate(page, threadName) {
+	      threadName === threadName || "";
+	      this.setState({ page: page, threadName: threadName });
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      if (this.state.page === "home") {
-	        return _react2.default.createElement(_roster2.default, { navigate: this.navigate });
+	        return _react2.default.createElement(_roster2.default, { me: this.state.me, navigate: this.navigate });
 	      } else {
-	        return _react2.default.createElement(_dmThread2.default, { thread_id: this.state.thread_id });
+	        return _react2.default.createElement(_dmThread2.default, { me: this.state.me, navigate: this.navigate, thread_id: this.state.page, threadName: this.state.threadName });
 	      }
 	    }
 	  }]);
@@ -27211,7 +27227,6 @@
 	      usersTypingCount: 0
 	    };
 	    _this.usersTyping = {};
-
 	    _this.getOldMessages = _this.getOldMessages.bind(_this);
 	    _this.handleScroll = _this.handleScroll.bind(_this);
 	    _this.handleEventUpdate = _this.handleEventUpdate.bind(_this);
@@ -27240,7 +27255,7 @@
 	    value: function getOldMessages() {
 	      var _this2 = this;
 
-	      Bebo.Db.get('messages', { count: 50 }, function (err, data) {
+	      Bebo.Db.get('dm_' + this.props.thread_id, { count: 50 }, function (err, data) {
 	        if (err) {
 	          console.log('error getting list');
 	          return;
@@ -41742,8 +41757,7 @@
 
 	    _this.state = {
 	      messageText: '',
-	      isTyping: false,
-	      user: null
+	      isTyping: false
 	    };
 	    _this.handleInputFocus = _this.handleInputFocus.bind(_this);
 	    _this.handleInputBlur = _this.handleInputBlur.bind(_this);
@@ -41757,14 +41771,7 @@
 
 	  _createClass(ChatInput, [{
 	    key: 'componentWillMount',
-	    value: function componentWillMount() {
-	      var _this2 = this;
-
-	      // do a get on -> http://api.giphy.com/v1/gifs/trending?api_key=dc6zaTOxFJmzCZ
-	      Bebo.User.getUser('me', function (err, data) {
-	        _this2.setState({ user: data });
-	      });
-	    }
+	    value: function componentWillMount() {}
 	  }, {
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
@@ -41795,20 +41802,20 @@
 	  }, {
 	    key: 'handleInputChange',
 	    value: function handleInputChange(e) {
-	      var _this3 = this;
+	      var _this2 = this;
 
 	      clearTimeout(this.isTypingTimeout);
 	      if (!this.state.isTyping) {
 	        this.setState({ isTyping: true });
-	        Bebo.emitEvent({ presence: { started_typing: this.state.user.user_id } });
+	        Bebo.emitEvent({ presence: { started_typing: this.props.actingUser.user_id, thread_id: this.props.thread_id } });
 	        this.typingInterval = setInterval(function () {
-	          Bebo.emitEvent({ presence: { started_typing: _this3.state.user.user_id } });
+	          Bebo.emitEvent({ presence: { started_typing: _this2.props.actingUser.user_id, thread_id: _this2.props.thread_id } });
 	        }, 3000);
 	      }
 	      this.isTypingTimeout = setTimeout(this.stoppedTyping, 3000);
 	      this.setState({ messageText: e.target.value }, function () {
-	        if (_this3.state.messageText.length === 0) {
-	          _this3.stoppedTyping();
+	        if (_this2.state.messageText.length === 0) {
+	          _this2.stoppedTyping();
 	        }
 	      });
 	    }
@@ -41816,7 +41823,7 @@
 	    key: 'stoppedTyping',
 	    value: function stoppedTyping() {
 	      clearInterval(this.typingInterval);
-	      Bebo.emitEvent({ presence: { stopped_typing: this.state.user.user_id } });
+	      Bebo.emitEvent({ presence: { stopped_typing: this.props.actingUser.user_id, thread_id: this.props.thread_id } });
 	      this.setState({ isTyping: false });
 	    }
 	  }, {
@@ -41827,15 +41834,15 @@
 	      if (text.length > 0) {
 	        var message = {
 	          type: 'message',
-	          username: this.state.user.username,
-	          user_id: this.state.user.user_id,
+	          username: this.props.actingUser.username,
+	          user_id: this.props.actingUser.user_id,
 	          message: text,
 	          users: []
 	        };
 
 	        // TODO mention stuff in users[]
 
-	        Bebo.Db.save('messages', message, this.broadcastChat);
+	        Bebo.Db.save('dm_' + this.props.thread_id, message, this.broadcastChat);
 	        this.resetTextarea();
 	      } else {
 	        console.warn('no message, returning');
@@ -43243,11 +43250,11 @@
 
 	    _this.state = {
 	      page: "home",
-	      me: {},
 	      online: [],
 	      offline: []
 	    };
-	    _this.poll = _.bind(_this.poll, _this);
+	    _this.poll = _this.poll.bind(_this);
+	    _this.componentWillMount = _this.componentWillMount.bind(_this);
 	    return _this;
 	  }
 
@@ -43266,7 +43273,7 @@
 	        var l = stream.viewer_ids.length;
 	        for (var i = 0; i < l; i++) {
 	          var viewer_id = stream.viewer_ids[i];
-	          if (viewer_id === that.state.me.user_id) {
+	          if (viewer_id === that.props.me.user_id) {
 	            continue;
 	          } else if (roster[viewer_id]) {
 	            roster[viewer_id].online = true;
@@ -43282,7 +43289,7 @@
 	          if (that.pollTimer) {
 	            clearInterval(that.pollTimer);
 	          }
-	          _.defer(that.componentWillMount.bind(that));
+	          _.defer(that.componentWillMount);
 	        }
 	      });
 	    }
@@ -43294,8 +43301,7 @@
 	      // });
 	      console.log("Roster.componentWillMount");
 	      var that = this;
-	      var props = { me: Bebo.User.getAsync("me"),
-	        roster: Bebo.getRosterAsync(),
+	      var props = { roster: Bebo.getRosterAsync(),
 	        stream: Bebo.getStreamFullAsync() };
 	      _bluebird2.default.props(props).then(function (data) {
 	        console.log("Roster.componentWillMount - got data", data);
@@ -43306,19 +43312,18 @@
 	          var user = data.roster[i];
 	          user.online = false;
 	          roster[user.user_id] = user;
-	          roster[user.user_id].thread_id = _helper2.default.mkThreadId(props.me, user.user_id);
+	          roster[user.user_id].thread_id = _helper2.default.mkThreadId(that.props.me, user.user_id);
 	        }
 	        l = data.stream.viewer_ids.length;
 	        for (var i = 0; i < l; i++) {
 	          var viewer_id = data.stream.viewer_ids[i];
 	          roster[viewer_id].online = true;
 	        }
-	        delete roster[data.me.user_id];
+	        delete roster[that.props.me.user_id];
 	        that.roster = roster;
 	        var online = _.filter(_.values(roster), { online: true });
 	        var offline = _.filter(_.values(roster), { online: false });
-	        that.setState({ me: data.me,
-	          online: online,
+	        that.setState({ online: online,
 	          offline: offline });
 	        that.pollTimer = setInterval(that.poll, 1000);
 	      });
@@ -43326,26 +43331,31 @@
 	  }, {
 	    key: 'renderOnline',
 	    value: function renderOnline() {
+	      var _this2 = this;
+
 	      return this.state.online.map(function (i) {
-	        return _react2.default.createElement(_rosterItem2.default, { key: i.thread_id, unread: i.unread, thread_id: i.thread_id, image_url: i.image_url, online: i.online, username: i.username });
+	        return _react2.default.createElement(_rosterItem2.default, { key: i.thread_id, unread: i.unread, thread_id: i.thread_id, image_url: i.image_url, online: i.online, username: i.username, navigate: _this2.props.navigate });
 	      });
 	    }
 	  }, {
 	    key: 'renderOffline',
 	    value: function renderOffline() {
+	      var _this3 = this;
+
 	      return this.state.offline.map(function (i) {
-	        return _react2.default.createElement(_rosterItem2.default, { key: i.thread_id, unread: i.unread, thread_id: i.thread_id, image_url: i.image_url, online: i.online, username: i.username });
+	        return _react2.default.createElement(_rosterItem2.default, { key: i.thread_id, unread: i.unread, thread_id: i.thread_id, image_url: i.image_url, online: i.online, username: i.username, navigate: _this3.props.navigate });
 	      });
 	    }
 	  }, {
 	    key: 'onUserNameChange',
 	    value: function onUserNameChange(e) {
+	      // FIXME
 	      console.log("FIXME - username changed", e);
 	    }
 	  }, {
 	    key: 'renderMe',
 	    value: function renderMe() {
-	      if (!this.state.me || !this.state.me.user_id) {
+	      if (!this.props.me || !this.props.me.user_id) {
 	        return _react2.default.createElement(
 	          'div',
 	          { className: 'roster-me' },
@@ -43363,7 +43373,7 @@
 	      var username = _react2.default.createElement(
 	        'span',
 	        { className: 'roster-list-item--user--name' },
-	        this.state.me.username,
+	        this.props.me.username,
 	        ' ',
 	        _react2.default.createElement('span', { className: 'circle' })
 	      );
@@ -43371,7 +43381,7 @@
 	        username = _react2.default.createElement(
 	          'span',
 	          { className: 'roster-list-item--user--name' },
-	          _react2.default.createElement('input', { type: 'text', className: 'roster-list-item--user--name--edit', name: 'username', value: this.state.me.username, onChange: this.onUserNameChange })
+	          _react2.default.createElement('input', { type: 'text', className: 'roster-list-item--user--name--edit', name: 'username', value: this.props.me.username, onChange: this.onUserNameChange })
 	        );
 	      }
 	      return _react2.default.createElement(
@@ -43380,7 +43390,7 @@
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'roster-list-item--image' },
-	          _react2.default.createElement('img', { src: this.state.me.image_url })
+	          _react2.default.createElement('img', { src: this.props.me.image_url })
 	        ),
 	        _react2.default.createElement(
 	          'div',
@@ -43556,6 +43566,12 @@
 	  }
 
 	  _createClass(RosterItem, [{
+	    key: "navigate",
+	    value: function navigate(e) {
+	      console.log("Nav", e);
+	      this.props.navigate(e.currentTarget.dataset.threadId, e.currentTarget.dataset.userName);
+	    }
+	  }, {
 	    key: "render",
 	    value: function render() {
 
@@ -43578,7 +43594,7 @@
 	      }
 	      return _react2.default.createElement(
 	        "div",
-	        { className: "roster-list-item roster-list-item--content", "data-thread-id": this.props.thread_id },
+	        { className: "roster-list-item roster-list-item--content", "data-user-name": this.props.username, "data-thread-id": this.props.thread_id, onClick: this.navigate.bind(this) },
 	        _react2.default.createElement(
 	          "div",
 	          { className: "roster-list-item--image" },
@@ -43656,7 +43672,6 @@
 
 	    _this.state = {
 	      blurInput: true,
-	      actingUser: {},
 	      mode: 'text',
 	      open: false,
 	      closing: false
@@ -43668,17 +43683,7 @@
 
 	  _createClass(Thread, [{
 	    key: 'componentWillMount',
-	    value: function componentWillMount() {
-	      var _this2 = this;
-
-	      Bebo.User.get('me', function (err, resp) {
-	        if (err) {
-	          return console.error(err);
-	        }
-	        _this2.setState({ actingUser: resp });
-	        return null;
-	      });
-	    }
+	    value: function componentWillMount() {}
 	  }, {
 	    key: 'blurInput',
 	    value: function blurInput() {
@@ -43688,19 +43693,19 @@
 	  }, {
 	    key: 'handleSwitchMode',
 	    value: function handleSwitchMode(mode) {
-	      var _this3 = this;
+	      var _this2 = this;
 
 	      if (this.state.mode === 'gif') {
 	        this.setState({ mode: 'text', closing: true, open: false }, function () {
 	          setTimeout(function () {
-	            _this3.setState({ closing: false });
+	            _this2.setState({ closing: false });
 	          }, 333);
 	        });
 	      }
 	      if (this.state.mode === 'text' && mode !== 'text') {
 	        this.setState({ mode: mode }, function () {
 	          setTimeout(function () {
-	            _this3.setState({ open: true });
+	            _this2.setState({ open: true });
 	          }, 5);
 	        });
 	      }
@@ -43715,14 +43720,19 @@
 	        { className: 'chat' },
 	        _react2.default.createElement(
 	          'div',
+	          { className: 'chat-thread-name' },
+	          this.props.threadName
+	        ),
+	        _react2.default.createElement(
+	          'div',
 	          { className: 'chat-upper', style: this.state.mode === 'gif' ? { transform: 'translate3d(40vw,0,0)' } : {} },
-	          _react2.default.createElement(_chatList2.default, { blurChat: this.blurInput, actingUser: this.state.actingUser }),
+	          _react2.default.createElement(_chatList2.default, { blurChat: this.blurInput, actingUser: this.props.me, threadId: this.props.thread_id }),
 	          _react2.default.createElement(_chatBackground2.default, null)
 	        ),
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'chat-lower', style: this.state.mode === 'gif' ? { transform: 'translate3d(40vw,0,0)' } : {} },
-	          _react2.default.createElement(_chatInput2.default, { blurChat: this.state.blurInput, switchMode: this.handleSwitchMode, setChatInputState: this.blurInput })
+	          _react2.default.createElement(_chatInput2.default, { blurChat: this.state.blurInput, actingUser: this.props.me, switchMode: this.handleSwitchMode, setChatInputState: this.blurInput })
 	        ),
 	        (giphyOpen || giphyClosing || this.state.mode === 'gif') && _react2.default.createElement(_giphyBrowser2.default, { style: giphyOpen ? { transform: 'translate3d(0,0,0)' } : {}, actingUser: this.state.actingUser, switchMode: this.handleSwitchMode })
 	      );
