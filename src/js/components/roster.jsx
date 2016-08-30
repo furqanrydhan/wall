@@ -13,9 +13,48 @@ class Roster extends React.Component {
       online: [],
       offline: [],
     };
+    this.poll = _.bind(this.poll, this);
+  }
+
+  poll() {
+    var that = this;
+    Bebo.getStreamFullAsync()
+      .then(function(stream) {
+        var resync = false;
+        var rosterList = _.values(that.roster);
+        var l = rosterList.length;
+        for (var i=0; i< l; i++) {
+          rosterList[i].online = false;
+        }
+        var roster = that.roster;
+        var l = stream.viewer_ids.length;
+        for (var i=0; i< l; i++) {
+          var viewer_id = stream.viewer_ids[i];
+          if (viewer_id === that.state.me.user_id) {
+            continue;
+          } else if (roster[viewer_id]) {
+            roster[viewer_id].online = true;
+          } else {
+            resync = true;
+          }
+        }
+        var online = _.filter(_.values(roster), {online: true});
+        var offline = _.filter(_.values(roster), {online: false});
+        that.setState({online: online,
+                       offline: offline});
+        if (resync === true) {
+          if (that.pollTimer) {
+            clearInterval(that.pollTimer);
+          }
+          _.defer(that.componentWillMount.bind(that));
+        }
+      });
   }
 
   componentWillMount() {
+    // Bebo.onWidgetUpdate(function(err, data) {
+    //   console.log("Widget Update", err, data);
+    // });
     console.log("Roster.componentWillMount");
     var that = this;
     var props = { me: Bebo.User.getAsync("me"),
@@ -45,6 +84,7 @@ class Roster extends React.Component {
       that.setState({me: data.me,
                      online: online,
                      offline: offline});
+      that.pollTimer = setInterval(that.poll, 1000);
     });
   }
 
