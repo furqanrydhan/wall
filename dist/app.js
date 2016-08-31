@@ -27248,6 +27248,9 @@
 	      var props = { unread: Bebo.Db.getAsync('dm_unread_' + that.state.me.user_id, { count: 200 }),
 	        roster: Bebo.getRosterAsync(),
 	        stream: Bebo.getStreamFullAsync() };
+	      if (!this.state.me.user_id) {
+	        props.me = this.getMe();
+	      }
 	      return _bluebird2.default.props(props).then(function (data) {
 	        console.timeStamp && console.timeStamp("GotFullRosterData");
 	        var roster = {};
