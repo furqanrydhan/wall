@@ -118,7 +118,7 @@
 	 * 
 	 */
 	/**
-	 * bluebird build version 3.4.3
+	 * bluebird build version 3.4.5
 	 * Features enabled: core, race, call_get, generators, map, nodeify, promisify, props, reduce, settle, some, using, timers, filter, any, each
 	*/
 	!function(e){if(true)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Promise=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof _dereq_=="function"&&_dereq_;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof _dereq_=="function"&&_dereq_;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
@@ -866,14 +866,16 @@
 	Promise.onPossiblyUnhandledRejection = function (fn) {
 	    var domain = getDomain();
 	    possiblyUnhandledRejection =
-	        typeof fn === "function" ? (domain === null ? fn : domain.bind(fn))
+	        typeof fn === "function" ? (domain === null ?
+	                                            fn : util.domainBind(domain, fn))
 	                                 : undefined;
 	};
 
 	Promise.onUnhandledRejectionHandled = function (fn) {
 	    var domain = getDomain();
 	    unhandledRejectionHandled =
-	        typeof fn === "function" ? (domain === null ? fn : domain.bind(fn))
+	        typeof fn === "function" ? (domain === null ?
+	                                            fn : util.domainBind(domain, fn))
 	                                 : undefined;
 	};
 
@@ -913,7 +915,20 @@
 	            var event = new CustomEvent("CustomEvent");
 	            util.global.dispatchEvent(event);
 	            return function(name, event) {
-	                var domEvent = new CustomEvent(name.toLowerCase(), event);
+	                var domEvent = new CustomEvent(name.toLowerCase(), {
+	                    detail: event,
+	                    cancelable: true
+	                });
+	                return !util.global.dispatchEvent(domEvent);
+	            };
+	        } else if (typeof Event === "function") {
+	            var event = new Event("CustomEvent");
+	            util.global.dispatchEvent(event);
+	            return function(name, event) {
+	                var domEvent = new Event(name.toLowerCase(), {
+	                    cancelable: true
+	                });
+	                domEvent.detail = event;
 	                return !util.global.dispatchEvent(domEvent);
 	            };
 	        } else {
@@ -1669,7 +1684,7 @@
 
 	},{"./errors":12,"./util":36}],10:[function(_dereq_,module,exports){
 	"use strict";
-	module.exports = function(Promise, tryConvertToPromise) {
+	module.exports = function(Promise) {
 	function returner() {
 	    return this.value;
 	}
@@ -1679,7 +1694,6 @@
 
 	Promise.prototype["return"] =
 	Promise.prototype.thenReturn = function (value) {
-	    value = tryConvertToPromise(value);
 	    if (value instanceof Promise) value.suppressUnhandledRejections();
 	    return this._then(
 	        returner, undefined, undefined, {value: value}, undefined);
@@ -1704,13 +1718,11 @@
 
 	Promise.prototype.catchReturn = function (value) {
 	    if (arguments.length <= 1) {
-	        value = tryConvertToPromise(value);
 	        if (value instanceof Promise) value.suppressUnhandledRejections();
 	        return this._then(
 	            undefined, returner, undefined, {value: value}, undefined);
 	    } else {
 	        var _value = arguments[1];
-	        _value = tryConvertToPromise(_value);
 	        if (_value instanceof Promise) _value.suppressUnhandledRejections();
 	        var handler = function() {return _value;};
 	        return this.caught(value, handler);
@@ -1733,8 +1745,8 @@
 	}
 
 	Promise.prototype.each = function (fn) {
-	    return this.mapSeries(fn)
-	            ._then(promiseAllThis, undefined, undefined, this, undefined);
+	    return PromiseReduce(this, fn, INTERNAL, 0)
+	              ._then(promiseAllThis, undefined, undefined, this, undefined);
 	};
 
 	Promise.prototype.mapSeries = function (fn) {
@@ -1742,12 +1754,13 @@
 	};
 
 	Promise.each = function (promises, fn) {
-	    return PromiseMapSeries(promises, fn)
-	            ._then(promiseAllThis, undefined, undefined, promises, undefined);
+	    return PromiseReduce(promises, fn, INTERNAL, 0)
+	              ._then(promiseAllThis, undefined, undefined, promises, undefined);
 	};
 
 	Promise.mapSeries = PromiseMapSeries;
 	};
+
 
 	},{}],12:[function(_dereq_,module,exports){
 	"use strict";
@@ -2304,7 +2317,8 @@
 	},{"./errors":12,"./util":36}],17:[function(_dereq_,module,exports){
 	"use strict";
 	module.exports =
-	function(Promise, PromiseArray, tryConvertToPromise, INTERNAL) {
+	function(Promise, PromiseArray, tryConvertToPromise, INTERNAL, async,
+	         getDomain) {
 	var util = _dereq_("./util");
 	var canEvaluate = util.canEvaluate;
 	var tryCatch = util.tryCatch;
@@ -2346,25 +2360,35 @@
 	        var name = "Holder$" + total;
 
 
-	        var code = "return function(tryCatch, errorObj, Promise) {           \n\
+	        var code = "return function(tryCatch, errorObj, Promise, async) {    \n\
 	            'use strict';                                                    \n\
 	            function [TheName](fn) {                                         \n\
 	                [TheProperties]                                              \n\
 	                this.fn = fn;                                                \n\
+	                this.asyncNeeded = true;                                     \n\
 	                this.now = 0;                                                \n\
 	            }                                                                \n\
+	                                                                             \n\
+	            [TheName].prototype._callFunction = function(promise) {          \n\
+	                promise._pushContext();                                      \n\
+	                var ret = tryCatch(this.fn)([ThePassedArguments]);           \n\
+	                promise._popContext();                                       \n\
+	                if (ret === errorObj) {                                      \n\
+	                    promise._rejectCallback(ret.e, false);                   \n\
+	                } else {                                                     \n\
+	                    promise._resolveCallback(ret);                           \n\
+	                }                                                            \n\
+	            };                                                               \n\
+	                                                                             \n\
 	            [TheName].prototype.checkFulfillment = function(promise) {       \n\
 	                var now = ++this.now;                                        \n\
 	                if (now === [TheTotal]) {                                    \n\
-	                    promise._pushContext();                                  \n\
-	                    var callback = this.fn;                                  \n\
-	                    var ret = tryCatch(callback)([ThePassedArguments]);      \n\
-	                    promise._popContext();                                   \n\
-	                    if (ret === errorObj) {                                  \n\
-	                        promise._rejectCallback(ret.e, false);               \n\
+	                    if (this.asyncNeeded) {                                  \n\
+	                        async.invoke(this._callFunction, this, promise);     \n\
 	                    } else {                                                 \n\
-	                        promise._resolveCallback(ret);                       \n\
+	                        this._callFunction(promise);                         \n\
 	                    }                                                        \n\
+	                                                                             \n\
 	                }                                                            \n\
 	            };                                                               \n\
 	                                                                             \n\
@@ -2373,7 +2397,7 @@
 	            };                                                               \n\
 	                                                                             \n\
 	            return [TheName];                                                \n\
-	        }(tryCatch, errorObj, Promise);                                      \n\
+	        }(tryCatch, errorObj, Promise, async);                               \n\
 	        ";
 
 	        code = code.replace(/\[TheName\]/g, name)
@@ -2382,8 +2406,8 @@
 	            .replace(/\[TheProperties\]/g, assignment)
 	            .replace(/\[CancellationCode\]/g, cancellationCode);
 
-	        return new Function("tryCatch", "errorObj", "Promise", code)
-	                           (tryCatch, errorObj, Promise);
+	        return new Function("tryCatch", "errorObj", "Promise", "async", code)
+	                           (tryCatch, errorObj, Promise, async);
 	    };
 
 	    var holderClasses = [];
@@ -2424,6 +2448,7 @@
 	                            maybePromise._then(callbacks[i], reject,
 	                                               undefined, ret, holder);
 	                            promiseSetters[i](maybePromise, holder);
+	                            holder.asyncNeeded = false;
 	                        } else if (((bitField & 33554432) !== 0)) {
 	                            callbacks[i].call(ret,
 	                                              maybePromise._value(), holder);
@@ -2436,7 +2461,14 @@
 	                        callbacks[i].call(ret, maybePromise, holder);
 	                    }
 	                }
+
 	                if (!ret._isFateSealed()) {
+	                    if (holder.asyncNeeded) {
+	                        var domain = getDomain();
+	                        if (domain !== null) {
+	                            holder.fn = util.domainBind(domain, holder.fn);
+	                        }
+	                    }
 	                    ret._setAsyncGuaranteed();
 	                    ret._setOnCancel(holder);
 	                }
@@ -2464,19 +2496,18 @@
 	var util = _dereq_("./util");
 	var tryCatch = util.tryCatch;
 	var errorObj = util.errorObj;
-	var EMPTY_ARRAY = [];
 
 	function MappingPromiseArray(promises, fn, limit, _filter) {
 	    this.constructor$(promises);
 	    this._promise._captureStackTrace();
 	    var domain = getDomain();
-	    this._callback = domain === null ? fn : domain.bind(fn);
+	    this._callback = domain === null ? fn : util.domainBind(domain, fn);
 	    this._preservedValues = _filter === INTERNAL
 	        ? new Array(this.length())
 	        : null;
 	    this._limit = limit;
 	    this._inFlight = 0;
-	    this._queue = limit >= 1 ? [] : EMPTY_ARRAY;
+	    this._queue = [];
 	    this._init$(undefined, -2);
 	}
 	util.inherits(MappingPromiseArray, PromiseArray);
@@ -3050,7 +3081,8 @@
 
 	        async.invoke(settler, target, {
 	            handler: domain === null ? handler
-	                : (typeof handler === "function" && domain.bind(handler)),
+	                : (typeof handler === "function" &&
+	                    util.domainBind(domain, handler)),
 	            promise: promise,
 	            receiver: receiver,
 	            value: value
@@ -3186,11 +3218,11 @@
 	        this._receiver0 = receiver;
 	        if (typeof fulfill === "function") {
 	            this._fulfillmentHandler0 =
-	                domain === null ? fulfill : domain.bind(fulfill);
+	                domain === null ? fulfill : util.domainBind(domain, fulfill);
 	        }
 	        if (typeof reject === "function") {
 	            this._rejectionHandler0 =
-	                domain === null ? reject : domain.bind(reject);
+	                domain === null ? reject : util.domainBind(domain, reject);
 	        }
 	    } else {
 	        var base = index * 4 - 4;
@@ -3198,11 +3230,11 @@
 	        this[base + 3] = receiver;
 	        if (typeof fulfill === "function") {
 	            this[base + 0] =
-	                domain === null ? fulfill : domain.bind(fulfill);
+	                domain === null ? fulfill : util.domainBind(domain, fulfill);
 	        }
 	        if (typeof reject === "function") {
 	            this[base + 1] =
-	                domain === null ? reject : domain.bind(reject);
+	                domain === null ? reject : util.domainBind(domain, reject);
 	        }
 	    }
 	    this._setLength(index + 1);
@@ -3516,12 +3548,12 @@
 	    debug);
 	_dereq_("./bind")(Promise, INTERNAL, tryConvertToPromise, debug);
 	_dereq_("./cancel")(Promise, PromiseArray, apiRejection, debug);
-	_dereq_("./direct_resolve")(Promise, tryConvertToPromise);
+	_dereq_("./direct_resolve")(Promise);
 	_dereq_("./synchronous_inspection")(Promise);
 	_dereq_("./join")(
-	    Promise, PromiseArray, tryConvertToPromise, INTERNAL, debug);
+	    Promise, PromiseArray, tryConvertToPromise, INTERNAL, async, getDomain);
 	Promise.Promise = Promise;
-	Promise.version = "3.4.3";
+	Promise.version = "3.4.5";
 	_dereq_('./map.js')(Promise, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug);
 	_dereq_('./call_get.js')(Promise);
 	_dereq_('./using.js')(Promise, apiRejection, tryConvertToPromise, createContext, INTERNAL, debug);
@@ -4342,27 +4374,37 @@
 	function ReductionPromiseArray(promises, fn, initialValue, _each) {
 	    this.constructor$(promises);
 	    var domain = getDomain();
-	    this._fn = domain === null ? fn : domain.bind(fn);
+	    this._fn = domain === null ? fn : util.domainBind(domain, fn);
 	    if (initialValue !== undefined) {
 	        initialValue = Promise.resolve(initialValue);
 	        initialValue._attachCancellationCallback(this);
 	    }
 	    this._initialValue = initialValue;
 	    this._currentCancellable = null;
-	    this._eachValues = _each === INTERNAL ? [] : undefined;
+	    if(_each === INTERNAL) {
+	        this._eachValues = Array(this._length);
+	    } else if (_each === 0) {
+	        this._eachValues = null;
+	    } else {
+	        this._eachValues = undefined;
+	    }
 	    this._promise._captureStackTrace();
 	    this._init$(undefined, -5);
 	}
 	util.inherits(ReductionPromiseArray, PromiseArray);
 
 	ReductionPromiseArray.prototype._gotAccum = function(accum) {
-	    if (this._eachValues !== undefined && accum !== INTERNAL) {
+	    if (this._eachValues !== undefined && 
+	        this._eachValues !== null && 
+	        accum !== INTERNAL) {
 	        this._eachValues.push(accum);
 	    }
 	};
 
 	ReductionPromiseArray.prototype._eachComplete = function(value) {
-	    this._eachValues.push(value);
+	    if (this._eachValues !== null) {
+	        this._eachValues.push(value);
+	    }
 	    return this._eachValues;
 	};
 
@@ -4514,7 +4556,7 @@
 	} else if ((typeof MutationObserver !== "undefined") &&
 	          !(typeof window !== "undefined" &&
 	            window.navigator &&
-	            window.navigator.standalone)) {
+	            (window.navigator.standalone || window.cordova))) {
 	    schedule = (function() {
 	        var div = document.createElement("div");
 	        var opts = {attributes: true};
@@ -5593,6 +5635,10 @@
 	    }
 	}
 
+	function domainBind(self, cb) {
+	    return self.bind(cb);
+	}
+
 	var ret = {
 	    isClass: isClass,
 	    isIdentifier: isIdentifier,
@@ -5625,7 +5671,8 @@
 	    isNode: isNode,
 	    env: env,
 	    global: globalObject,
-	    getNativePromise: getNativePromise
+	    getNativePromise: getNativePromise,
+	    domainBind: domainBind
 	};
 	ret.isRecentNode = ret.isNode && (function() {
 	    var version = process.versions.node.split(".").map(Number);
@@ -5656,25 +5703,40 @@
 	var cachedSetTimeout;
 	var cachedClearTimeout;
 
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
 	(function () {
 	    try {
-	        cachedSetTimeout = setTimeout;
-	    } catch (e) {
-	        cachedSetTimeout = function () {
-	            throw new Error('setTimeout is not defined');
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
 	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
 	    }
 	    try {
-	        cachedClearTimeout = clearTimeout;
-	    } catch (e) {
-	        cachedClearTimeout = function () {
-	            throw new Error('clearTimeout is not defined');
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
 	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
 	    }
 	} ())
 	function runTimeout(fun) {
 	    if (cachedSetTimeout === setTimeout) {
 	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
 	        return setTimeout(fun, 0);
 	    }
 	    try {
@@ -5695,6 +5757,11 @@
 	function runClearTimeout(marker) {
 	    if (cachedClearTimeout === clearTimeout) {
 	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
 	        return clearTimeout(marker);
 	    }
 	    try {
