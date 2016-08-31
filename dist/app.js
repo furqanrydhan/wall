@@ -56,6 +56,12 @@
 
 	var App = __webpack_require__(4);
 
+	var didReceiveData = Bebo.didReceiveData;
+	Bebo.didReceiveData = function (data) {
+	  console.timeStamp && console.timeStamp("Bebo.didReceiveData");
+	  return didReceiveData(data);
+	};
+
 	Bebo.onReady(function () {
 	  console.timeStamp && console.timeStamp("Bebo.onReady");
 	  Bebo.User.getAsync = Promise.promisify(Bebo.User.get);

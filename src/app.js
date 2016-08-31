@@ -8,6 +8,12 @@ var Promise = require('bluebird');
 
 var App = require('./app.jsx');
 
+var didReceiveData = Bebo.didReceiveData;
+Bebo.didReceiveData = function(data) {
+  console.timeStamp && console.timeStamp("Bebo.didReceiveData");
+  return didReceiveData(data);
+}
+
 
 Bebo.onReady(function () {
   console.timeStamp && console.timeStamp("Bebo.onReady");
