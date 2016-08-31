@@ -38,6 +38,7 @@ class App extends React.Component {
   }
 
   componentWillMount() {
+    console.timeStamp && console.timeStamp("Main.componentWillMount");
     this.getMe().then(this.getFullRoster);
     Bebo.onEvent(this.handleEventUpdate);
   }
@@ -82,6 +83,7 @@ class App extends React.Component {
                   stream: Bebo.getStreamFullAsync() };
     return Promise.props(props)
       .then(function (data) {
+      console.timeStamp && console.timeStamp("GotFullRosterData");
       var roster = {};
       var l = data.roster.length;
       for (var i=0; i< l; i++) {
@@ -234,8 +236,10 @@ class App extends React.Component {
 
   getMe() {
     var that = this;
+    console.timeStamp && console.timeStamp("Bebo.User.me request");
     return Bebo.User.getAsync("me")
       .then(function(user) {
+        console.timeStamp && console.timeStamp("Bebo.User.me response");
         that.setState({me: user});
         return user;
       });

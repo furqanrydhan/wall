@@ -49,44 +49,45 @@
 	/*eslint-disable */
 
 	// require('../shared/error-reporter');
+	//
+	console.timeStamp && console.timeStamp("app.js load");
+
 	var Promise = __webpack_require__(1);
 
 	var App = __webpack_require__(4);
 
-	document.addEventListener('DOMContentLoaded', function () {
+	Bebo.onReady(function () {
+	  console.timeStamp && console.timeStamp("Bebo.onReady");
+	  Bebo.User.getAsync = Promise.promisify(Bebo.User.get);
+	  Bebo.uploadImageAsync = Promise.promisify(Bebo.uploadImage);
+	  Bebo.User.updateAsync = Promise.promisify(Bebo.User.update);
+	  Bebo.Db.saveAsync = Promise.promisify(Bebo.Db.save);
 
-	  Bebo.onReady(function () {
-	    Bebo.User.getAsync = Promise.promisify(Bebo.User.get);
-	    Bebo.uploadImageAsync = Promise.promisify(Bebo.uploadImage);
-	    Bebo.User.updateAsync = Promise.promisify(Bebo.User.update);
-	    Bebo.Db.saveAsync = Promise.promisify(Bebo.Db.save);
+	  var getAsync = Promise.promisify(Bebo.Db.get);
+	  Bebo.Db.getAsync = function (table, params) {
+	    return getAsync(table, params).then(function (json) {
+	      if (json.code != 200) {
+	        throw new Error("Not 200");
+	      } else {
+	        return json.result;
+	      }
+	    });
+	  };
 
-	    var getAsync = Promise.promisify(Bebo.Db.get);
-	    Bebo.Db.getAsync = function (table, params) {
-	      return getAsync(table, params).then(function (json) {
-	        if (json.code != 200) {
-	          throw new Error("Not 200");
-	        } else {
-	          return json.result;
-	        }
-	      });
-	    };
-
-	    Bebo.Db.deleteAsync = Promise.promisify(Bebo.Db.delete);
-	    Bebo.getStreamFullAsync = Promise.promisify(Bebo.getStreamFull);
-	    var getRosterAsync = Promise.promisify(Bebo.getRoster);
-	    Bebo.getRosterAsync = function () {
-	      return getRosterAsync().then(function (json) {
-	        if (json.code != 200) {
-	          throw new Error("Not 200");
-	        } else {
-	          return json.result;
-	        }
-	      });
-	    };
-	    Bebo.UI.disableKeyboardDoneStrip();
-	    App.init();
-	  });
+	  Bebo.Db.deleteAsync = Promise.promisify(Bebo.Db.delete);
+	  Bebo.getStreamFullAsync = Promise.promisify(Bebo.getStreamFull);
+	  var getRosterAsync = Promise.promisify(Bebo.getRoster);
+	  Bebo.getRosterAsync = function () {
+	    return getRosterAsync().then(function (json) {
+	      if (json.code != 200) {
+	        throw new Error("Not 200");
+	      } else {
+	        return json.result;
+	      }
+	    });
+	  };
+	  Bebo.UI.disableKeyboardDoneStrip();
+	  App.init();
 	});
 
 /***/ },
@@ -27195,6 +27196,7 @@
 	  _createClass(App, [{
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
+	      console.timeStamp && console.timeStamp("Main.componentWillMount");
 	      this.getMe().then(this.getFullRoster);
 	      Bebo.onEvent(this.handleEventUpdate);
 	    }
@@ -27241,6 +27243,7 @@
 	        roster: Bebo.getRosterAsync(),
 	        stream: Bebo.getStreamFullAsync() };
 	      return _bluebird2.default.props(props).then(function (data) {
+	        console.timeStamp && console.timeStamp("GotFullRosterData");
 	        var roster = {};
 	        var l = data.roster.length;
 	        for (var i = 0; i < l; i++) {
@@ -27403,7 +27406,9 @@
 	    key: 'getMe',
 	    value: function getMe() {
 	      var that = this;
+	      console.timeStamp && console.timeStamp("Bebo.User.me request");
 	      return Bebo.User.getAsync("me").then(function (user) {
+	        console.timeStamp && console.timeStamp("Bebo.User.me response");
 	        that.setState({ me: user });
 	        return user;
 	      });
