@@ -1,17 +1,6 @@
+//////////////////////////////////////////////////////////////////////////////////////////
+// ROSTER STYLING
 
-
-// * {
-//   box-sizing: border-box;
-//   user-select: none;
-// }
-
-// body,
-// html {
-//   margin: 0;
-//   height: 100%;
-//   width: 100%;
-//   font-family: 'Work Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-// }
 input, input:before, input:after, textarea {
   -webkit-user-select: initial;
   -khtml-user-select: initial;
@@ -19,6 +8,7 @@ input, input:before, input:after, textarea {
   -ms-user-select: initial;
   user-select: initial;
 }
+
 input[type="text"] {
   text-transform: lowercase;
 }
@@ -51,64 +41,6 @@ input[type="text"] {
   width: 64px;
 }
 
-.edit-settings {
-  float: right;
-}
-
-.edit-settings img {
-  width: 5vw;
-  margin-top: 2vh;
-  margin-right: 2vw;
-}
-
-.save-icon {
-  display: none;
-}
-
-.roster-list {
-  width: 95%;
-  margin: 0 auto;
-}
-
-.roster-list-item--user--name--edit {
-  display: none;
-  font-size: 3.7vh;
-  width: 50vw;
-  border: none;
-  border-bottom: 1px solid #858c93;
-  border-radius: 0px;
-  -webkit-appearance: none;
-}
-
-.roster-me {
-  display: block;
-  overflow: auto;
-  margin: 4vh auto;
-  width: 95%;
-}
-
-// @derek find larger me section odd looking
-// .roster-me .roster-list-item--image img {
-//   width: 12vw !important;
-// }
-
-.roster-me .roster-list-item--user--name {
-  position: relative !important;
-  top: 50% !important;
-  -webkit-transform: translateY(-50%) !important;
-  -ms-transform: translateY(-50%) !important;
-  transform: translateY(-50%) !important;
-}
-
-.roster-header {
-  background-color: #eaeaea;
-  color: #888d8f;
-  padding: 1vh;
-  font-size: 2.2vh;
-  font-weight: 600;
-  margin: 2vh 0;
-}
-
 .roster {
   display: flex;
   display: -webkit-flex;
@@ -128,10 +60,75 @@ input[type="text"] {
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 }
 
-.roster-list-item {
+.roster-header {
+  background-color: $color-light-grey;
+  color: $color-grey;
+  padding: calc-em(4px) calc-em(16px) calc-em(3px);
+  font-size: calc-em(12px);
+  margin: 0;
+}
+
+.roster-list {
+  margin: 0 auto;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// MY CELL STYLING
+
+.roster-me {
   display: block;
   overflow: auto;
-  margin: 2vh 0;
+  margin: calc-em(16px) calc-em(16px);
+  .roster-list-item--image img {
+    width: calc-em(50px);
+    height: calc-em(50px);
+  }
+  .roster-list-item--user--name {
+    @extend .font-size-medium;
+  }
+  &.roster-list-item {
+    border: 0;
+  }
+}
+
+.edit-settings {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  img {
+    width: calc-em(20px);
+    height: calc-em(20px);
+  }
+}
+
+.save-icon {
+  display: none;
+}
+
+.roster-list-item--user--name--edit {
+  display: none;
+  font-size: 3.7vh;
+  width: 50vw;
+  border: none;
+  border-bottom: 1px solid #858c93;
+  border-radius: 0px;
+  -webkit-appearance: none;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// DEFAULT ROSTER CELL
+
+.roster-list-item {
+  overflow: auto;
+  margin: 0;
+  padding: calc-em(16px);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  align-content: center;
+  border-bottom: 1px solid $color-light-grey;
 }
 
 .roster-list-item--image,
@@ -146,12 +143,15 @@ input[type="text"] {
 }
 
 .roster-list-item--user {
-  float: left;
-  margin-left: 2vw;
+  margin-left: calc-em(10px);
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: left;
+  flex: 1 1 auto;
 }
 
 .roster-list-item--user--name {
-  font-weight: 700;
 }
 
 .roster-list-item--user--desc {
@@ -160,8 +160,14 @@ input[type="text"] {
 }
 
 .roster-list-item--user--chat-badge {
-  float: right;
-  margin-top: 2vh;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  img {
+    width: calc-em(20px);
+    height: calc-em(20px);
+  }
 }
 
 .unread-badge {
@@ -169,7 +175,7 @@ input[type="text"] {
   background-color: #f73c40;
   display: block;
   width: 5vh;
-  height: 5vh; 
+  height: 5vh;
   text-align: center;
   font-weight: 700;
   color: #fff;
@@ -182,7 +188,7 @@ input[type="text"] {
   background-color: #2CBF76;
   display: inline-block;
   width: 2vh;
-  height: 2vh; 
+  height: 2vh;
 }
 
 .no-recent-message {

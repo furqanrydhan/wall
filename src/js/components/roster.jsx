@@ -122,7 +122,7 @@ class Roster extends React.Component {
       )
     }
     return (
-      <div className="roster-me">
+      <div className="roster-me roster-list-item">
         <div className="roster-list-item--image">
           <img src={this.props.me.image_url}/>
         </div>
@@ -131,7 +131,7 @@ class Roster extends React.Component {
         </div>
         <div className="roster-list-item--settings"></div>
         <span className="edit-settings edit">
-          <img src="assets/img/settings.svg" className="edit-icon"/>
+          <img src="assets/img/icSettings.png" className="edit-icon"/>
           <img src="assets/img/ok.svg" className="save-icon"/>
         </span>
       </div>

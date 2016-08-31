@@ -52,7 +52,7 @@ class Thread extends React.Component {
     const giphyClosing = this.state.closing === true;
     return (<div className="chat">
       <div className="chat-header">
-        <div onClick={this.home} ><b>&lt;</b></div>
+        <div onClick={this.home} className="back-button"><img src="./assets/img/icBack.png" alt="back"/></div>
         <div className="chat-thread-name">{this.props.threadName}</div>
       </div>
       <div className="chat-upper" style={this.state.mode === 'gif' ? { transform: 'translate3d(40vw,0,0)' } : {}}>
