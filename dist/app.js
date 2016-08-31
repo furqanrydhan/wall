@@ -68,6 +68,7 @@
 	        }
 	      });
 	    };
+	    Bebo.UI.disableKeyboardDoneStrip();
 	    App.init();
 	  });
 	});
