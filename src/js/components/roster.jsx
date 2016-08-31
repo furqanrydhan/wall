@@ -19,6 +19,7 @@ class Roster extends React.Component {
     this.editUserName = this.editUserName.bind(this);
     this.onUserNameChange= this.onUserNameChange.bind(this);
     this.saveUserName = this.saveUserName.bind(this);
+    this.fileUpload = this.fileUpload.bind(this);
     Bebo.onViewerUpdate(this.viewerUpdate);
   }
 
@@ -27,6 +28,17 @@ class Roster extends React.Component {
       this.setState({username: this.props.me.username});
     }
   }
+
+  // componentDidUpdate() {
+  //   if (this.state.editUserName) {
+  //     var element = document.getElementById('file');
+  //     element.value = null;
+  //     element.onclick = function () {
+  //       element.value = null;
+  //     }
+  //     element.onchange = this.fileUpload;
+  //   }
+  // }
 
   componentWillReceiveProps(nextProps) {
     if (this.state.username !== nextProps.me.username) {
@@ -128,8 +140,17 @@ class Roster extends React.Component {
     this.setState({username: _.toLower(_.trim(e.target.value))});
   }
 
+  fileUpload(e) {
+    var that = this;
+    console.log("fileUpload", e);
+    var file = e.target.files[0];
+    this.props.uploadImage(file, function() {
+      that.setState({editUserName: false});
+    });
+  }
+
   renderMe() {
-    var username, edit;
+    var username, edit, image;
     if (this.state.editUserName) {
       username = (
         <span className="roster-list-item--user--name">
@@ -146,6 +167,13 @@ class Roster extends React.Component {
           <img src="assets/img/ok.svg" className="save-icon"/>
         </span>
       )
+      image = (
+        <div className="fileinput">
+          <input id="file" type="file" onChange={this.fileUpload} accept="image/*" />
+          <img src={this.props.me.image_url}/>
+          <img className="fileOverlay" src={this.props.me.image_url}/>
+        </div>)
+          
     } else {
       username = <span className="roster-list-item--user--name">{this.props.me.username} <span className="circle"></span></span>;
       edit = (
@@ -153,6 +181,7 @@ class Roster extends React.Component {
             <img src="assets/img/icSettings.png" className="edit-icon"/>
           </span>
       )
+      image = <img src={this.props.me.image_url}/>;
     }
     if (! this.props.me || ! this.props.me.user_id) {
       return (
@@ -167,7 +196,7 @@ class Roster extends React.Component {
     return (
       <div className="roster-me roster-list-item">
         <div className="roster-list-item--image">
-          <img src={this.props.me.image_url}/>
+          {image}
         </div>
         <div className="roster-list-item--user">
           {username}

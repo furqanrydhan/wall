@@ -22,6 +22,7 @@ class App extends React.Component {
     this.getOldMessages = this.getOldMessages.bind(this);
     this.onThreadPresenceEvent = this.onThreadPresenceEvent.bind(this);
     this.updateUser = this.updateUser.bind(this);
+    this.uploadImage = this.uploadImage.bind(this);
   }
 
   getOldMessages(thread_id, count, offset) {
@@ -102,10 +103,27 @@ class App extends React.Component {
       });
   }
 
+  uploadImage(file, callback) {
+    var that = this;
+    var reader = new FileReader();
+    reader.onloadend = function () {
+      Bebo.uploadImageAsync(reader.result)
+        .then(function(image_url) {
+          console.log("uploded image to bebo", image_url);
+          return that.updateUser({image_url: image_url});
+        }).then(callback);
+    }
+    reader.onerror = function(err) {
+      console.error("error reading file", err);
+    }
+    reader.readAsDataURL(file);
+  }
+
   render() {
     if (this.state.page === "home") {
       return <Roster me={this.state.me}
                      updateUser={this.updateUser}
+                     uploadImage={this.uploadImage}
                      navigate={this.navigate} ></Roster>
     } else {
       return <DirectMessageThread messages = {this.state.currentThread} me={this.state.me} navigate={this.navigate} onPresenceEvent={this.onThreadPresenceEvent} thread_id={this.state.page} threadName={this.state.threadName}/>

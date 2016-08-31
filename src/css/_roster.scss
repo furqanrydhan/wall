@@ -79,7 +79,38 @@
   display: block;
   overflow: auto;
   margin: calc-em(16px) calc-em(16px);
+  .roster-list-item--image {
+    width: calc-em(50px);
+    height: calc-em(50px);
+    .fileinput {
+        position: relative;
+        display: block;
+        img {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            z-index: 1;
+        }
+        .fileOverlay {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            z-index: 2;
+        }
+        input {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            z-index: 3;
+            opacity: 0;
+        }
+    }
+  }
   .roster-list-item--image img {
+    width: calc-em(50px);
+    height: calc-em(50px);
+  }
+  .roster-list-item--image input{
     width: calc-em(50px);
     height: calc-em(50px);
   }
@@ -130,7 +161,7 @@
   float: left;
 }
 
-.roster-list-item--image img,
+.roster-list-item--image img ,
 .chat-item--inner--avatar img {
   border-radius: 1.3vh;
   width: 10vw;

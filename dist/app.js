@@ -57,6 +57,7 @@
 
 	  Bebo.onReady(function () {
 	    Bebo.User.getAsync = Promise.promisify(Bebo.User.get);
+	    Bebo.uploadImageAsync = Promise.promisify(Bebo.uploadImage);
 	    Bebo.User.updateAsync = Promise.promisify(Bebo.User.update);
 	    Bebo.getStreamFullAsync = Promise.promisify(Bebo.getStreamFull);
 	    var getRosterAsync = Promise.promisify(Bebo.getRoster);
@@ -27155,6 +27156,7 @@
 	    _this.getOldMessages = _this.getOldMessages.bind(_this);
 	    _this.onThreadPresenceEvent = _this.onThreadPresenceEvent.bind(_this);
 	    _this.updateUser = _this.updateUser.bind(_this);
+	    _this.uploadImage = _this.uploadImage.bind(_this);
 	    return _this;
 	  }
 
@@ -27244,11 +27246,28 @@
 	      });
 	    }
 	  }, {
+	    key: 'uploadImage',
+	    value: function uploadImage(file, callback) {
+	      var that = this;
+	      var reader = new FileReader();
+	      reader.onloadend = function () {
+	        Bebo.uploadImageAsync(reader.result).then(function (image_url) {
+	          console.log("uploded image to bebo", image_url);
+	          return that.updateUser({ image_url: image_url });
+	        }).then(callback);
+	      };
+	      reader.onerror = function (err) {
+	        console.error("error reading file", err);
+	      };
+	      reader.readAsDataURL(file);
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      if (this.state.page === "home") {
 	        return _react2.default.createElement(_roster2.default, { me: this.state.me,
 	          updateUser: this.updateUser,
+	          uploadImage: this.uploadImage,
 	          navigate: this.navigate });
 	      } else {
 	        return _react2.default.createElement(_dmThread2.default, { messages: this.state.currentThread, me: this.state.me, navigate: this.navigate, onPresenceEvent: this.onThreadPresenceEvent, thread_id: this.state.page, threadName: this.state.threadName });
@@ -43468,6 +43487,7 @@
 	    _this.editUserName = _this.editUserName.bind(_this);
 	    _this.onUserNameChange = _this.onUserNameChange.bind(_this);
 	    _this.saveUserName = _this.saveUserName.bind(_this);
+	    _this.fileUpload = _this.fileUpload.bind(_this);
 	    Bebo.onViewerUpdate(_this.viewerUpdate);
 	    return _this;
 	  }
@@ -43479,6 +43499,18 @@
 	        this.setState({ username: this.props.me.username });
 	      }
 	    }
+
+	    // componentDidUpdate() {
+	    //   if (this.state.editUserName) {
+	    //     var element = document.getElementById('file');
+	    //     element.value = null;
+	    //     element.onclick = function () {
+	    //       element.value = null;
+	    //     }
+	    //     element.onchange = this.fileUpload;
+	    //   }
+	    // }
+
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {
@@ -43590,9 +43622,19 @@
 	      this.setState({ username: _.toLower(_.trim(e.target.value)) });
 	    }
 	  }, {
+	    key: 'fileUpload',
+	    value: function fileUpload(e) {
+	      var that = this;
+	      console.log("fileUpload", e);
+	      var file = e.target.files[0];
+	      this.props.uploadImage(file, function () {
+	        that.setState({ editUserName: false });
+	      });
+	    }
+	  }, {
 	    key: 'renderMe',
 	    value: function renderMe() {
-	      var username, edit;
+	      var username, edit, image;
 	      if (this.state.editUserName) {
 	        username = _react2.default.createElement(
 	          'span',
@@ -43611,6 +43653,13 @@
 	          { className: 'edit-settings edit', onClick: this.saveUserName },
 	          _react2.default.createElement('img', { src: 'assets/img/ok.svg', className: 'save-icon' })
 	        );
+	        image = _react2.default.createElement(
+	          'div',
+	          { className: 'fileinput' },
+	          _react2.default.createElement('input', { id: 'file', type: 'file', onChange: this.fileUpload, accept: 'image/*' }),
+	          _react2.default.createElement('img', { src: this.props.me.image_url }),
+	          _react2.default.createElement('img', { className: 'fileOverlay', src: this.props.me.image_url })
+	        );
 	      } else {
 	        username = _react2.default.createElement(
 	          'span',
@@ -43624,6 +43673,7 @@
 	          { className: 'edit-settings edit', onClick: this.editUserName },
 	          _react2.default.createElement('img', { src: 'assets/img/icSettings.png', className: 'edit-icon' })
 	        );
+	        image = _react2.default.createElement('img', { src: this.props.me.image_url });
 	      }
 	      if (!this.props.me || !this.props.me.user_id) {
 	        return _react2.default.createElement(
@@ -43643,7 +43693,7 @@
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'roster-list-item--image' },
-	          _react2.default.createElement('img', { src: this.props.me.image_url })
+	          image
 	        ),
 	        _react2.default.createElement(
 	          'div',
