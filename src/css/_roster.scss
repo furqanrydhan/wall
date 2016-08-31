@@ -1,17 +1,17 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 // ROSTER STYLING
 
-input, input:before, input:after, textarea {
-  -webkit-user-select: initial;
-  -khtml-user-select: initial;
-  -moz-user-select: initial;
-  -ms-user-select: initial;
-  user-select: initial;
-}
+// input, input:before, input:after, textarea {
+//   -webkit-user-select: initial;
+//   -khtml-user-select: initial;
+//   -moz-user-select: initial;
+//   -ms-user-select: initial;
+//   user-select: initial;
+// }
 
-input[type="text"] {
-  text-transform: lowercase;
-}
+// input[type="text"] {
+//   text-transform: lowercase;
+// }
 
 @media screen and (device-aspect-ratio: 40/71) {
   /* iphone 5 */
@@ -102,18 +102,12 @@ input[type="text"] {
   }
 }
 
-.save-icon {
-  display: none;
-}
-
 .roster-list-item--user--name--edit {
-  display: none;
   font-size: 3.7vh;
   width: 50vw;
   border: none;
   border-bottom: 1px solid #858c93;
   border-radius: 0px;
-  -webkit-appearance: none;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -21,6 +21,7 @@ class App extends React.Component {
     this.handleEventUpdate = this.handleEventUpdate.bind(this);
     this.getOldMessages = this.getOldMessages.bind(this);
     this.onThreadPresenceEvent = this.onThreadPresenceEvent.bind(this);
+    this.updateUser = this.updateUser.bind(this);
   }
 
   getOldMessages(thread_id, count, offset) {
@@ -65,13 +66,18 @@ class App extends React.Component {
       this.getOldMessages(message.thread_id, count, 0);
     }
   }
-  
-  componentWillMount() {
+
+  getMe() {
     var that = this;
-    Bebo.User.getAsync("me")
+    return Bebo.User.getAsync("me")
       .then(function(user) {
         that.setState({me: user});
+        return user;
       });
+  }
+  
+  componentWillMount() {
+    this.getMe();
     Bebo.onEvent(this.handleEventUpdate);
   }
 
@@ -88,9 +94,19 @@ class App extends React.Component {
     this.setState({page: page, threadName: threadName, currentThread: currentThread});
   }
 
+  updateUser(options) {
+    var that = this;
+    return Bebo.User.updateAsync(options)
+      .then(function() {
+        return that.getMe();
+      });
+  }
+
   render() {
     if (this.state.page === "home") {
-      return <Roster me={this.state.me} navigate={this.navigate} ></Roster>
+      return <Roster me={this.state.me}
+                     updateUser={this.updateUser}
+                     navigate={this.navigate} ></Roster>
     } else {
       return <DirectMessageThread messages = {this.state.currentThread} me={this.state.me} navigate={this.navigate} onPresenceEvent={this.onThreadPresenceEvent} thread_id={this.state.page} threadName={this.state.threadName}/>
     }

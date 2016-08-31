@@ -1,7 +1,6 @@
 import React from 'react';
 import Helper from '../helper.js';
 
-
 class ChatInput extends React.Component {
 
   constructor() {
@@ -20,7 +19,6 @@ class ChatInput extends React.Component {
     this.broadcastChat = this.broadcastChat.bind(this);
     this.handleSendChat = this.handleSendChat.bind(this);
   }
-
 
   componentWillMount() {
   }

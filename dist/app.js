@@ -57,7 +57,8 @@
 
 	  Bebo.onReady(function () {
 	    Bebo.User.getAsync = Promise.promisify(Bebo.User.get);
-	    Bebo.getRosterAsync = Bebo.getStreamFullAsync = Promise.promisify(Bebo.getStreamFull);
+	    Bebo.User.updateAsync = Promise.promisify(Bebo.User.update);
+	    Bebo.getStreamFullAsync = Promise.promisify(Bebo.getStreamFull);
 	    var getRosterAsync = Promise.promisify(Bebo.getRoster);
 	    Bebo.getRosterAsync = function () {
 	      return getRosterAsync().then(function (json) {
@@ -27153,6 +27154,7 @@
 	    _this.handleEventUpdate = _this.handleEventUpdate.bind(_this);
 	    _this.getOldMessages = _this.getOldMessages.bind(_this);
 	    _this.onThreadPresenceEvent = _this.onThreadPresenceEvent.bind(_this);
+	    _this.updateUser = _this.updateUser.bind(_this);
 	    return _this;
 	  }
 
@@ -27205,12 +27207,18 @@
 	      }
 	    }
 	  }, {
+	    key: 'getMe',
+	    value: function getMe() {
+	      var that = this;
+	      return Bebo.User.getAsync("me").then(function (user) {
+	        that.setState({ me: user });
+	        return user;
+	      });
+	    }
+	  }, {
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
-	      var that = this;
-	      Bebo.User.getAsync("me").then(function (user) {
-	        that.setState({ me: user });
-	      });
+	      this.getMe();
 	      Bebo.onEvent(this.handleEventUpdate);
 	    }
 	  }, {
@@ -27228,10 +27236,20 @@
 	      this.setState({ page: page, threadName: threadName, currentThread: currentThread });
 	    }
 	  }, {
+	    key: 'updateUser',
+	    value: function updateUser(options) {
+	      var that = this;
+	      return Bebo.User.updateAsync(options).then(function () {
+	        return that.getMe();
+	      });
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      if (this.state.page === "home") {
-	        return _react2.default.createElement(_roster2.default, { me: this.state.me, navigate: this.navigate });
+	        return _react2.default.createElement(_roster2.default, { me: this.state.me,
+	          updateUser: this.updateUser,
+	          navigate: this.navigate });
 	      } else {
 	        return _react2.default.createElement(_dmThread2.default, { messages: this.state.currentThread, me: this.state.me, navigate: this.navigate, onPresenceEvent: this.onThreadPresenceEvent, thread_id: this.state.page, threadName: this.state.threadName });
 	      }
@@ -43440,16 +43458,35 @@
 
 	    _this.state = {
 	      page: "home",
+	      username: "",
 	      online: [],
-	      offline: []
+	      offline: [],
+	      editUserName: false
 	    };
 	    _this.viewerUpdate = _this.viewerUpdate.bind(_this);
 	    _this.componentWillMount = _this.componentWillMount.bind(_this);
+	    _this.editUserName = _this.editUserName.bind(_this);
+	    _this.onUserNameChange = _this.onUserNameChange.bind(_this);
+	    _this.saveUserName = _this.saveUserName.bind(_this);
 	    Bebo.onViewerUpdate(_this.viewerUpdate);
 	    return _this;
 	  }
 
 	  _createClass(Roster, [{
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      if (this.props.me.username) {
+	        this.setState({ username: this.props.me.username });
+	      }
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {
+	      if (this.state.username !== nextProps.me.username) {
+	        this.setState({ username: nextProps.me.username });
+	      }
+	    }
+	  }, {
 	    key: 'viewerUpdate',
 	    value: function viewerUpdate(viewer_ids) {
 	      var resync = false;
@@ -43535,14 +43572,59 @@
 	      });
 	    }
 	  }, {
+	    key: 'editUserName',
+	    value: function editUserName(e) {
+	      this.setState({ editUserName: true });
+	    }
+	  }, {
+	    key: 'saveUserName',
+	    value: function saveUserName(e) {
+	      var that = this;
+	      this.props.updateUser({ username: this.state.username }).then(function (user) {
+	        that.setState({ editUserName: false });
+	      });
+	    }
+	  }, {
 	    key: 'onUserNameChange',
 	    value: function onUserNameChange(e) {
-	      // FIXME
-	      console.log("FIXME - username changed", e);
+	      this.setState({ username: _.toLower(_.trim(e.target.value)) });
 	    }
 	  }, {
 	    key: 'renderMe',
 	    value: function renderMe() {
+	      var username, edit;
+	      if (this.state.editUserName) {
+	        username = _react2.default.createElement(
+	          'span',
+	          { className: 'roster-list-item--user--name' },
+	          _react2.default.createElement(
+	            'form',
+	            null,
+	            _react2.default.createElement('input', { type: 'text',
+	              className: 'roster-list-item--user--name--edit',
+	              value: this.state.username,
+	              onChange: this.onUserNameChange })
+	          )
+	        );
+	        edit = _react2.default.createElement(
+	          'span',
+	          { className: 'edit-settings edit', onClick: this.saveUserName },
+	          _react2.default.createElement('img', { src: 'assets/img/ok.svg', className: 'save-icon' })
+	        );
+	      } else {
+	        username = _react2.default.createElement(
+	          'span',
+	          { className: 'roster-list-item--user--name' },
+	          this.props.me.username,
+	          ' ',
+	          _react2.default.createElement('span', { className: 'circle' })
+	        );
+	        edit = _react2.default.createElement(
+	          'span',
+	          { className: 'edit-settings edit', onClick: this.editUserName },
+	          _react2.default.createElement('img', { src: 'assets/img/icSettings.png', className: 'edit-icon' })
+	        );
+	      }
 	      if (!this.props.me || !this.props.me.user_id) {
 	        return _react2.default.createElement(
 	          'div',
@@ -43551,24 +43633,8 @@
 	          _react2.default.createElement(
 	            'span',
 	            { className: 'edit-settings edit' },
-	            _react2.default.createElement('img', { src: 'assets/img/icSettings.png', className: 'edit-icon' }),
-	            _react2.default.createElement('img', { src: 'assets/img/ok.svg', className: 'save-icon' })
+	            _react2.default.createElement('img', { src: 'assets/img/icSettings.png', className: 'edit-icon' })
 	          )
-	        );
-	      }
-	      var username = "";
-	      var username = _react2.default.createElement(
-	        'span',
-	        { className: 'roster-list-item--user--name' },
-	        this.props.me.username,
-	        ' ',
-	        _react2.default.createElement('span', { className: 'circle' })
-	      );
-	      if (this.state.editUsername) {
-	        username = _react2.default.createElement(
-	          'span',
-	          { className: 'roster-list-item--user--name' },
-	          _react2.default.createElement('input', { type: 'text', className: 'roster-list-item--user--name--edit', name: 'username', value: this.props.me.username, onChange: this.onUserNameChange })
 	        );
 	      }
 	      return _react2.default.createElement(
@@ -43585,12 +43651,7 @@
 	          username
 	        ),
 	        _react2.default.createElement('div', { className: 'roster-list-item--settings' }),
-	        _react2.default.createElement(
-	          'span',
-	          { className: 'edit-settings edit' },
-	          _react2.default.createElement('img', { src: 'assets/img/icSettings.png', className: 'edit-icon' }),
-	          _react2.default.createElement('img', { src: 'assets/img/ok.svg', className: 'save-icon' })
-	        )
+	        edit
 	      );
 	    }
 	  }, {

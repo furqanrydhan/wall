@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   Bebo.onReady(function () {
     Bebo.User.getAsync = Promise.promisify(Bebo.User.get);
-    Bebo.getRosterAsync = 
+    Bebo.User.updateAsync = Promise.promisify(Bebo.User.update);
     Bebo.getStreamFullAsync = Promise.promisify(Bebo.getStreamFull);
     var getRosterAsync = Promise.promisify(Bebo.getRoster);
     Bebo.getRosterAsync= function () {
@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         });
     }
+    Bebo.UI.disableKeyboardDoneStrip();
     App.init();
   });
 });

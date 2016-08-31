@@ -9,13 +9,30 @@ class Roster extends React.Component {
     super();
     this.state = {
       page: "home",
+      username: "",
       online: [],
       offline: [],
+      editUserName: false,
     };
     this.viewerUpdate= this.viewerUpdate.bind(this);
     this.componentWillMount = this.componentWillMount.bind(this);
+    this.editUserName = this.editUserName.bind(this);
+    this.onUserNameChange= this.onUserNameChange.bind(this);
+    this.saveUserName = this.saveUserName.bind(this);
     Bebo.onViewerUpdate(this.viewerUpdate);
   }
+
+  componentWillMount() {
+    if (this.props.me.username) {
+      this.setState({username: this.props.me.username});
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.state.username !== nextProps.me.username) {
+      this.setState({username: nextProps.me.username});
+    }
+  } 
 
   viewerUpdate(viewer_ids) {
     var resync = false;
@@ -95,29 +112,56 @@ class Roster extends React.Component {
     )
   }
 
-  onUserNameChange(e) {
-    // FIXME
-    console.log("FIXME - username changed", e);
+  editUserName(e) {
+    this.setState({editUserName: true});
   }
+
+  saveUserName(e) {
+    var that = this;
+    this.props.updateUser({username: this.state.username})
+      .then(function(user) {
+        that.setState({editUserName: false});
+      });
+  }
+
+  onUserNameChange(e) {
+    this.setState({username: _.toLower(_.trim(e.target.value))});
+  }
+
   renderMe() {
+    var username, edit;
+    if (this.state.editUserName) {
+      username = (
+        <span className="roster-list-item--user--name">
+          <form>
+          <input type="text"
+            className="roster-list-item--user--name--edit"
+            value={this.state.username}
+            onChange={this.onUserNameChange}/>
+        </form>
+        </span>
+      )
+      edit = (
+        <span className="edit-settings edit" onClick={this.saveUserName}>
+          <img src="assets/img/ok.svg" className="save-icon"/>
+        </span>
+      )
+    } else {
+      username = <span className="roster-list-item--user--name">{this.props.me.username} <span className="circle"></span></span>;
+      edit = (
+          <span className="edit-settings edit" onClick={this.editUserName}>
+            <img src="assets/img/icSettings.png" className="edit-icon"/>
+          </span>
+      )
+    }
     if (! this.props.me || ! this.props.me.user_id) {
       return (
         <div className="roster-me">
           <div className="roster-list-item--settings"></div>
           <span className="edit-settings edit">
             <img src="assets/img/icSettings.png" className="edit-icon"/>
-            <img src="assets/img/ok.svg" className="save-icon"/>
           </span>
         </div>
-      )
-    }
-    var username = "";
-    var username = <span className="roster-list-item--user--name">{this.props.me.username} <span className="circle"></span></span>;
-    if (this.state.editUsername) {
-      username = (
-        <span className="roster-list-item--user--name">
-          <input type="text" className="roster-list-item--user--name--edit" name="username" value={this.props.me.username} onChange={this.onUserNameChange}/>
-        </span>
       )
     }
     return (
@@ -129,10 +173,7 @@ class Roster extends React.Component {
           {username}
         </div>
         <div className="roster-list-item--settings"></div>
-        <span className="edit-settings edit">
-          <img src="assets/img/icSettings.png" className="edit-icon"/>
-          <img src="assets/img/ok.svg" className="save-icon"/>
-        </span>
+        {edit}
       </div>
     )
   }
