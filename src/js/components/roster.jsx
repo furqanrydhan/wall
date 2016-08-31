@@ -8,19 +8,14 @@ class Roster extends React.Component {
   constructor() {
     super();
     this.state = {
-      page: "home",
       username: "",
-      online: [],
-      offline: [],
       editUserName: false,
     };
-    this.viewerUpdate= this.viewerUpdate.bind(this);
     this.componentWillMount = this.componentWillMount.bind(this);
     this.editUserName = this.editUserName.bind(this);
     this.onUserNameChange= this.onUserNameChange.bind(this);
     this.saveUserName = this.saveUserName.bind(this);
     this.fileUpload = this.fileUpload.bind(this);
-    Bebo.onViewerUpdate(this.viewerUpdate);
   }
 
   componentWillMount() {
@@ -46,80 +41,14 @@ class Roster extends React.Component {
     }
   } 
 
-  viewerUpdate(viewer_ids) {
-    var resync = false;
-    var rosterList = _.values(this.roster);
-    var l = rosterList.length;
-    for (var i=0; i< l; i++) {
-      rosterList[i].online = false;
-    }
-    var roster = this.roster;
-    var l = viewer_ids.length;
-    for (var i=0; i< l; i++) {
-      var viewer_id = viewer_ids[i];
-      if (viewer_id === this.props.me.user_id) {
-        continue;
-      } else if (roster[viewer_id]) {
-        roster[viewer_id].online = true;
-      } else {
-        resync = true;
-      }
-    }
-    var online = _.filter(_.values(roster), {online: true});
-    var offline = _.filter(_.values(roster), {online: false});
-    this.setState({online: online,
-                   offline: offline});
-    if (resync === true) {
-      if (this.pollTimer) {
-        clearInterval(this.pollTimer);
-      }
-      _.defer(this.componentWillMount);
-    }
-  }
-
-  componentWillMount() {
-    // Bebo.onWidgetUpdate(function(err, data) {
-    //   console.log("Widget Update", err, data);
-    // });
-    console.log("Roster.componentWillMount");
-    var that = this;
-    var props = { roster: Bebo.getRosterAsync(),
-                  stream: Bebo.getStreamFullAsync() };
-    Promise.props(props)
-      .then(function (data) {
-      console.log("Roster.componentWillMount - got data", data);
-      // var online = new Set(stream.viewer_ids);
-      var roster = {};
-      var l = data.roster.length;
-      for (var i=0; i< l; i++) {
-        var user = data.roster[i];
-        user.online = false;
-        roster[user.user_id] = user;
-        roster[user.user_id].thread_id = Helper.mkThreadId(that.props.me, user.user_id);
-      }
-      l = data.stream.viewer_ids.length;
-      for (var i=0; i< l; i++) {
-        var viewer_id = data.stream.viewer_ids[i];
-        roster[viewer_id].online = true;
-      }
-      delete roster[that.props.me.user_id];
-      that.roster = roster;
-      var online = _.filter(_.values(roster), {online: true});
-      var offline = _.filter(_.values(roster), {online: false});
-      that.setState({online: online,
-                     offline: offline});
-      that.pollTimer = setInterval(that.poll, 1000);
-    });
-  }
-
   renderOnline() {
-    return this.state.online.map(
+    return this.props.online.map(
       (i) => <RosterItem key={i.thread_id} unread={i.unread} thread_id={i.thread_id} image_url={i.image_url} online={i.online} username={i.username} navigate={this.props.navigate}/>
     )
   }
 
   renderOffline() {
-    return this.state.offline.map(
+    return this.props.offline.map(
       (i) => <RosterItem key={i.thread_id} unread={i.unread} thread_id={i.thread_id} image_url={i.image_url} online={i.online} username={i.username} navigate={this.props.navigate}/>
     )
   }

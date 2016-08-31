@@ -75,19 +75,28 @@ class ChatInput extends React.Component {
 
   handleSendChat(e) {
     e.preventDefault();
+    var that = this;
     const text = this.state.messageText.trim();
+    var user_id = Helper.getPartnerFromThreadId(this.props.actingUser, this.props.thread_id);
     if (text.length > 0) {
       const message = {
         type: 'message',
         username: this.props.actingUser.username,
         user_id: this.props.actingUser.user_id,
         message: text,
-        users: [Helper.getPartnerFromThreadId(this.props.actingUser, this.props.thread_id)],
+        users: [user_id]
       };
 
       // TODO mention stuff in users[]
 
-      Bebo.Db.save('dm_' + this.props.thread_id, message, this.broadcastChat);
+      Bebo.Db.saveAsync('dm_' + this.props.thread_id, message)
+        .then(function(data) {
+          return that.props.incrUnreadMessage(that.props.thread_id, user_id)
+            .then(function() {
+              return data
+            });
+        })
+        .then(that.broadcastChat);
       this.resetTextarea();
     } else {
       console.warn('no message, returning');
@@ -111,11 +120,7 @@ class ChatInput extends React.Component {
       });
   }
 
-  broadcastChat(err, data) {
-    if (err) {
-      console.log('error', err);
-      return;
-    }
+  broadcastChat(data) {
     const m = data.result[0];
     this.notifyUser(m.users, m.message);
     console.log("message from db", m);

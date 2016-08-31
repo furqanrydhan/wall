@@ -52,6 +52,7 @@ class Thread extends React.Component {
     const giphyClosing = this.state.closing === true;
     var giphyBrowser = <GiphyBrowser style={giphyOpen ? { transform: 'translate3d(0,0,0)' } : {}}
                                      actingUser={this.props.me}
+                                     incrUnreadMessage={this.props.incrUnreadMessage}
                                      thread_id={this.props.thread_id}
                                      switchMode={this.handleSwitchMode} />;
     return (<div className="chat">
@@ -72,6 +73,7 @@ class Thread extends React.Component {
            style={this.state.mode === 'gif' ? { transform: 'translate3d(40vw,0,0)' } : {}}>
         <ChatInput blurChat={this.state.blurInput}
                    actingUser={this.props.me}
+                   incrUnreadMessage={this.props.incrUnreadMessage}
                    thread_id={this.props.thread_id}
                    switchMode={this.handleSwitchMode}
                    setChatInputState={this.blurInput} />

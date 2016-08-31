@@ -59,6 +59,20 @@
 	    Bebo.User.getAsync = Promise.promisify(Bebo.User.get);
 	    Bebo.uploadImageAsync = Promise.promisify(Bebo.uploadImage);
 	    Bebo.User.updateAsync = Promise.promisify(Bebo.User.update);
+	    Bebo.Db.saveAsync = Promise.promisify(Bebo.Db.save);
+
+	    var getAsync = Promise.promisify(Bebo.Db.get);
+	    Bebo.Db.getAsync = function (table, params) {
+	      return getAsync(table, params).then(function (json) {
+	        if (json.code != 200) {
+	          throw new Error("Not 200");
+	        } else {
+	          return json.result;
+	        }
+	      });
+	    };
+
+	    Bebo.Db.deleteAsync = Promise.promisify(Bebo.Db.delete);
 	    Bebo.getStreamFullAsync = Promise.promisify(Bebo.getStreamFull);
 	    var getRosterAsync = Promise.promisify(Bebo.getRoster);
 	    Bebo.getRosterAsync = function () {
@@ -27104,6 +27118,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _bluebird = __webpack_require__(1);
+
+	var _bluebird2 = _interopRequireDefault(_bluebird);
+
 	var _chatList = __webpack_require__(176);
 
 	var _chatList2 = _interopRequireDefault(_chatList);
@@ -27119,6 +27137,10 @@
 	var _giphyBrowser = __webpack_require__(285);
 
 	var _giphyBrowser2 = _interopRequireDefault(_giphyBrowser);
+
+	var _helper = __webpack_require__(284);
+
+	var _helper2 = _interopRequireDefault(_helper);
 
 	var _roster = __webpack_require__(290);
 
@@ -27148,6 +27170,8 @@
 	      page: "home",
 	      currentThread: [],
 	      me: {},
+	      online: [],
+	      offline: [],
 	      threadName: ""
 	    };
 	    _this.store = {};
@@ -27157,10 +27181,124 @@
 	    _this.onThreadPresenceEvent = _this.onThreadPresenceEvent.bind(_this);
 	    _this.updateUser = _this.updateUser.bind(_this);
 	    _this.uploadImage = _this.uploadImage.bind(_this);
+	    _this.viewerUpdate = _this.viewerUpdate.bind(_this);
+	    _this.getFullRoster = _this.getFullRoster.bind(_this);
+	    _this.setRosterState = _this.setRosterState.bind(_this);
+	    _this.incrUnreadMessage = _this.incrUnreadMessage.bind(_this);
+	    _this.clearUnreadMessage = _this.clearUnreadMessage.bind(_this);
+	    _this.getUnreadAndUpdate = _this.getUnreadAndUpdate.bind(_this);
+	    Bebo.onViewerUpdate(_this.viewerUpdate);
+	    _this.roster = {};
 	    return _this;
 	  }
 
 	  _createClass(App, [{
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      this.getMe().then(this.getFullRoster);
+	      Bebo.onEvent(this.handleEventUpdate);
+	    }
+
+	    /*
+	     * Roster Data
+	     */
+
+	  }, {
+	    key: 'setRosterState',
+	    value: function setRosterState(roster) {
+	      this.roster = roster;
+	      var online = _.filter(_.values(this.roster), { online: true });
+	      var offline = _.filter(_.values(this.roster), { online: false });
+	      this.setState({ online: online,
+	        offline: offline });
+	    }
+	  }, {
+	    key: 'getUnreadAndUpdate',
+	    value: function getUnreadAndUpdate(thread_id) {
+	      var that = this;
+	      var params = { count: 200 };
+	      if (thread_id) {
+	        params.thread_id = thread_id;
+	      }
+	      return Bebo.Db.getAsync('dm_unread_' + this.state.me.user_id, params).then(function (data) {
+	        var l = data.length;
+	        var roster = that.roster;
+	        for (var i = 0; i < l; i++) {
+	          var unread = data[i];
+	          var user_id = _helper2.default.getPartnerFromThreadId(that.state.me, unread.thread_id);
+	          if (roster[user_id]) {
+	            roster[user_id].unread = unread.unread_cnt;
+	          }
+	        }
+	        that.setRosterState(roster);
+	      });
+	    }
+	  }, {
+	    key: 'getFullRoster',
+	    value: function getFullRoster() {
+	      var that = this;
+	      var props = { unread: Bebo.Db.getAsync('dm_unread_' + that.state.me.user_id, { count: 200 }),
+	        roster: Bebo.getRosterAsync(),
+	        stream: Bebo.getStreamFullAsync() };
+	      return _bluebird2.default.props(props).then(function (data) {
+	        var roster = {};
+	        var l = data.roster.length;
+	        for (var i = 0; i < l; i++) {
+	          var user = data.roster[i];
+	          user.online = false;
+	          roster[user.user_id] = user;
+	          roster[user.user_id].thread_id = _helper2.default.mkThreadId(that.state.me, user.user_id);
+	        }
+	        l = data.stream.viewer_ids.length;
+	        for (var i = 0; i < l; i++) {
+	          var viewer_id = data.stream.viewer_ids[i];
+	          roster[viewer_id].online = true;
+	        }
+	        console.log("Unread DATA", data.unread);
+	        l = data.unread.length;
+	        for (var i = 0; i < l; i++) {
+	          var unread = data.unread[i];
+	          var user_id = _helper2.default.getPartnerFromThreadId(that.state.me, unread.thread_id);
+	          if (roster[user_id]) {
+	            roster[user_id].unread = unread.unread_cnt;
+	          }
+	        }
+	        delete roster[that.state.me.user_id];
+	        that.setRosterState(roster);
+	      });
+	    }
+	  }, {
+	    key: 'viewerUpdate',
+	    value: function viewerUpdate(viewer_ids) {
+	      var resync = false;
+	      var rosterList = _.values(this.roster);
+	      var l = rosterList.length;
+	      for (var i = 0; i < l; i++) {
+	        rosterList[i].online = false;
+	      }
+	      var roster = this.roster;
+	      var l = viewer_ids.length;
+	      for (var i = 0; i < l; i++) {
+	        var viewer_id = viewer_ids[i];
+	        if (viewer_id === this.state.me.user_id) {
+	          continue;
+	        } else if (roster[viewer_id]) {
+	          roster[viewer_id].online = true;
+	        } else {
+	          resync = true;
+	        }
+	      }
+	      this.setRosterState(roster);
+	      if (resync === true) {
+	        _.defer(this.getFullRoster);
+	      }
+	    }
+
+	    /*
+	     * Message Data
+	     */
+
+	  }, {
 	    key: 'getOldMessages',
 	    value: function getOldMessages(thread_id, count, offset) {
 	      var that = this;
@@ -27196,6 +27334,55 @@
 	      }
 	    }
 	  }, {
+	    key: 'incrUnreadMessage',
+	    value: function incrUnreadMessage(thread_id, to_user_id) {
+	      return Bebo.Db.getAsync('dm_unread_' + to_user_id, { thread_id: thread_id }).then(function (data) {
+	        console.log("THREAD COUNTER DATA", data);
+	        var row;
+	        if (data && data.length > 0) {
+	          row = data[0];
+	        }
+	        if (!row) {
+	          row = { thread_id: thread_id,
+	            unread_cnt: 0 };
+	        }
+	        row.unread_cnt = row.unread_cnt + 1;
+	        return Bebo.Db.saveAsync('dm_unread_' + to_user_id, row);
+	      });
+	    }
+
+	    // FIXME put this back in once we have delete working - no need to have this
+	    // in the table and fetch it
+	    // :w
+	    // 
+	    // clearUnreadMessage(thread_id) {
+	    //   var params = {thread_id: thread_id};
+	    //   console.log("DELETE", to_user_id, params);
+	    //   return Bebo.Db.deleteAsync('dm_unread_' + to_user_id, { thread_id: thread_id});
+	    // }
+
+	  }, {
+	    key: 'clearUnreadMessage',
+	    value: function clearUnreadMessage(thread_id) {
+	      var user_id = _helper2.default.getPartnerFromThreadId(this.state.me, thread_id);
+	      if (this.roster[user_id]) {
+	        this.roster[user_id].unread = 0;
+	      }
+	      this.setRosterState(this.roster);
+	      var that = this;
+	      return Bebo.Db.getAsync('dm_unread_' + this.state.me.user_id, { thread_id: thread_id }).then(function (data) {
+	        var row;
+	        if (data && data.length > 0) {
+	          row = data[0];
+	        }
+	        if (!row) {
+	          return;
+	        }
+	        row.unread_cnt = 0;
+	        return Bebo.Db.saveAsync('dm_unread_' + that.state.me.user_id, row);
+	      });
+	    }
+	  }, {
 	    key: 'onThreadPresenceEvent',
 	    value: function onThreadPresenceEvent(callback) {
 	      this.onThreadPresenceUpdate = callback;
@@ -27206,6 +27393,9 @@
 	      if (message.thread_id === this.state.page) {
 	        var count = Math.max(this.state.currentThread.length, 50) + 1;
 	        this.getOldMessages(message.thread_id, count, 0);
+	      } else {
+	        this.getUnreadAndUpdate(message.thread_id);
+	        this.getOldMessages(message.thread_id, 50, 0);
 	      }
 	    }
 	  }, {
@@ -27218,12 +27408,6 @@
 	      });
 	    }
 	  }, {
-	    key: 'componentWillMount',
-	    value: function componentWillMount() {
-	      this.getMe();
-	      Bebo.onEvent(this.handleEventUpdate);
-	    }
-	  }, {
 	    key: 'navigate',
 	    value: function navigate(page, threadName) {
 	      threadName === threadName || "";
@@ -27234,6 +27418,7 @@
 	        if (this.store[page]) {
 	          currentThread = this.store[page];
 	        }
+	        this.clearUnreadMessage(page);
 	      }
 	      this.setState({ page: page, threadName: threadName, currentThread: currentThread });
 	    }
@@ -27266,11 +27451,20 @@
 	    value: function render() {
 	      if (this.state.page === "home") {
 	        return _react2.default.createElement(_roster2.default, { me: this.state.me,
+	          online: this.state.online,
+	          offline: this.state.offline,
 	          updateUser: this.updateUser,
 	          uploadImage: this.uploadImage,
 	          navigate: this.navigate });
 	      } else {
-	        return _react2.default.createElement(_dmThread2.default, { messages: this.state.currentThread, me: this.state.me, navigate: this.navigate, onPresenceEvent: this.onThreadPresenceEvent, thread_id: this.state.page, threadName: this.state.threadName });
+	        return _react2.default.createElement(_dmThread2.default, {
+	          messages: this.state.currentThread,
+	          me: this.state.me,
+	          incrUnreadMessage: this.incrUnreadMessage,
+	          navigate: this.navigate,
+	          onPresenceEvent: this.onThreadPresenceEvent,
+	          thread_id: this.state.page,
+	          threadName: this.state.threadName });
 	      }
 	    }
 	  }]);
@@ -41959,19 +42153,25 @@
 	    key: 'handleSendChat',
 	    value: function handleSendChat(e) {
 	      e.preventDefault();
+	      var that = this;
 	      var text = this.state.messageText.trim();
+	      var user_id = _helper2.default.getPartnerFromThreadId(this.props.actingUser, this.props.thread_id);
 	      if (text.length > 0) {
 	        var message = {
 	          type: 'message',
 	          username: this.props.actingUser.username,
 	          user_id: this.props.actingUser.user_id,
 	          message: text,
-	          users: [_helper2.default.getPartnerFromThreadId(this.props.actingUser, this.props.thread_id)]
+	          users: [user_id]
 	        };
 
 	        // TODO mention stuff in users[]
 
-	        Bebo.Db.save('dm_' + this.props.thread_id, message, this.broadcastChat);
+	        Bebo.Db.saveAsync('dm_' + this.props.thread_id, message).then(function (data) {
+	          return that.props.incrUnreadMessage(that.props.thread_id, user_id).then(function () {
+	            return data;
+	          });
+	        }).then(that.broadcastChat);
 	        this.resetTextarea();
 	      } else {
 	        console.warn('no message, returning');
@@ -41995,11 +42195,7 @@
 	    }
 	  }, {
 	    key: 'broadcastChat',
-	    value: function broadcastChat(err, data) {
-	      if (err) {
-	        console.log('error', err);
-	        return;
-	      }
+	    value: function broadcastChat(data) {
 	      var m = data.result[0];
 	      this.notifyUser(m.users, m.message);
 	      console.log("message from db", m);
@@ -43476,19 +43672,14 @@
 	    var _this = _possibleConstructorReturn(this, (Roster.__proto__ || Object.getPrototypeOf(Roster)).call(this));
 
 	    _this.state = {
-	      page: "home",
 	      username: "",
-	      online: [],
-	      offline: [],
 	      editUserName: false
 	    };
-	    _this.viewerUpdate = _this.viewerUpdate.bind(_this);
 	    _this.componentWillMount = _this.componentWillMount.bind(_this);
 	    _this.editUserName = _this.editUserName.bind(_this);
 	    _this.onUserNameChange = _this.onUserNameChange.bind(_this);
 	    _this.saveUserName = _this.saveUserName.bind(_this);
 	    _this.fileUpload = _this.fileUpload.bind(_this);
-	    Bebo.onViewerUpdate(_this.viewerUpdate);
 	    return _this;
 	  }
 
@@ -43519,78 +43710,11 @@
 	      }
 	    }
 	  }, {
-	    key: 'viewerUpdate',
-	    value: function viewerUpdate(viewer_ids) {
-	      var resync = false;
-	      var rosterList = _.values(this.roster);
-	      var l = rosterList.length;
-	      for (var i = 0; i < l; i++) {
-	        rosterList[i].online = false;
-	      }
-	      var roster = this.roster;
-	      var l = viewer_ids.length;
-	      for (var i = 0; i < l; i++) {
-	        var viewer_id = viewer_ids[i];
-	        if (viewer_id === this.props.me.user_id) {
-	          continue;
-	        } else if (roster[viewer_id]) {
-	          roster[viewer_id].online = true;
-	        } else {
-	          resync = true;
-	        }
-	      }
-	      var online = _.filter(_.values(roster), { online: true });
-	      var offline = _.filter(_.values(roster), { online: false });
-	      this.setState({ online: online,
-	        offline: offline });
-	      if (resync === true) {
-	        if (this.pollTimer) {
-	          clearInterval(this.pollTimer);
-	        }
-	        _.defer(this.componentWillMount);
-	      }
-	    }
-	  }, {
-	    key: 'componentWillMount',
-	    value: function componentWillMount() {
-	      // Bebo.onWidgetUpdate(function(err, data) {
-	      //   console.log("Widget Update", err, data);
-	      // });
-	      console.log("Roster.componentWillMount");
-	      var that = this;
-	      var props = { roster: Bebo.getRosterAsync(),
-	        stream: Bebo.getStreamFullAsync() };
-	      _bluebird2.default.props(props).then(function (data) {
-	        console.log("Roster.componentWillMount - got data", data);
-	        // var online = new Set(stream.viewer_ids);
-	        var roster = {};
-	        var l = data.roster.length;
-	        for (var i = 0; i < l; i++) {
-	          var user = data.roster[i];
-	          user.online = false;
-	          roster[user.user_id] = user;
-	          roster[user.user_id].thread_id = _helper2.default.mkThreadId(that.props.me, user.user_id);
-	        }
-	        l = data.stream.viewer_ids.length;
-	        for (var i = 0; i < l; i++) {
-	          var viewer_id = data.stream.viewer_ids[i];
-	          roster[viewer_id].online = true;
-	        }
-	        delete roster[that.props.me.user_id];
-	        that.roster = roster;
-	        var online = _.filter(_.values(roster), { online: true });
-	        var offline = _.filter(_.values(roster), { online: false });
-	        that.setState({ online: online,
-	          offline: offline });
-	        that.pollTimer = setInterval(that.poll, 1000);
-	      });
-	    }
-	  }, {
 	    key: 'renderOnline',
 	    value: function renderOnline() {
 	      var _this2 = this;
 
-	      return this.state.online.map(function (i) {
+	      return this.props.online.map(function (i) {
 	        return _react2.default.createElement(_rosterItem2.default, { key: i.thread_id, unread: i.unread, thread_id: i.thread_id, image_url: i.image_url, online: i.online, username: i.username, navigate: _this2.props.navigate });
 	      });
 	    }
@@ -43599,7 +43723,7 @@
 	    value: function renderOffline() {
 	      var _this3 = this;
 
-	      return this.state.offline.map(function (i) {
+	      return this.props.offline.map(function (i) {
 	        return _react2.default.createElement(_rosterItem2.default, { key: i.thread_id, unread: i.unread, thread_id: i.thread_id, image_url: i.image_url, online: i.online, username: i.username, navigate: _this3.props.navigate });
 	      });
 	    }
@@ -43799,7 +43923,7 @@
 	        badge = _react2.default.createElement(
 	          "div",
 	          { className: "roster-list-item--user--chat-badge unread-badge" },
-	          "1"
+	          this.props.unread
 	        );
 	      }
 	      var widget = "";
@@ -43938,6 +44062,7 @@
 	      var giphyClosing = this.state.closing === true;
 	      var giphyBrowser = _react2.default.createElement(_giphyBrowser2.default, { style: giphyOpen ? { transform: 'translate3d(0,0,0)' } : {},
 	        actingUser: this.props.me,
+	        incrUnreadMessage: this.props.incrUnreadMessage,
 	        thread_id: this.props.thread_id,
 	        switchMode: this.handleSwitchMode });
 	      return _react2.default.createElement(
@@ -43974,6 +44099,7 @@
 	            style: this.state.mode === 'gif' ? { transform: 'translate3d(40vw,0,0)' } : {} },
 	          _react2.default.createElement(_chatInput2.default, { blurChat: this.state.blurInput,
 	            actingUser: this.props.me,
+	            incrUnreadMessage: this.props.incrUnreadMessage,
 	            thread_id: this.props.thread_id,
 	            switchMode: this.handleSwitchMode,
 	            setChatInputState: this.blurInput })

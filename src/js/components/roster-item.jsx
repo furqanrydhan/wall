@@ -17,7 +17,7 @@ class RosterItem extends React.Component {
 
     var badge = <div className="roster-list-item--user--chat-badge"><img src="assets/img/icDM.png"/></div>;
     if (this.props.unread) {
-      badge = <div className="roster-list-item--user--chat-badge unread-badge">1</div>;
+      badge = <div className="roster-list-item--user--chat-badge unread-badge">{this.props.unread}</div>;
     }
     var widget = "";
     var online = "";
