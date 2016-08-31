@@ -1,4 +1,5 @@
 import React from 'react';
+import Helper from '../helper.js';
 
 class GiphyGif extends React.Component {
 
@@ -14,17 +15,19 @@ class GiphyGif extends React.Component {
       return;
     }
     const m = data.result[0];
-    Bebo.Notification.broadcast('{{{user.username}}}', ' just posted a GIF', { rate_limit_key: `${m.user_id}_${Math.floor(Date.now() / 1000 / 60 / 60)}` }, (error, resp) => {
-      if (error) {
-        return console.log('error sending notification', error);
-      }
-      return console.log('resp', resp); // an object containing success
-    });
-    Bebo.emitEvent({ message: m });
+    // FIXME
+    // Bebo.Notification.broadcast('{{{user.username}}}', ' just posted a GIF', { rate_limit_key: `${m.user_id}_${Math.floor(Date.now() / 1000 / 60 / 60)}` }, (error, resp) => {
+    //   if (error) {
+    //     return console.log('error sending notification', error);
+    //   }
+    //   return console.log('resp', resp); // an object containing success
+    // });
+    console.log("Sending GIF", m);
+    // Bebo.emitEvent({ message: m });
+    Bebo.emitEvent({ message: {thread_id: this.props.thread_id, "newMsg": 1, "dm_id": m.id }});
 
     this.props.switchMode('text');
   }
-
 
   render() {
     const { gif, actingUser, children, originalSize } = this.props;
@@ -43,11 +46,12 @@ class GiphyGif extends React.Component {
         };
         const message = {
           image,
-          username,
-          user_id,
+          username: this.props.actingUser.username,
+          user_id: this.props.actingUser.user_id,
+          users: [Helper.getPartnerFromThreadId(this.props.actingUser, this.props.thread_id)],
           type: 'image',
         };
-        Bebo.Db.save('messages', message, this.broadcastChat);
+        Bebo.Db.save('dm_' + this.props.thread_id, message, this.broadcastChat);
       })}
     >
       {originalSize ? (

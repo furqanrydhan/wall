@@ -42328,7 +42328,7 @@
 	                'div',
 	                null,
 	                list.map(function (g, index) {
-	                  return _react2.default.createElement(_giphyGif2.default, { originalSize: true, gif: g, key: index, switchMode: _this2.props.switchMode, actingUser: _this2.props.actingUser });
+	                  return _react2.default.createElement(_giphyGif2.default, { originalSize: true, gif: g, key: index, switchMode: _this2.props.switchMode, thread_id: _this2.props.thread_id, actingUser: _this2.props.actingUser });
 	                })
 	              ) : _react2.default.createElement(
 	                'div',
@@ -42420,6 +42420,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _helper = __webpack_require__(284);
+
+	var _helper2 = _interopRequireDefault(_helper);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -42449,13 +42453,16 @@
 	        return;
 	      }
 	      var m = data.result[0];
-	      Bebo.Notification.broadcast('{{{user.username}}}', ' just posted a GIF', { rate_limit_key: m.user_id + '_' + Math.floor(Date.now() / 1000 / 60 / 60) }, function (error, resp) {
-	        if (error) {
-	          return console.log('error sending notification', error);
-	        }
-	        return console.log('resp', resp); // an object containing success
-	      });
-	      Bebo.emitEvent({ message: m });
+	      // FIXME
+	      // Bebo.Notification.broadcast('{{{user.username}}}', ' just posted a GIF', { rate_limit_key: `${m.user_id}_${Math.floor(Date.now() / 1000 / 60 / 60)}` }, (error, resp) => {
+	      //   if (error) {
+	      //     return console.log('error sending notification', error);
+	      //   }
+	      //   return console.log('resp', resp); // an object containing success
+	      // });
+	      console.log("Sending GIF", m);
+	      // Bebo.emitEvent({ message: m });
+	      Bebo.emitEvent({ message: { thread_id: this.props.thread_id, "newMsg": 1, "dm_id": m.id } });
 
 	      this.props.switchMode('text');
 	    }
@@ -42490,11 +42497,12 @@
 	            };
 	            var message = {
 	              image: image,
-	              username: username,
-	              user_id: user_id,
+	              username: _this2.props.actingUser.username,
+	              user_id: _this2.props.actingUser.user_id,
+	              users: [_helper2.default.getPartnerFromThreadId(_this2.props.actingUser, _this2.props.thread_id)],
 	              type: 'image'
 	            };
-	            Bebo.Db.save('messages', message, _this2.broadcastChat);
+	            Bebo.Db.save('dm_' + _this2.props.thread_id, message, _this2.broadcastChat);
 	          }
 	        },
 	        originalSize ? _react2.default.createElement('img', { className: 'gif', style: { paddingTop: 0 }, role: 'presentation', src: gifUrl.replace('http://', 'https://') }) : _react2.default.createElement('div', { className: 'gif', style: { backgroundImage: 'url(' + gifUrl.replace('http://', 'https://') + ')' } }),
@@ -43542,12 +43550,11 @@
 	          _react2.default.createElement(
 	            'span',
 	            { className: 'edit-settings edit' },
-	            _react2.default.createElement('img', { src: 'assets/img/settings.svg', className: 'edit-icon' }),
+	            _react2.default.createElement('img', { src: 'assets/img/icSettings.png', className: 'edit-icon' }),
 	            _react2.default.createElement('img', { src: 'assets/img/ok.svg', className: 'save-icon' })
 	          )
 	        );
 	      }
-
 	      var username = "";
 	      var username = _react2.default.createElement(
 	        'span',
@@ -43817,6 +43824,10 @@
 	    value: function render() {
 	      var giphyOpen = this.state.open === true;
 	      var giphyClosing = this.state.closing === true;
+	      var giphyBrowser = _react2.default.createElement(_giphyBrowser2.default, { style: giphyOpen ? { transform: 'translate3d(0,0,0)' } : {},
+	        actingUser: this.props.me,
+	        thread_id: this.props.thread_id,
+	        switchMode: this.handleSwitchMode });
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'chat' },
@@ -43836,16 +43847,26 @@
 	        ),
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'chat-upper', style: this.state.mode === 'gif' ? { transform: 'translate3d(40vw,0,0)' } : {} },
-	          _react2.default.createElement(_chatList2.default, { messages: this.props.messages, blurChat: this.blurInput, onPresenceEvent: this.props.onPresenceEvent, actingUser: this.props.me, thread_id: this.props.thread_id }),
+	          { className: 'chat-upper',
+	            style: this.state.mode === 'gif' ? { transform: 'translate3d(40vw,0,0)' } : {} },
+	          _react2.default.createElement(_chatList2.default, { messages: this.props.messages,
+	            blurChat: this.blurInput,
+	            onPresenceEvent: this.props.onPresenceEvent,
+	            actingUser: this.props.me,
+	            thread_id: this.props.thread_id }),
 	          _react2.default.createElement(_chatBackground2.default, null)
 	        ),
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'chat-lower', style: this.state.mode === 'gif' ? { transform: 'translate3d(40vw,0,0)' } : {} },
-	          _react2.default.createElement(_chatInput2.default, { blurChat: this.state.blurInput, actingUser: this.props.me, thread_id: this.props.thread_id, switchMode: this.handleSwitchMode, setChatInputState: this.blurInput })
+	          { className: 'chat-lower',
+	            style: this.state.mode === 'gif' ? { transform: 'translate3d(40vw,0,0)' } : {} },
+	          _react2.default.createElement(_chatInput2.default, { blurChat: this.state.blurInput,
+	            actingUser: this.props.me,
+	            thread_id: this.props.thread_id,
+	            switchMode: this.handleSwitchMode,
+	            setChatInputState: this.blurInput })
 	        ),
-	        (giphyOpen || giphyClosing || this.state.mode === 'gif') && _react2.default.createElement(_giphyBrowser2.default, { style: giphyOpen ? { transform: 'translate3d(0,0,0)' } : {}, actingUser: this.state.actingUser, switchMode: this.handleSwitchMode })
+	        (giphyOpen || giphyClosing || this.state.mode === 'gif') && giphyBrowser
 	      );
 	    }
 	  }]);

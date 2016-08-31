@@ -105,13 +105,12 @@ class Roster extends React.Component {
         <div className="roster-me">
           <div className="roster-list-item--settings"></div>
           <span className="edit-settings edit">
-            <img src="assets/img/settings.svg" className="edit-icon"/>
+            <img src="assets/img/icSettings.png" className="edit-icon"/>
             <img src="assets/img/ok.svg" className="save-icon"/>
           </span>
         </div>
       )
     }
-
     var username = "";
     var username = <span className="roster-list-item--user--name">{this.props.me.username} <span className="circle"></span></span>;
     if (this.state.editUsername) {
