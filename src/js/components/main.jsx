@@ -86,6 +86,7 @@ class App extends React.Component {
       var l = data.roster.length;
       for (var i=0; i< l; i++) {
         var user = data.roster[i];
+        user.image_url = user.image_url + "?h=48&w=48";
         user.online = false;
         roster[user.user_id] = user;
         roster[user.user_id].thread_id = Helper.mkThreadId(that.state.me, user.user_id);
