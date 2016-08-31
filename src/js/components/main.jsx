@@ -263,20 +263,13 @@ class App extends React.Component {
       });
   }
 
-  uploadImage(file, callback) {
+  uploadImage(url) {
     var that = this;
-    var reader = new FileReader();
-    reader.onloadend = function () {
-      Bebo.uploadImageAsync(reader.result)
-        .then(function(image_url) {
-          console.log("uploded image to bebo", image_url);
-          return that.updateUser({image_url: image_url});
-        }).then(callback);
-    }
-    reader.onerror = function(err) {
-      console.error("error reading file", err);
-    }
-    reader.readAsDataURL(file);
+    return Bebo.uploadImageAsync(url)
+      .then(function(image_url) {
+        console.log("uploded image to bebo", image_url);
+        return that.updateUser({image_url: image_url});
+      });
   }
 
   render() {

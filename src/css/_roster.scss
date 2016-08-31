@@ -20,6 +20,16 @@
   }
 }
 
+
+// body {
+//   @extend html;
+//   display: flex;
+//   justify-content: space-around;
+//   align-items: center;
+//   background: #333333;
+// }
+
+
 .main-div {
   background: #fff;
   color: #000;
@@ -75,35 +85,74 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 // MY CELL STYLING
 
+$base-line-height: 24px;
+$white: rgb(255,255,255);
+$off-white: rgba($white, 0.2);
+$spin-duration: 1s;
+$pulse-duration: 750ms;
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .roster-me {
   display: block;
   overflow: auto;
   margin: calc-em(16px) calc-em(16px);
   .roster-list-item--image {
+    border-radius: 8px;
     width: calc-em(50px);
     height: calc-em(50px);
-    .fileinput {
-        position: relative;
-        display: block;
-        img {
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            z-index: 1;
-        }
-        .fileOverlay {
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            z-index: 2;
-        }
-        input {
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            z-index: 3;
-            opacity: 0;
-        }
+    display: flex;
+    justify-content: space-around;
+    background-size: cover;
+    position: relative;
+    .image {
+        border-radius: 8px;
+        z-index: 0;
+        width: calc-em(50px);
+        height: calc-em(50px);
+        background-size: cover;
+    }
+    .loading {
+        z-index: 100;
+        border-radius: 50%;
+        margin-top: calc-em(13px);
+        width: calc-em(24px);
+        height: calc-em(24px);
+        border: .25rem solid $off-white;
+        border-top-color: $white;
+        animation: spin $spin-duration infinite linear;
+    }
+    // img {
+    //     position: absolute;
+    //     top: 0px;
+    //     left: 0px;
+    //     z-index: 1;
+    // }
+    .fileOverlay {
+        position: absolute;
+        background-size:  calc-em(23px)  calc-em(21px);
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-color: rgba(255,255,255,0.5);
+        top: 0px;
+        left: 0px;
+        width: calc-em(50px);
+        height: calc-em(50px);
+        z-index: 2;
+    }
+    input {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        z-index: 3;
+        opacity: 0;
     }
   }
   .roster-list-item--image img {

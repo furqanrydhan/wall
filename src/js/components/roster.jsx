@@ -9,7 +9,7 @@ class Roster extends React.Component {
     super();
     this.state = {
       username: "",
-      editUserName: false,
+      editState: false,
     };
     this.componentWillMount = this.componentWillMount.bind(this);
     this.editUserName = this.editUserName.bind(this);
@@ -23,17 +23,6 @@ class Roster extends React.Component {
       this.setState({username: this.props.me.username});
     }
   }
-
-  // componentDidUpdate() {
-  //   if (this.state.editUserName) {
-  //     var element = document.getElementById('file');
-  //     element.value = null;
-  //     element.onclick = function () {
-  //       element.value = null;
-  //     }
-  //     element.onchange = this.fileUpload;
-  //   }
-  // }
 
   componentWillReceiveProps(nextProps) {
     if (this.state.username !== nextProps.me.username) {
@@ -54,14 +43,14 @@ class Roster extends React.Component {
   }
 
   editUserName(e) {
-    this.setState({editUserName: true});
+    this.setState({editState: true});
   }
 
   saveUserName(e) {
     var that = this;
     this.props.updateUser({username: this.state.username})
       .then(function(user) {
-        that.setState({editUserName: false});
+        that.setState({editState: false});
       });
   }
 
@@ -73,14 +62,32 @@ class Roster extends React.Component {
     var that = this;
     console.log("fileUpload", e);
     var file = e.target.files[0];
-    this.props.uploadImage(file, function() {
-      that.setState({editUserName: false});
-    });
+    var reader = new FileReader();
+    reader.onloadend = function () {
+      var url = reader.result;
+      that.setState({editState: "uploading",
+                     image_url: url});
+      that.props.uploadImage(url)
+      .then(function() {
+        that.setState({editState: false,
+                       image_url: null});
+      }).catch(function(err) {
+        console.error("upload failed", err);
+        that.setState({editState: false,
+                       image_url: null});
+      });
+    }
+    reader.onerror = function(err) {
+      console.error("error reading file", err);
+      that.setState({editState: false,
+                     image_url: null});
+    }
+    reader.readAsDataURL(file);
   }
 
   renderMe() {
     var username, edit, image;
-    if (this.state.editUserName) {
+    if (this.state.editState === true) {
       username = (
         <span className="roster-list-item--user--name">
           <form>
@@ -96,12 +103,27 @@ class Roster extends React.Component {
           <img src="assets/img/ok.svg" className="save-icon"/>
         </span>
       )
+      var style = { backgroundImage: 'url(' + this.props.me.image_url + ')'};
+      var cameraStyle = { backgroundImage: 'url(' + "assets/img/icCamera.png" + ')'};
       image = (
-        <div className="fileinput">
+        <div className="roster-list-item--image" >
+          <div className="image" style={style} />
           <input id="file" type="file" onChange={this.fileUpload} accept="image/*" />
-          <img src={this.props.me.image_url}/>
-          <img className="fileOverlay" src={this.props.me.image_url}/>
+          <div className="fileOverlay" style={cameraStyle} />
         </div>)
+
+    } else if (this.state.editState === "uploading") {
+      username = <span className="roster-list-item--user--name">{this.props.me.username} <span className="circle"></span></span>;
+      edit = (
+          <span className="edit-settings edit" onClick={this.editUserName}>
+          </span>
+      )
+      var style = {backgroundImage: 'url(' + this.state.image_url + ')'};
+      image = (
+        <div className="roster-list-item--image" style={style}>
+          <div className="loading"/>
+        </div>
+      )
           
     } else {
       username = <span className="roster-list-item--user--name">{this.props.me.username} <span className="circle"></span></span>;
@@ -110,7 +132,9 @@ class Roster extends React.Component {
             <img src="assets/img/icSettings.png" className="edit-icon"/>
           </span>
       )
-      image = <img src={this.props.me.image_url}/>;
+      var style = {backgroundImage: 'url(' + this.props.me.image_url + ')'};
+      image = (<div className="roster-list-item--image" style={style}>
+               </div>)
     }
     if (! this.props.me || ! this.props.me.user_id) {
       return (
@@ -124,9 +148,7 @@ class Roster extends React.Component {
     }
     return (
       <div className="roster-me roster-list-item">
-        <div className="roster-list-item--image">
-          {image}
-        </div>
+        {image}
         <div className="roster-list-item--user">
           {username}
         </div>

@@ -27432,19 +27432,12 @@
 	    }
 	  }, {
 	    key: 'uploadImage',
-	    value: function uploadImage(file, callback) {
+	    value: function uploadImage(url) {
 	      var that = this;
-	      var reader = new FileReader();
-	      reader.onloadend = function () {
-	        Bebo.uploadImageAsync(reader.result).then(function (image_url) {
-	          console.log("uploded image to bebo", image_url);
-	          return that.updateUser({ image_url: image_url });
-	        }).then(callback);
-	      };
-	      reader.onerror = function (err) {
-	        console.error("error reading file", err);
-	      };
-	      reader.readAsDataURL(file);
+	      return Bebo.uploadImageAsync(url).then(function (image_url) {
+	        console.log("uploded image to bebo", image_url);
+	        return that.updateUser({ image_url: image_url });
+	      });
 	    }
 	  }, {
 	    key: 'render',
@@ -43673,7 +43666,7 @@
 
 	    _this.state = {
 	      username: "",
-	      editUserName: false
+	      editState: false
 	    };
 	    _this.componentWillMount = _this.componentWillMount.bind(_this);
 	    _this.editUserName = _this.editUserName.bind(_this);
@@ -43690,18 +43683,6 @@
 	        this.setState({ username: this.props.me.username });
 	      }
 	    }
-
-	    // componentDidUpdate() {
-	    //   if (this.state.editUserName) {
-	    //     var element = document.getElementById('file');
-	    //     element.value = null;
-	    //     element.onclick = function () {
-	    //       element.value = null;
-	    //     }
-	    //     element.onchange = this.fileUpload;
-	    //   }
-	    // }
-
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {
@@ -43730,14 +43711,14 @@
 	  }, {
 	    key: 'editUserName',
 	    value: function editUserName(e) {
-	      this.setState({ editUserName: true });
+	      this.setState({ editState: true });
 	    }
 	  }, {
 	    key: 'saveUserName',
 	    value: function saveUserName(e) {
 	      var that = this;
 	      this.props.updateUser({ username: this.state.username }).then(function (user) {
-	        that.setState({ editUserName: false });
+	        that.setState({ editState: false });
 	      });
 	    }
 	  }, {
@@ -43751,15 +43732,32 @@
 	      var that = this;
 	      console.log("fileUpload", e);
 	      var file = e.target.files[0];
-	      this.props.uploadImage(file, function () {
-	        that.setState({ editUserName: false });
-	      });
+	      var reader = new FileReader();
+	      reader.onloadend = function () {
+	        var url = reader.result;
+	        that.setState({ editState: "uploading",
+	          image_url: url });
+	        that.props.uploadImage(url).then(function () {
+	          that.setState({ editState: false,
+	            image_url: null });
+	        }).catch(function (err) {
+	          console.error("upload failed", err);
+	          that.setState({ editState: false,
+	            image_url: null });
+	        });
+	      };
+	      reader.onerror = function (err) {
+	        console.error("error reading file", err);
+	        that.setState({ editState: false,
+	          image_url: null });
+	      };
+	      reader.readAsDataURL(file);
 	    }
 	  }, {
 	    key: 'renderMe',
 	    value: function renderMe() {
 	      var username, edit, image;
-	      if (this.state.editUserName) {
+	      if (this.state.editState === true) {
 	        username = _react2.default.createElement(
 	          'span',
 	          { className: 'roster-list-item--user--name' },
@@ -43777,12 +43775,29 @@
 	          { className: 'edit-settings edit', onClick: this.saveUserName },
 	          _react2.default.createElement('img', { src: 'assets/img/ok.svg', className: 'save-icon' })
 	        );
+	        var style = { backgroundImage: 'url(' + this.props.me.image_url + ')' };
+	        var cameraStyle = { backgroundImage: 'url(' + "assets/img/icCamera.png" + ')' };
 	        image = _react2.default.createElement(
 	          'div',
-	          { className: 'fileinput' },
+	          { className: 'roster-list-item--image' },
+	          _react2.default.createElement('div', { className: 'image', style: style }),
 	          _react2.default.createElement('input', { id: 'file', type: 'file', onChange: this.fileUpload, accept: 'image/*' }),
-	          _react2.default.createElement('img', { src: this.props.me.image_url }),
-	          _react2.default.createElement('img', { className: 'fileOverlay', src: this.props.me.image_url })
+	          _react2.default.createElement('div', { className: 'fileOverlay', style: cameraStyle })
+	        );
+	      } else if (this.state.editState === "uploading") {
+	        username = _react2.default.createElement(
+	          'span',
+	          { className: 'roster-list-item--user--name' },
+	          this.props.me.username,
+	          ' ',
+	          _react2.default.createElement('span', { className: 'circle' })
+	        );
+	        edit = _react2.default.createElement('span', { className: 'edit-settings edit', onClick: this.editUserName });
+	        var style = { backgroundImage: 'url(' + this.state.image_url + ')' };
+	        image = _react2.default.createElement(
+	          'div',
+	          { className: 'roster-list-item--image', style: style },
+	          _react2.default.createElement('div', { className: 'loading' })
 	        );
 	      } else {
 	        username = _react2.default.createElement(
@@ -43797,7 +43812,8 @@
 	          { className: 'edit-settings edit', onClick: this.editUserName },
 	          _react2.default.createElement('img', { src: 'assets/img/icSettings.png', className: 'edit-icon' })
 	        );
-	        image = _react2.default.createElement('img', { src: this.props.me.image_url });
+	        var style = { backgroundImage: 'url(' + this.props.me.image_url + ')' };
+	        image = _react2.default.createElement('div', { className: 'roster-list-item--image', style: style });
 	      }
 	      if (!this.props.me || !this.props.me.user_id) {
 	        return _react2.default.createElement(
@@ -43814,11 +43830,7 @@
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'roster-me roster-list-item' },
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'roster-list-item--image' },
-	          image
-	        ),
+	        image,
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'roster-list-item--user' },
