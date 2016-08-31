@@ -27181,6 +27181,7 @@
 	      offline: [],
 	      threadName: ""
 	    };
+	    _this.stream_id = Bebo.getStreamId();
 	    _this.store = {};
 	    _this.navigate = _this.navigate.bind(_this);
 	    _this.handleEventUpdate = _this.handleEventUpdate.bind(_this);
@@ -27194,7 +27195,6 @@
 	    _this.incrUnreadMessage = _this.incrUnreadMessage.bind(_this);
 	    _this.clearUnreadMessage = _this.clearUnreadMessage.bind(_this);
 	    _this.getUnreadAndUpdate = _this.getUnreadAndUpdate.bind(_this);
-	    Bebo.onViewerUpdate(_this.viewerUpdate);
 	    _this.roster = {};
 	    return _this;
 	  }
@@ -27203,8 +27203,13 @@
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
 	      console.timeStamp && console.timeStamp("Main.componentWillMount");
-	      this.getMe().then(this.getFullRoster);
-	      Bebo.onEvent(this.handleEventUpdate);
+	      var that = this;
+	      this.getFullRoster().then(function () {
+	        return that.getUnreadAndUpdate();
+	      }).then(function () {
+	        Bebo.onViewerUpdate(that.viewerUpdate);
+	        Bebo.onEvent(that.handleEventUpdate);
+	      });
 	    }
 
 	    /*
@@ -27245,14 +27250,17 @@
 	    key: 'getFullRoster',
 	    value: function getFullRoster() {
 	      var that = this;
-	      var props = { unread: Bebo.Db.getAsync('dm_unread_' + that.state.me.user_id, { count: 200 }),
-	        roster: Bebo.getRosterAsync(),
+	      var props = { roster: Bebo.getRosterAsync(),
 	        stream: Bebo.getStreamFullAsync() };
 	      if (!this.state.me.user_id) {
 	        props.me = this.getMe();
+	      } else {
+	        props.unread = Bebo.Db.getAsync('dm_unread_' + this.state.me.user_id, { count: 200 });
 	      }
 	      return _bluebird2.default.props(props).then(function (data) {
 	        console.timeStamp && console.timeStamp("GotFullRosterData");
+
+	        var me = that.state.me.user_id && that.state.me || data.me && data.me.user_id && data.me;
 	        var roster = {};
 	        var l = data.roster.length;
 	        for (var i = 0; i < l; i++) {
@@ -27260,23 +27268,24 @@
 	          user.image_url = user.image_url + "?h=48&w=48";
 	          user.online = false;
 	          roster[user.user_id] = user;
-	          roster[user.user_id].thread_id = _helper2.default.mkThreadId(that.state.me, user.user_id);
+	          roster[user.user_id].thread_id = _helper2.default.mkThreadId(me, user.user_id);
 	        }
 	        l = data.stream.viewer_ids.length;
 	        for (var i = 0; i < l; i++) {
 	          var viewer_id = data.stream.viewer_ids[i];
 	          roster[viewer_id].online = true;
 	        }
-	        console.log("Unread DATA", data.unread);
-	        l = data.unread.length;
-	        for (var i = 0; i < l; i++) {
-	          var unread = data.unread[i];
-	          var user_id = _helper2.default.getPartnerFromThreadId(that.state.me, unread.thread_id);
-	          if (roster[user_id]) {
-	            roster[user_id].unread = unread.unread_cnt;
+	        if (data.unread) {
+	          l = data.unread.length;
+	          for (var i = 0; i < l; i++) {
+	            var unread = data.unread[i];
+	            var user_id = _helper2.default.getPartnerFromThreadId(me, unread.thread_id);
+	            if (roster[user_id]) {
+	              roster[user_id].unread = unread.unread_cnt;
+	            }
 	          }
 	        }
-	        delete roster[that.state.me.user_id];
+	        delete roster[me.user_id];
 	        that.setRosterState(roster);
 	      });
 	    }
