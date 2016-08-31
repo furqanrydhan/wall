@@ -43,6 +43,10 @@
   margin: 0 calc-em(13px);
   border-radius: calc-em(8px);
   overflow:hidden;
+  img {
+    width: calc-em(36px);
+    height: calc-em(36px);
+  }
 }
 
 .chat-item--inner--meta--username {
