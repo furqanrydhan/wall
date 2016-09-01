@@ -158,7 +158,7 @@ class App extends React.Component {
     var that = this;
     Bebo.Db.get('dm_' + thread_id, { count: count}, (err, data) => {
       if (err) {
-        console.log('error getting list');
+        console.error('error getting list');
         return;
       }
       
@@ -172,11 +172,12 @@ class App extends React.Component {
   }
 
   handleEventUpdate(data) {
-    console.log("New event", data);
     if (data.message) {
       this.handleMessageEvent(data.message);
     } else if (data.presence) {
       this.handlePresenceUpdates(data.presence);
+    } else {
+      console.warn("Unexpected event", data);
     }
   }
 
@@ -189,7 +190,6 @@ class App extends React.Component {
   incrUnreadMessage(thread_id, to_user_id) {
     return Bebo.Db.getAsync('dm_unread_' + to_user_id, { thread_id: thread_id})
       .then(function(data) {
-        console.log("THREAD COUNTER DATA", data);
         var row;
         if (data && data.length > 0) {
           row = data[0];
@@ -285,7 +285,6 @@ class App extends React.Component {
     var that = this;
     return Bebo.uploadImageAsync(url)
       .then(function(image_url) {
-        console.log("uploded image to bebo", image_url);
         return that.updateUser({image_url: image_url});
       });
   }

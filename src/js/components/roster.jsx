@@ -60,7 +60,6 @@ class Roster extends React.Component {
 
   fileUpload(e) {
     var that = this;
-    console.log("fileUpload", e);
     var file = e.target.files[0];
     var reader = new FileReader();
     reader.onloadend = function () {

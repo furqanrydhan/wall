@@ -9,7 +9,6 @@ class RosterItem extends React.Component {
   }
 
   navigate(e) {
-    console.log("Nav", e);
     this.props.navigate(e.currentTarget.dataset.threadId, e.currentTarget.dataset.userName);
   }
 

@@ -11,7 +11,7 @@ class GiphyGif extends React.Component {
 
   broadcastChat(err, data) {
     if (err) {
-      console.log('error', err);
+      console.error(err);
       return;
     }
     const m = data.result[0];
@@ -22,7 +22,7 @@ class GiphyGif extends React.Component {
     //   }
     //   return console.log('resp', resp); // an object containing success
     // });
-    console.log("Sending GIF", m);
+    // console.log("Sending GIF", m);
     // Bebo.emitEvent({ message: m });
     Bebo.emitEvent({ message: {thread_id: this.props.thread_id, "newMsg": 1, "dm_id": m.id }});
 

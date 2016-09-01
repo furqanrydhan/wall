@@ -5,14 +5,11 @@ class Helper {
       Accepts: 1 thread ID
       Returns: (boolean) true or false, do I have permission to view this thread ID
      */
-    console.log('is this my thread id? ...');
     var first_user_id = thread_id.split('_')[0];
     var second_user_id = thread_id.split('_')[1];
     if (first_user_id === me.user_id || second_user_id === me.user_id)  {
-      console.log('this is my thread');
       return true;
     } else {
-      console.log('this is not my thread');
       return false;
     }  
   }

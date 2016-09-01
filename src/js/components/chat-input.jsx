@@ -108,7 +108,7 @@ class ChatInput extends React.Component {
 
   notifyUser(users, msg) {
     // TODO: "send you 3 messages ( text ...);
-    console.log('notifying user: ', users, msg);
+    // console.log('notifying user: ', users, msg);
     Bebo.Notification.users('⚡️' + this.props.actingUser.username + ': ',
       msg,
       users,
@@ -123,7 +123,7 @@ class ChatInput extends React.Component {
   broadcastChat(data) {
     const m = data.result[0];
     this.notifyUser(m.users, m.message);
-    console.log("message from db", m);
+    // console.log("message from db", m);
     Bebo.emitEvent({ message: {thread_id: this.props.thread_id, "newMsg": 1, "dm_id": m.id }});
     // TODO check if any user is in str
   }

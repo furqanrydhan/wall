@@ -45,7 +45,6 @@ class ChatList extends React.Component {
   componentWillUpdate(prevProps, prevState) {
     var newMsgCnt = prevProps.messages.length - this.props.messages.length;
     if (prevProps.messages.length > 0 && this.state.newMsgCnt !== newMsgCnt) {
-      console.log("Setting newMsgCnt", prevProps.messages.length, this.props.messages.length);
       this.setState({newMsgCnt: newMsgCnt});
     }
   }
@@ -144,7 +143,6 @@ class ChatList extends React.Component {
   }
 
   handleNewMessage() {
-    console.log("scrolledPastFirstMessage", this.state.scrolledPastFirstMessage);
     if (!this.state.scrolledPastFirstMessage) {
       this.scrollChatToBottom();
     }
