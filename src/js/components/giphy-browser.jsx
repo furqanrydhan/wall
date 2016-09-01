@@ -172,11 +172,19 @@ class GiphyBrowser extends React.Component {
         },
       ],
       filter: null,
+      height: 0,
     };
   }
 
+  componentDidMount() {
+    setTimeout(() => {
+      this.setState({ height: window.innerHeight });
+    }, 100)
+
+  }
+
   render() {
-    const { categories, filter } = this.state;
+    const { categories, filter, height } = this.state;
     const { style } = this.props;
     return (<div className="giphy-browser" style={style}>
       <div className="giphy-nav-title" onClick={filter ? (() => { this.setState({ filter: null }); }) : (() => {})}>
@@ -190,7 +198,7 @@ class GiphyBrowser extends React.Component {
           </SimpleFetch>
         </div>
       ) : (
-        <Cluster className="gif-list-container" height={window.innerHeight} rowHeight={(window.innerWidth * 0.4)}>
+        <Cluster className="gif-list-container" height={height || window.innerHeight} rowHeight={(window.innerWidth * 0.4)}>
           {categories.map((category, ind) => (
             <SimpleFetch key={ind} as="gif" path="data" url={`http://api.giphy.com/v1/gifs/${category.id}?api_key=dc6zaTOxFJmzC`}>
               <GiphyGif incrUnreadMessage={this.props.incrUnreadMessage} loader={loader()} onClick={() => { this.setState({ filter: category }); }} switchMode={this.props.switchMode} actingUser={this.props.actingUser}>
