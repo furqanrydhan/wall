@@ -177,7 +177,7 @@ class ChatList extends React.Component {
   renderChatList() {
     if (this.props.messages && this.props.messages.length > 0) {
       return (<ul ref="chats" className="chat-list--inner--list">
-        {this.props.messages.map((i) => <ChatItem handleNewMessage={this.handleNewMessage} item={i} key={i.id} />)}
+        {this.props.messages.map((i) => <ChatItem handleNewMessage={this.handleNewMessage} db={this.props.db} item={i} key={i.id} />)}
       </ul>);
     }
     return (<ul className="chat-list--inner--list">

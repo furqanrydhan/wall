@@ -20,6 +20,7 @@ class App extends React.Component {
       offline: [],
       threadName: "",
     };
+    this.db = {};
     this.stream_id = Bebo.getStreamId();
     this.store = {};
     this.navigate = this.navigate.bind(this);
@@ -35,6 +36,7 @@ class App extends React.Component {
     this.clearUnreadMessage = this.clearUnreadMessage.bind(this);
     this.getUnreadAndUpdate = this.getUnreadAndUpdate.bind(this);
     this.roster = {};
+    this.db.getImageUrl = this.getImageUrl.bind(this);
   }
 
   componentWillMount() {
@@ -100,7 +102,7 @@ class App extends React.Component {
       var l = data.roster.length;
       for (var i=0; i< l; i++) {
         var user = data.roster[i];
-        user.image_url = user.image_url + "?h=48&w=48";
+        user.image_url = user.image_url + "?h=72&w=72";
         user.online = false;
         roster[user.user_id] = user;
         roster[user.user_id].thread_id = Helper.mkThreadId(me, user.user_id);
@@ -253,11 +255,22 @@ class App extends React.Component {
     return Bebo.User.getAsync("me")
       .then(function(user) {
         console.timeStamp && console.timeStamp("Bebo.User.me response");
+        user.image_url = user.image_url + "?w=144&h=144";
         that.setState({me: user});
         return user;
       });
   }
-  
+
+  getImageUrl(user_id) {
+    if (user_id === this.state.me.user_id) {
+      return this.state.me.image_url;
+    }
+    var user = this.roster[user_id];
+    if (user) {
+      return user.image_url;
+    }
+    return Bebo.getImageUrl() + "image/user/" + user_id  + "?w=72&h=72";
+  }
 
   navigate(page, threadName) {
     threadName === threadName || "";
@@ -303,6 +316,7 @@ class App extends React.Component {
         me={this.state.me}
         incrUnreadMessage={this.incrUnreadMessage}
         navigate={this.navigate}
+        db={this.db}
         onPresenceEvent={this.onThreadPresenceEvent}
         thread_id={this.state.page}
         threadName={this.state.threadName}/>

@@ -66,6 +66,7 @@ class Thread extends React.Component {
                   blurChat={this.blurInput}
                   onPresenceEvent={this.props.onPresenceEvent}
                   actingUser={this.props.me}
+                  db={this.props.db}
                   thread_id={this.props.thread_id} />
         <ChatBackground />
       </div>

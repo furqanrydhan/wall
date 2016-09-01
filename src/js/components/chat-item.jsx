@@ -34,7 +34,7 @@ class ChatItem extends React.Component {
 
   renderAvatar() {
     return (<div className="ui-avatar">
-      <img src={`${Bebo.getImageUrl()}image/user/${this.state.item.user_id}`} role="presentation" />
+      <img src={this.props.db.getImageUrl(this.state.item.user_id)} role="presentation" />
     </div>);
   }
 
