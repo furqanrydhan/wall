@@ -9,11 +9,13 @@
   },
   "dependencies": {
     "bluebird": "^3.4.3",
+    "deep-find": "0.0.0-alpha",
     "graceful-fs": "^4.1.6",
     "moment": "^2.14.1",
     "react": "^15.3.1",
     "react-cluster": "^0.1.2",
     "react-dom": "^15.3.1",
+    "react-simple-fetch": "^0.1.1",
     "request-promise": "^4.1.1",
     "whatwg-fetch": "^1.0.0"
   },

@@ -75,7 +75,7 @@ GiphyGif.displayName = 'GiphyGif';
 
 // Uncomment properties you need
 GiphyGif.propTypes = {
-  gif: React.PropTypes.object.isRequired,
+  gif: React.PropTypes.object,
   actingUser: React.PropTypes.object.isRequired,
   switchMode: React.PropTypes.func.isRequired,
   onClick: React.PropTypes.func,

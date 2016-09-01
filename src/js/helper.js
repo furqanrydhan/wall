@@ -15,6 +15,7 @@ class Helper {
   }
 
   static getPartnerFromThreadId(me, thread_id) {
+    console.log(thread_id);
     var first_user_id = thread_id.split('_')[0];
     var second_user_id = thread_id.split('_')[1];
     if (first_user_id === me.user_id)  {
