@@ -80,6 +80,7 @@ class ChatInput extends React.Component {
     var user_id = Helper.getPartnerFromThreadId(this.props.actingUser, this.props.thread_id);
     if (text.length > 0) {
       const message = {
+        thread_id: this.props.thread_id,
         type: 'message',
         username: this.props.actingUser.username,
         user_id: this.props.actingUser.user_id,
@@ -89,7 +90,7 @@ class ChatInput extends React.Component {
 
       // TODO mention stuff in users[]
 
-      Bebo.Db.saveAsync('dm_' + this.props.thread_id, message)
+      Bebo.Db.saveAsync('dm', message)
         .then(function(data) {
           return that.props.incrUnreadMessage(that.props.thread_id, user_id)
             .then(function() {

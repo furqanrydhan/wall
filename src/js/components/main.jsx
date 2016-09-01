@@ -65,11 +65,11 @@ class App extends React.Component {
 
   getUnreadAndUpdate(thread_id) {
     var that = this;
-    var params = {count: 200};
+    var params = {user_id: this.state.me.user_id, count: 200};
     if (thread_id) {
       params.thread_id = thread_id;
     }
-    return Bebo.Db.getAsync('dm_unread_' + this.state.me.user_id, params)
+    return Bebo.Db.getAsync('unread', params)
       .then(function(data) {
         var l = data.length;
         var roster = that.roster;
@@ -91,7 +91,7 @@ class App extends React.Component {
     if (!this.state.me.user_id) {
       props.me = this.getMe();
     } else {
-      props.unread = Bebo.Db.getAsync('dm_unread_' + this.state.me.user_id, {count: 200});
+      props.unread = Bebo.Db.getAsync('unread', {user_id: this.state.me.user_id, count: 200});
     }
     return Promise.props(props)
       .then(function (data) {
@@ -158,7 +158,7 @@ class App extends React.Component {
 
   getOldMessages(thread_id, count, offset) {
     var that = this;
-    Bebo.Db.get('dm_' + thread_id, { count: count}, (err, data) => {
+    Bebo.Db.get('dm', { thread_id: thread_id, count: count}, (err, data) => {
       if (err) {
         console.error('error getting list');
         return;
@@ -190,18 +190,19 @@ class App extends React.Component {
   }
 
   incrUnreadMessage(thread_id, to_user_id) {
-    return Bebo.Db.getAsync('dm_unread_' + to_user_id, { thread_id: thread_id})
+    return Bebo.Db.getAsync('unread', {user_id: to_user_id, thread_id: thread_id})
       .then(function(data) {
         var row;
         if (data && data.length > 0) {
           row = data[0];
         }
         if (! row) {
-          row = { thread_id: thread_id,
+          row = { user_id: to_user_id,
+                  thread_id: thread_id,
                   unread_cnt: 0 };
         }
         row.unread_cnt = row.unread_cnt + 1;
-        return Bebo.Db.saveAsync('dm_unread_' + to_user_id, row);
+        return Bebo.Db.saveAsync('unread', row);
       });
   }
 
@@ -221,7 +222,7 @@ class App extends React.Component {
     }
     this.setRosterState(this.roster);
     var that = this;
-    return Bebo.Db.getAsync('dm_unread_' + this.state.me.user_id, { thread_id: thread_id})
+    return Bebo.Db.getAsync('unread', {user_id: this.state.me.user_id, thread_id: thread_id})
       .then(function(data) {
         var row;
         if (data && data.length > 0) {
@@ -231,7 +232,7 @@ class App extends React.Component {
           return;
         }
         row.unread_cnt = 0;
-        return Bebo.Db.saveAsync('dm_unread_' + that.state.me.user_id, row);
+        return Bebo.Db.saveAsync('unread', row);
       });
   }
 

@@ -174,7 +174,7 @@ class GiphyBrowser extends React.Component {
         <div style={filter ? { position: 'absolute', top: 0, left: 0 } : {}} className={filter ? 'gif-list-container' : ''}>
           <Fetch url={`http://api.giphy.com/v1/gifs/search?q=${filter.q}&api_key=dc6zaTOxFJmzC`}>
             {({ data: list }) => (list ? (
-              <div>{list.map((g, index) => <GiphyGif originalSize gif={g} key={index} switchMode={this.props.switchMode} thread_id={this.props.thread_id} actingUser={this.props.actingUser} />)}</div>
+              <div>{list.map((g, index) => <GiphyGif incrUnreadMessage={this.props.incrUnreadMessage} originalSize gif={g} key={index} switchMode={this.props.switchMode} thread_id={this.props.thread_id} actingUser={this.props.actingUser} />)}</div>
             ) : (
               <div className="loader">
                 <svg version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 81 45" >
@@ -192,7 +192,7 @@ class GiphyBrowser extends React.Component {
           {categories.map((category, ind) => (
             <Fetch key={ind} url={`http://api.giphy.com/v1/gifs/${category.id}?api_key=dc6zaTOxFJmzC`}>
               {({ data: gif }) => (gif ? (
-                <GiphyGif gif={gif} onClick={() => { this.setState({ filter: category }); }} switchMode={this.props.switchMode} actingUser={this.props.actingUser}>
+                <GiphyGif incrUnreadMessage={this.props.incrUnreadMessage} gif={gif} onClick={() => { this.setState({ filter: category }); }} switchMode={this.props.switchMode} actingUser={this.props.actingUser}>
                   <div className="giphy-gif--category-background">
                     <div className="giphy-gif--category-title">{category.q.replace(/\+/g, ' ')}</div>
                   </div>

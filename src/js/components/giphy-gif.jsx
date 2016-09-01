@@ -9,11 +9,7 @@ class GiphyGif extends React.Component {
     this.broadcastChat = this.broadcastChat.bind(this);
   }
 
-  broadcastChat(err, data) {
-    if (err) {
-      console.error(err);
-      return;
-    }
+  broadcastChat(data) {
     const m = data.result[0];
     // FIXME
     // Bebo.Notification.broadcast('{{{user.username}}}', ' just posted a GIF', { rate_limit_key: `${m.user_id}_${Math.floor(Date.now() / 1000 / 60 / 60)}` }, (error, resp) => {
@@ -30,6 +26,7 @@ class GiphyGif extends React.Component {
   }
 
   render() {
+    var that = this;
     const { gif, actingUser, children, originalSize } = this.props;
     const { username, user_id } = actingUser;
     const { url, webp } = gif.images.fixed_width_downsampled;
@@ -37,6 +34,7 @@ class GiphyGif extends React.Component {
     return (<div
       className="gif-wrapper"
       onClick={this.props.onClick ? (this.props.onClick) : (() => {
+        var user_id = Helper.getPartnerFromThreadId(this.props.actingUser, this.props.thread_id);
         const image = {
           preview: gif.images.downsized_still.url,
           url: gif.images.fixed_width_downsampled.url,
@@ -45,13 +43,21 @@ class GiphyGif extends React.Component {
           height: gif.images.fixed_width_downsampled.height,
         };
         const message = {
+          thread_id: this.props.thread_id,
           image,
           username: this.props.actingUser.username,
           user_id: this.props.actingUser.user_id,
-          users: [Helper.getPartnerFromThreadId(this.props.actingUser, this.props.thread_id)],
+          users: [user_id],
           type: 'image',
         };
-        Bebo.Db.save('dm_' + this.props.thread_id, message, this.broadcastChat);
+        Bebo.Db.saveAsync('dm', message)
+          .then(function(data) {
+            return that.props.incrUnreadMessage(that.props.thread_id, user_id)
+              .then(function() {
+                return data
+              });
+          })
+          .then(that.broadcastChat);
       })}
     >
       {originalSize ? (
