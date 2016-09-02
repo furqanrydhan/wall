@@ -27234,27 +27234,42 @@
 	  }, {
 	    key: 'initialRosterFromStorage',
 	    value: function initialRosterFromStorage() {
+	      var roster = this.read("roster");
+	      if (!roster) {
+	        return;
+	      }
+	      this.roster = roster;
+	      var online = _.filter(_.values(this.roster), { online: true });
+	      var offline = _.filter(_.values(this.roster), { online: false });
+	      var me = this.read("me");
+	      if (!me) {
+	        return;
+	      }
+
+	      this.setState({ online: online,
+	        offline: offline,
+	        me: me });
+	    }
+	  }, {
+	    key: 'read',
+	    value: function read(key) {
 	      if (!hasLocalStorage) {
 	        return;
 	      }
-	      var json = window.localStorage.getItem("roster:" + this.stream_id);
+	      var json = window.localStorage.getItem("dm:" + key + ":" + this.stream_id);
 	      if (!json) {
 	        return;
 	      }
-	      this.roster = JSON.parse(json);
-	      var online = _.filter(_.values(this.roster), { online: true });
-	      var offline = _.filter(_.values(this.roster), { online: false });
-	      this.setState({ online: online,
-	        offline: offline });
+	      return JSON.parse(json);
 	    }
 	  }, {
-	    key: 'persistRoster',
-	    value: function persistRoster(roster) {
+	    key: 'persist',
+	    value: function persist(key, value) {
 	      if (!hasLocalStorage) {
 	        return;
 	      }
-	      var json = JSON.stringify(roster);
-	      window.localStorage.setItem("roster:" + this.stream_id, json);
+	      var json = JSON.stringify(value);
+	      window.localStorage.setItem("dm:" + key + ":" + this.stream_id, json);
 	    }
 	    /*
 	     * Roster Data
@@ -27264,7 +27279,7 @@
 	    key: 'setRosterState',
 	    value: function setRosterState(roster) {
 	      this.roster = roster;
-	      this.persistRoster(roster);
+	      this.persist("roster", roster);
 	      var online = _.filter(_.values(this.roster), { online: true });
 	      var offline = _.filter(_.values(this.roster), { online: false });
 	      this.setState({ online: online,
@@ -27474,6 +27489,7 @@
 	      return Bebo.User.getAsync("me").then(function (user) {
 	        console.timeStamp && console.timeStamp("Bebo.User.me response");
 	        user.image_url = user.image_url + "?w=144&h=144";
+	        that.persist("me", user);
 	        that.setState({ me: user });
 	        return user;
 	      });
