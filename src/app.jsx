@@ -5,7 +5,7 @@ import App from './js/components/main.jsx';
 
 const chat = {
   init: () => {
-    ReactDOM.render(<App />, document.getElementById('app'));
+    return ReactDOM.render(<App />, document.getElementById('app'));
   },
 };
 

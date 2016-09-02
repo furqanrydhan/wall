@@ -15,7 +15,24 @@ Bebo.didReceiveData = function(data) {
 }
 
 
+var app;
+var online;
+var t = setInterval(function() {
+  if (app) {
+    clearInterval(t);
+  }
+  if (Bebo && Bebo.getStreamId) {
+    console.timeStamp && console.timeStamp("Bebo.getStreamId exists");
+    app = App.init();
+    if (online) {
+      app.online();
+    }
+    clearInterval(t);
+  }
+}, 1);
+
 Bebo.onReady(function () {
+  online = true;
   console.timeStamp && console.timeStamp("Bebo.onReady");
   Bebo.User.getAsync = Promise.promisify(Bebo.User.get);
   Bebo.uploadImageAsync = Promise.promisify(Bebo.uploadImage);
@@ -48,5 +65,7 @@ Bebo.onReady(function () {
       });
   };
   Bebo.UI.disableKeyboardDoneStrip();
-  App.init();
+  if (app) {
+    app.online();
+  }
 });

@@ -36,7 +36,7 @@ class App extends React.Component {
       me: {},
       online: [],
       offline: [],
-      threadName: "",
+      threadName: ""
     };
     this.db = {};
     this.stream_id = Bebo.getStreamId();
@@ -53,14 +53,13 @@ class App extends React.Component {
     this.incrUnreadMessage = this.incrUnreadMessage.bind(this);
     this.clearUnreadMessage = this.clearUnreadMessage.bind(this);
     this.getUnreadAndUpdate = this.getUnreadAndUpdate.bind(this);
+    this.online = this.online.bind(this);
     this.roster = {};
     this.db.getImageUrl = this.getImageUrl.bind(this);
   }
 
-  componentWillMount() {
-    console.timeStamp && console.timeStamp("Main.componentWillMount");
+  online() {
     var that = this;
-    this.initialRosterFromStorage();
     this.getFullRoster()
     .then(function() {
       return that.getUnreadAndUpdate();
@@ -70,19 +69,24 @@ class App extends React.Component {
     });
   }
 
-  initialRosterFromStorage() {
-    var roster = this.read("roster");
-    if (!roster) {
-      return;
-    }
-    this.roster = roster;
-    var online = _.filter(_.values(this.roster), {online: true});
-    var offline = _.filter(_.values(this.roster), {online: false});
-    var me = this.read("me");
-    if (!me) {
-      return;
-    }
+  componentWillMount() {
+    console.timeStamp && console.timeStamp("Main.componentWillMount");
+    var that = this;
+    this.initialRosterFromStorage();
+  }
 
+  componentDidMount() {
+    console.timeStamp && console.timeStamp("Main.componentDidMount");
+  }
+
+  initialRosterFromStorage() {
+    var online = this.read("online");
+    var offline = this.read("offline");
+    var me = this.read("me");
+    if (!me || !offline) {
+      return;
+    }
+    console.timeStamp && console.timeStamp("initialRosterFromStorage complete");
     this.setState({online: online,
                    offline: offline,
                    me: me});
@@ -112,9 +116,10 @@ class App extends React.Component {
 
   setRosterState(roster) {
     this.roster = roster;
-    this.persist("roster", roster);
     var online = _.filter(_.values(this.roster), {online: true});
     var offline = _.filter(_.values(this.roster), {online: false});
+    this.persist("online", online);
+    this.persist("offline", offline);
     this.setState({online: online,
                    offline: offline});
   }

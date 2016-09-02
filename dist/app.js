@@ -62,7 +62,24 @@
 	  return didReceiveData(data);
 	};
 
+	var app;
+	var online;
+	var t = setInterval(function () {
+	  if (app) {
+	    clearInterval(t);
+	  }
+	  if (Bebo && Bebo.getStreamId) {
+	    console.timeStamp && console.timeStamp("Bebo.getStreamId exists");
+	    app = App.init();
+	    if (online) {
+	      app.online();
+	    }
+	    clearInterval(t);
+	  }
+	}, 1);
+
 	Bebo.onReady(function () {
+	  online = true;
 	  console.timeStamp && console.timeStamp("Bebo.onReady");
 	  Bebo.User.getAsync = Promise.promisify(Bebo.User.get);
 	  Bebo.uploadImageAsync = Promise.promisify(Bebo.uploadImage);
@@ -93,7 +110,9 @@
 	    });
 	  };
 	  Bebo.UI.disableKeyboardDoneStrip();
-	  App.init();
+	  if (app) {
+	    app.online();
+	  }
 	});
 
 /***/ },
@@ -5918,7 +5937,7 @@
 
 	var chat = {
 	  init: function init() {
-	    _reactDom2.default.render(_react2.default.createElement(_main2.default, null), document.getElementById('app'));
+	    return _reactDom2.default.render(_react2.default.createElement(_main2.default, null), document.getElementById('app'));
 	  }
 	};
 
@@ -27213,17 +27232,16 @@
 	    _this.incrUnreadMessage = _this.incrUnreadMessage.bind(_this);
 	    _this.clearUnreadMessage = _this.clearUnreadMessage.bind(_this);
 	    _this.getUnreadAndUpdate = _this.getUnreadAndUpdate.bind(_this);
+	    _this.online = _this.online.bind(_this);
 	    _this.roster = {};
 	    _this.db.getImageUrl = _this.getImageUrl.bind(_this);
 	    return _this;
 	  }
 
 	  _createClass(App, [{
-	    key: 'componentWillMount',
-	    value: function componentWillMount() {
-	      console.timeStamp && console.timeStamp("Main.componentWillMount");
+	    key: 'online',
+	    value: function online() {
 	      var that = this;
-	      this.initialRosterFromStorage();
 	      this.getFullRoster().then(function () {
 	        return that.getUnreadAndUpdate();
 	      }).then(function () {
@@ -27232,20 +27250,27 @@
 	      });
 	    }
 	  }, {
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      console.timeStamp && console.timeStamp("Main.componentWillMount");
+	      var that = this;
+	      this.initialRosterFromStorage();
+	    }
+	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      console.timeStamp && console.timeStamp("Main.componentDidMount");
+	    }
+	  }, {
 	    key: 'initialRosterFromStorage',
 	    value: function initialRosterFromStorage() {
-	      var roster = this.read("roster");
-	      if (!roster) {
-	        return;
-	      }
-	      this.roster = roster;
-	      var online = _.filter(_.values(this.roster), { online: true });
-	      var offline = _.filter(_.values(this.roster), { online: false });
+	      var online = this.read("online");
+	      var offline = this.read("offline");
 	      var me = this.read("me");
-	      if (!me) {
+	      if (!me || !offline) {
 	        return;
 	      }
-
+	      console.timeStamp && console.timeStamp("initialRosterFromStorage complete");
 	      this.setState({ online: online,
 	        offline: offline,
 	        me: me });
@@ -27279,9 +27304,10 @@
 	    key: 'setRosterState',
 	    value: function setRosterState(roster) {
 	      this.roster = roster;
-	      this.persist("roster", roster);
 	      var online = _.filter(_.values(this.roster), { online: true });
 	      var offline = _.filter(_.values(this.roster), { online: false });
+	      this.persist("online", online);
+	      this.persist("offline", offline);
 	      this.setState({ online: online,
 	        offline: offline });
 	    }
