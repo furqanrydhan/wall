@@ -8,6 +8,24 @@ import Helper from '../helper.js';
 import Roster from './roster.jsx';
 import DirectMessageThread from './dm-thread.jsx';
 
+function storageAvailable(type) {
+	try {
+		var storage = window[type],
+			x = '__storage_test__';
+		storage.setItem(x, x);
+		storage.removeItem(x);
+		return true;
+	}
+	catch(e) {
+		return false;
+	}
+}
+
+var hasLocalStorage = false;
+if (storageAvailable('localStorage')) {
+  hasLocalStorage = true;
+}
+
 class App extends React.Component {
 
   constructor() {
@@ -42,6 +60,7 @@ class App extends React.Component {
   componentWillMount() {
     console.timeStamp && console.timeStamp("Main.componentWillMount");
     var that = this;
+    this.initialRosterFromStorage();
     this.getFullRoster()
     .then(function() {
       return that.getUnreadAndUpdate();
@@ -51,12 +70,35 @@ class App extends React.Component {
     });
   }
 
+  initialRosterFromStorage() {
+    if (!hasLocalStorage) {
+      return;
+    }
+    var json = window.localStorage.getItem("roster:" + this.stream_id);
+    if (!json) {
+      return;
+    }
+    this.roster = JSON.parse(json);
+    var online = _.filter(_.values(this.roster), {online: true});
+    var offline = _.filter(_.values(this.roster), {online: false});
+    this.setState({online: online,
+                   offline: offline});
+  };
+
+  persistRoster(roster) {
+    if (! hasLocalStorage) {
+      return;
+    }
+    var json = JSON.stringify(roster);
+    window.localStorage.setItem("roster:" + this.stream_id, json);
+  }
   /*
    * Roster Data
    */
 
   setRosterState(roster) {
     this.roster = roster;
+    this.persistRoster(roster);
     var online = _.filter(_.values(this.roster), {online: true});
     var offline = _.filter(_.values(this.roster), {online: false});
     this.setState({online: online,

@@ -27165,6 +27165,23 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	function storageAvailable(type) {
+	  try {
+	    var storage = window[type],
+	        x = '__storage_test__';
+	    storage.setItem(x, x);
+	    storage.removeItem(x);
+	    return true;
+	  } catch (e) {
+	    return false;
+	  }
+	}
+
+	var hasLocalStorage = false;
+	if (storageAvailable('localStorage')) {
+	  hasLocalStorage = true;
+	}
+
 	var App = function (_React$Component) {
 	  _inherits(App, _React$Component);
 
@@ -27206,6 +27223,7 @@
 	    value: function componentWillMount() {
 	      console.timeStamp && console.timeStamp("Main.componentWillMount");
 	      var that = this;
+	      this.initialRosterFromStorage();
 	      this.getFullRoster().then(function () {
 	        return that.getUnreadAndUpdate();
 	      }).then(function () {
@@ -27213,7 +27231,31 @@
 	        Bebo.onEvent(that.handleEventUpdate);
 	      });
 	    }
-
+	  }, {
+	    key: 'initialRosterFromStorage',
+	    value: function initialRosterFromStorage() {
+	      if (!hasLocalStorage) {
+	        return;
+	      }
+	      var json = window.localStorage.getItem("roster:" + this.stream_id);
+	      if (!json) {
+	        return;
+	      }
+	      this.roster = JSON.parse(json);
+	      var online = _.filter(_.values(this.roster), { online: true });
+	      var offline = _.filter(_.values(this.roster), { online: false });
+	      this.setState({ online: online,
+	        offline: offline });
+	    }
+	  }, {
+	    key: 'persistRoster',
+	    value: function persistRoster(roster) {
+	      if (!hasLocalStorage) {
+	        return;
+	      }
+	      var json = JSON.stringify(roster);
+	      window.localStorage.setItem("roster:" + this.stream_id, json);
+	    }
 	    /*
 	     * Roster Data
 	     */
@@ -27222,6 +27264,7 @@
 	    key: 'setRosterState',
 	    value: function setRosterState(roster) {
 	      this.roster = roster;
+	      this.persistRoster(roster);
 	      var online = _.filter(_.values(this.roster), { online: true });
 	      var offline = _.filter(_.values(this.roster), { online: false });
 	      this.setState({ online: online,
