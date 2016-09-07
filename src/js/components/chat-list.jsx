@@ -35,7 +35,7 @@ class ChatList extends React.Component {
     // this.props.getOldMessages(this.props.thread_id, 50, 0);
     // Bebo.onEvent(this.handleEventUpdate);
     this.setState({scrolledPastFirstMessage: false, newMsgCnt: 0});
-    this.props.onPresenceEvent(this.handlePresenceUpdates);
+    // this.props.onPresenceEvent(this.handlePresenceUpdates);
   }
 
   componentDidMount() {
@@ -177,7 +177,7 @@ class ChatList extends React.Component {
   renderChatList() {
     if (this.props.messages && this.props.messages.length > 0) {
       return (<ul ref="chats" className="chat-list--inner--list">
-        {this.props.messages.map((i) => <ChatItem handleNewMessage={this.handleNewMessage} db={this.props.db} item={i} key={i.id} />)}
+        {this.props.messages.map((i) => <ChatItem reply={this.props.reply} handleNewMessage={this.handleNewMessage} db={this.props.db} item={i} key={i.id} />)}
       </ul>);
     }
     return (<ul className="chat-list--inner--list">

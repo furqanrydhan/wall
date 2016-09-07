@@ -5,8 +5,7 @@ import ChatBackground from './chat-background.jsx';
 import ChatInput from './chat-input.jsx';
 import GiphyBrowser from './giphy-browser.jsx';
 import Helper from '../helper.js';
-import Roster from './roster.jsx';
-import DirectMessageThread from './dm-thread.jsx';
+import Wall from './wall.jsx';
 
 function storageAvailable(type) {
 	try {
@@ -32,10 +31,9 @@ class App extends React.Component {
     super();
     this.state = {
       page: "home",
-      currentThread: [],
+      messages: [],
+      quote: null,
       me: {},
-      online: [],
-      offline: [],
       threadName: ""
     };
     this.db = {};
@@ -53,9 +51,20 @@ class App extends React.Component {
     this.incrUnreadMessage = this.incrUnreadMessage.bind(this);
     this.clearUnreadMessage = this.clearUnreadMessage.bind(this);
     this.getUnreadAndUpdate = this.getUnreadAndUpdate.bind(this);
+    this.onReply = this.onReply.bind(this);
+    this.onClearQuote = this.onClearQuote.bind(this);
     this.online = this.online.bind(this);
     this.roster = {};
     this.db.getImageUrl = this.getImageUrl.bind(this);
+  }
+
+  onReply(quote) {
+    console.log("quote", quote);
+    this.setState({quote: quote});
+  }
+
+  onClearQuote() {
+    this.setState({quote: null});
   }
 
   online() {
@@ -72,7 +81,7 @@ class App extends React.Component {
   componentWillMount() {
     console.timeStamp && console.timeStamp("Main.componentWillMount");
     var that = this;
-    this.initialRosterFromStorage();
+    this.getOldMessages();
   }
 
   componentDidMount() {
@@ -217,9 +226,10 @@ class App extends React.Component {
    * Message Data
    */
 
-  getOldMessages(thread_id, count, offset) {
+  getOldMessages(thread_id,  count, offset) {
+    // handle thread Id later
     var that = this;
-    Bebo.Db.get('dm', { thread_id: thread_id, count: count}, (err, data) => {
+    Bebo.Db.get('post', {count: count}, (err, data) => {
       if (err) {
         console.error('error getting list');
         return;
@@ -227,10 +237,8 @@ class App extends React.Component {
       
       // TODO merge and sort
       const list = data.result.reverse();
-      that.store[thread_id] = list;
-      if (that.state.page === thread_id) {
-        that.setState({ currentThread: list });
-      }
+      that.store.wall = list;
+      that.setState({ messages: list });
     });
   }
 
@@ -367,22 +375,15 @@ class App extends React.Component {
 
   render() {
     if (this.state.page === "home") {
-      return <Roster me={this.state.me}
-                     online={this.state.online}
-                     offline={this.state.offline}
-                     updateUser={this.updateUser}
-                     uploadImage={this.uploadImage}
-                     navigate={this.navigate} ></Roster>
-    } else {
-      return <DirectMessageThread
-        messages = {this.state.currentThread}
+      return <Wall 
+        messages = {this.state.messages}
         me={this.state.me}
-        incrUnreadMessage={this.incrUnreadMessage}
         navigate={this.navigate}
-        db={this.db}
-        onPresenceEvent={this.onThreadPresenceEvent}
-        thread_id={this.state.page}
-        threadName={this.state.threadName}/>
+        quote={this.state.quote}
+        reply={this.onReply}
+        clearQuote={this.onClearQuote}
+        db={this.db}/>
+    } else {
     }
   }
 }

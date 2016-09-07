@@ -13,8 +13,8 @@ class ChatItem extends React.Component {
     this.renderAvatar = this.renderAvatar.bind(this);
     this.renderTimestamp = this.renderTimestamp.bind(this);
     this.renderContent = this.renderContent.bind(this);
+    this.reply = this.reply.bind(this);
   }
-
 
   componentWillMount() {
     const obj = this.props.item;
@@ -42,6 +42,29 @@ class ChatItem extends React.Component {
     return moment(this.props.item.created_at).format('LT');
   }
 
+  renderQuote() {
+    if (!this.props.item.quote) {
+      return "";
+    }
+    return (
+      <div className="chat-quote">
+        <div className="chat-quote-left">
+          <div className="chat-quote-avatar">
+            <img src={this.props.db.getImageUrl(this.props.item.quote.user_id)} role="presentation" />
+          </div>
+        </div>
+        <div className = "chat-quote-right">
+          <div className="chat-quote--username">
+            {this.props.item.quote.username}
+          </div>
+          <div className="chat-quote--text">
+            {this.props.item.quote.message}
+          </div>
+        </div>
+      </div> 
+    )
+  }
+
   renderContent() {
     const { type, image } = this.props.item;
     if (type === 'image') {
@@ -55,6 +78,11 @@ class ChatItem extends React.Component {
       </span>);
     }
     return <span className="chat-item--inner--message--content">{this.props.item.message}</span>;
+  }
+
+  reply(e) {
+    console.log("reply clicked");
+    this.props.reply(this.state.item);
   }
 
   render() {
@@ -71,10 +99,12 @@ class ChatItem extends React.Component {
             <span className="chat-item--inner--meta--time">
               {this.renderTimestamp()}
             </span>
+            <div className="chat-item--reply--button" data-post-id={this.props.item.id} onClick={this.reply}></div>
           </div>
           <div className="chat-item--inner--message">
             {this.renderContent()}
           </div>
+          {this.renderQuote()}
         </div>
       </div>
     </li>);

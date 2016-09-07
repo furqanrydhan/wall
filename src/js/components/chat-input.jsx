@@ -77,27 +77,22 @@ class ChatInput extends React.Component {
     e.preventDefault();
     var that = this;
     const text = this.state.messageText.trim();
-    var user_id = Helper.getPartnerFromThreadId(this.props.actingUser, this.props.thread_id);
     if (text.length > 0) {
       const message = {
         thread_id: this.props.thread_id,
+        parent_id: this.props.parent_id,
         type: 'message',
         username: this.props.actingUser.username,
         user_id: this.props.actingUser.user_id,
         message: text,
-        users: [user_id]
+        quote: this.props.quote,
       };
 
       // TODO mention stuff in users[]
 
-      Bebo.Db.saveAsync('dm', message)
-        .then(function(data) {
-          return that.props.incrUnreadMessage(that.props.thread_id, user_id)
-            .then(function() {
-              return data
-            });
-        })
+      Bebo.Db.saveAsync('post', message)
         .then(that.broadcastChat);
+      this.props.clearQuote();
       this.resetTextarea();
     } else {
       console.warn('no message, returning');
@@ -152,6 +147,7 @@ class ChatInput extends React.Component {
   }
 
   render() {
+    var placeholder = this.props.quote ? "reply..." : "type a message..";
     return (<div className="chat-input" style={this.state.mode === 'gif' ? { transform: 'translate3d(0,-100vh, 0' } : {}}>
       <div className="chat-input--left">
         {this.renderActions()}
@@ -162,7 +158,7 @@ class ChatInput extends React.Component {
           onFocus={this.handleInputFocus}
           onBlur={this.handleInputBlur}
           ref="textarea"
-          placeholder="type a message.."
+          placeholder={placeholder}
           onChange={this.handleInputChange}
           value={this.state.messageText}
         />

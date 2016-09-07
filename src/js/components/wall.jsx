@@ -4,7 +4,7 @@ import ChatBackground from './chat-background.jsx';
 import ChatInput from './chat-input.jsx';
 import GiphyBrowser from './giphy-browser.jsx';
 
-class Thread extends React.Component {
+class Wall extends React.Component {
 
   constructor() {
     super();
@@ -56,13 +56,10 @@ class Thread extends React.Component {
                                      thread_id={this.props.thread_id}
                                      switchMode={this.handleSwitchMode} />;
     return (<div className="chat">
-      <div className="chat-header">
-        <div onClick={this.home} className="back-button"><img src="./assets/img/icBack.png" alt="back"/></div>
-        <div className="chat-thread-name">{this.props.threadName}</div>
-      </div>
       <div className="chat-upper"
            style={this.state.mode === 'gif' ?  { transform: 'translate3d(40vw,0,0)' } : {}}>
         <ChatList messages={this.props.messages}
+                  reply={this.props.reply}
                   blurChat={this.blurInput}
                   onPresenceEvent={this.props.onPresenceEvent}
                   actingUser={this.props.me}
@@ -73,6 +70,8 @@ class Thread extends React.Component {
       <div className="chat-lower"
            style={this.state.mode === 'gif' ? { transform: 'translate3d(40vw,0,0)' } : {}}>
         <ChatInput blurChat={this.state.blurInput}
+                   quote={this.props.quote}
+                   clearQuote={this.props.clearQuote}
                    actingUser={this.props.me}
                    incrUnreadMessage={this.props.incrUnreadMessage}
                    thread_id={this.props.thread_id}
@@ -84,11 +83,11 @@ class Thread extends React.Component {
   }
 }
 
-Thread.displayName = 'Thread';
+Wall.displayName = 'Wall';
 
 // Uncomment properties you need
 // App.propTypes = {};
 // App.defaultProps = {};
 
 
-export default Thread;
+export default Wall;
