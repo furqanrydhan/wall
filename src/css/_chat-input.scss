@@ -35,6 +35,8 @@
 }
 
 .post-edit-middle textarea {
+  @extend .font-size-default;
+  color: $chat-input-placeholder;
   width:100%;
   padding-left: calc-em(70px);
   min-height: calc-em(64px);

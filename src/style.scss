@@ -79,19 +79,18 @@ button {
     margin-left: calc-em(60px);
     line-height: 1.5;
     margin-top: 10px;
-    width: 100%;
-    margin-bottom: 10px;// bottom: 0;
+    margin-bottom: 10px;
     display: flex;
     flex-direction: row;
-    input {
-        @extend .font-size-default;
+    .chat-fake-input--input {
+        margin: auto auto auto 0;
         border-style: none;
+        @extend .font-size-default;
+        color: $chat-input-placeholder;
     }
     .chat-fake-input--send-btn {
       pointer-events:none;
-      color:$chat-input-send;
-      padding:0;
-      align-self: flex-end;
-      margin: auto;
+      color: $chat-input-send;
+      margin: auto calc-em(10px) auto auto;
     }
 }

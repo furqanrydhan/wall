@@ -77,10 +77,7 @@ class Wall extends React.Component {
       <div className="chat">
         <div className="chat-new-post">
           <div className="chat-fake-input" onClick={this.onPost}>
-            <input 
-              type="text"
-              placeholder="New Post..."
-            />
+            <div className="chat-fake-input--input">New Post...</div>
             <div className="chat-fake-input--send-btn">Post</div>
           </div>
         </div>
