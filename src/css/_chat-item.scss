@@ -1,4 +1,5 @@
 .chat-item {
+  border-top: calc-em(6px) solid #f5f5f5;
   width:100%;
   flex: 0 0 auto;
   padding: calc-em(10px) 0;
@@ -32,7 +33,7 @@
   flex:0 0 auto;
   display:flex;
   flex-direction: row;
-  align-items:flex-end;
+  align-items:flex-start;
 }
 
 .chat-item--inner--avatar {
@@ -59,17 +60,17 @@
 .chat-item--reply--button {
   cursor: pointer;
   flex: 0 0 auto;
+  align-self: flex-end;
+  margin-left: auto;
   background-image: url('assets/img/reply.png');
-  background-size: calc-em(12px);
+  background-size: calc-em(18px);
   background-position: center;
   background-repeat: no-repeat;
   width: calc-em(32px);
   height: calc-em(32px);
   vertical-align: middle;
-  transform: translate3d(calc-em(-8px), calc-em(8px), 0);
-  margin-left: calc-em(5px);
+  transform: translate3d(calc-em(8px), calc-em(-8px), 0);
   position: relative;
-  top: -2px;
 }
 
 .chat-item--inner--meta--time {
@@ -80,14 +81,13 @@
   margin-left: calc-em(5px);
   color: $color-medium-grey;
   position: relative;
-  top: -2px;
 }
 
 .chat-item--inner--message {
   width:100%;
   flex: 0 0 auto;
   padding:0;
-  margin-top: calc-em(1px);
+  margin-top: calc-em(-8px);
 }
 
 .chat-item--inner--message--content {
@@ -125,8 +125,9 @@
 }
 
 .chat-quote--text {
-  margin-top: calc-em(1px);
-  padding: 0;
+  margin-top: calc-em(2px);
+  padding-right: calc-em(10px);
+  padding-left: calc-em(50px);
   @extend .chat-item--inner--message--content; 
 } 
 

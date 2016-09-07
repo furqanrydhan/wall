@@ -1,0 +1,38 @@
+
+.sub-header {
+	background-color: $color-brand;
+	height: calc-em(50px);
+	width: 100vw;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items: stretch;
+}
+
+.sub-back-button {
+	padding: calc-em(13px) calc-em(18px);
+	img {
+		height: calc-em(24px);
+		width: calc-em(24px);
+	}
+}
+
+.sub-name {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  font-weight: 700;
+  color: $color-white;
+  font-size: calc-em(18px);
+}
+
+.sub-action {
+  display: flex;
+  align-self: flex-end;
+  margin: auto 10px auto auto;
+  text-align: center;
+  font-weight: 700;
+  color: $color-white;
+  font-size: calc-em(18px);
+}

@@ -24,7 +24,7 @@ class ChatList extends React.Component {
     this.scrollChatToBottom = this.scrollChatToBottom.bind(this);
     this.handleNewMessage = this.handleNewMessage.bind(this);
     this.updatePresence = this.updatePresence.bind(this);
-    this.handleListClick = this.handleListClick.bind(this);
+    // this.handleListClick = this.handleListClick.bind(this);
     this.renderNoChatsMessage = this.renderNoChatsMessage.bind(this);
     this.renderMessagesBadge = this.renderMessagesBadge.bind(this);
     this.renderUsersAreTyping = this.renderUsersAreTyping.bind(this);
@@ -129,6 +129,7 @@ class ChatList extends React.Component {
   }
 
   scrollChatToBottom() {
+    return;
 
     if (this.state.unloadedMessages.length > 0) {
       this.addNewMessages(this.state.unloadedMessages);
@@ -148,9 +149,9 @@ class ChatList extends React.Component {
     }
   }
 
-  handleListClick() {
-    this.props.blurChat();
-  }
+  // handleListClick() {
+  //   this.props.blurChat();
+  // }
 
   // Renders
 
@@ -203,7 +204,7 @@ ChatList.displayName = 'ChatList';
 
 // Uncomment properties you need
 ChatList.propTypes = {
-  blurChat: React.PropTypes.func.isRequired,
+  // blurChat: React.PropTypes.func.isRequired,
   actingUser: React.PropTypes.object.isRequired,
 };
 // ChatList.defaultProps = {};

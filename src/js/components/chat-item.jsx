@@ -1,5 +1,16 @@
 import React from 'react';
 import moment from 'moment';
+import Remarkable from 'remarkable';
+
+var md = new Remarkable(
+  {html: false,
+  breaks: true,
+  linkify: true});
+
+var quoteMd = new Remarkable(
+  {html: false,
+  breaks: false,
+  linkify: true});
 
 class ChatItem extends React.Component {
 
@@ -46,6 +57,8 @@ class ChatItem extends React.Component {
     if (!this.props.item.quote) {
       return "";
     }
+    var message = this.props.item.quote.message;
+    message = {__html: quoteMd.render(message)};
     return (
       <div className="chat-quote">
         <div className="chat-quote-left">
@@ -57,9 +70,7 @@ class ChatItem extends React.Component {
           <div className="chat-quote--username">
             {this.props.item.quote.username}
           </div>
-          <div className="chat-quote--text">
-            {this.props.item.quote.message}
-          </div>
+          <div className="chat-quote--text" dangerouslySetInnerHTML={message}></div>
         </div>
       </div> 
     )
@@ -77,7 +88,9 @@ class ChatItem extends React.Component {
         </div>
       </span>);
     }
-    return <span className="chat-item--inner--message--content">{this.props.item.message}</span>;
+    var message = this.props.item.message;
+    message = {__html: md.render(message)};
+    return <span className="chat-item--inner--message--content" dangerouslySetInnerHTML={message}></span>;
   }
 
   reply(e) {

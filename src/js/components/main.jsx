@@ -32,7 +32,6 @@ class App extends React.Component {
     this.state = {
       page: "home",
       messages: [],
-      quote: null,
       me: {},
       threadName: ""
     };
@@ -51,21 +50,11 @@ class App extends React.Component {
     this.incrUnreadMessage = this.incrUnreadMessage.bind(this);
     this.clearUnreadMessage = this.clearUnreadMessage.bind(this);
     this.getUnreadAndUpdate = this.getUnreadAndUpdate.bind(this);
-    this.onReply = this.onReply.bind(this);
-    this.onClearQuote = this.onClearQuote.bind(this);
     this.online = this.online.bind(this);
     this.roster = {};
     this.db.getImageUrl = this.getImageUrl.bind(this);
   }
 
-  onReply(quote) {
-    console.log("quote", quote);
-    this.setState({quote: quote});
-  }
-
-  onClearQuote() {
-    this.setState({quote: null});
-  }
 
   online() {
     var that = this;
@@ -236,7 +225,7 @@ class App extends React.Component {
       }
       
       // TODO merge and sort
-      const list = data.result.reverse();
+      const list = data.result;
       that.store.wall = list;
       that.setState({ messages: list });
     });
@@ -379,9 +368,6 @@ class App extends React.Component {
         messages = {this.state.messages}
         me={this.state.me}
         navigate={this.navigate}
-        quote={this.state.quote}
-        reply={this.onReply}
-        clearQuote={this.onClearQuote}
         db={this.db}/>
     } else {
     }

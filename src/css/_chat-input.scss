@@ -1,5 +1,50 @@
-//////////////////////////////////////////////////////////////////////////////////////////
-// CHAT INPUT STYLING
+
+.post-edit {
+  width:100%;
+  height:100%;
+  flex: 0 0 auto;
+  flex-direction: column;
+}
+
+.post-edit-middle {
+  width:100%;
+  // height:100%;
+  flex: 0 0 auto;
+}
+
+.post-edit-header {
+  display: flex;
+  flex-direction: row;
+  // justify-content: flex-start;
+  // align-items: flex-start;
+}
+
+.post-edit-header--image {
+    margin: calc-em(16px) calc-em(16px);
+    border-radius: 8px;
+    width: calc-em(50px);
+    height: calc-em(50px);
+    display: flex;
+    background-size: cover;
+    position: relative;
+}
+
+.post-edit-header--username {
+    margin: calc-em(16px) 0;
+    @extend .font-size-medium;
+}
+
+.post-edit-middle textarea {
+  width:100%;
+  padding-left: calc-em(70px);
+  min-height: calc-em(64px);
+  border: 0;
+  border-style: none;
+}
+.post-edit-quote {
+  padding-left: calc-em(70px);
+    // bottom: 0;
+}
 
 .chat-lower {
   position:relative;
