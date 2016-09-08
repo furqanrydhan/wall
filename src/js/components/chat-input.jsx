@@ -112,13 +112,10 @@ class ChatInput extends React.Component {
   }
 
   renderMenu() {
-    return;
-    // FIXME @fpn
     return (
     <div className="post-edit-menu-long">
-      <div className="post-edit-menu-item-long">
-        <div className="post-edit-menu-item-icon">
-          <img src="./assets/img/icCamera.png"/>
+      <div className="post-edit-menu-item-long" onClick={this.onPhoto}>
+        <div className="post-edit-menu-item-icon camera-icon">
         </div>
         <span>Upload or take a photo</span>
       </div>
@@ -165,7 +162,7 @@ class ChatInput extends React.Component {
     return (
       <div className="post-edit">
         <div className="sub-header">
-          <div onClick={this.props.home} className="sub-back-button"><img src="./assets/img/icBack.png" alt="back"/></div>
+          <div onClick={this.props.home} className="sub-back-button"></div>
           <div className="sub-name">Post to Bebo</div>
           <div className="sub-action" onClick={this.submitPost}>Post</div>
         </div>

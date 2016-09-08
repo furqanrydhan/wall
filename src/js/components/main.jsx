@@ -6,6 +6,7 @@ import ChatInput from './chat-input.jsx';
 import GiphyBrowser from './giphy-browser.jsx';
 import Helper from '../helper.js';
 import Wall from './wall.jsx';
+import PhotoModal from './PhotoModal.jsx';
 
 function storageAvailable(type) {
 	try {
@@ -362,6 +363,12 @@ class App extends React.Component {
       });
   }
 
+  renderModal() {
+    if (this.state.page === "photoUploader") {
+      return <Modal modal={this.state.page} closeModal={this.handleCloseModal} editPhoto={this.handleGoToEdit} savePhoto={this.handleSaveImage} photo={this.state.rawPhoto || {}} />;
+    }
+    return null;
+  }
   render() {
     if (this.state.page === "home") {
       return <Wall 
@@ -371,6 +378,7 @@ class App extends React.Component {
         db={this.db}/>
     } else {
     }
+    // <DropZone multiple={false} inputProps={{ capture: 'camera' }} onDrop={this.onDrop} ref="dropZone" style={{ display: 'none' }} accept="image/*" />
   }
 }
 

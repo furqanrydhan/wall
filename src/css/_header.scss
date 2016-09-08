@@ -10,11 +10,11 @@
 }
 
 .sub-back-button {
-	padding: calc-em(13px) calc-em(18px);
-	img {
-		height: calc-em(24px);
-		width: calc-em(24px);
-	}
+  padding: calc-em(13px) calc-em(18px);
+  background-image: url('assets/img/icBack.png');
+  background-size: calc-em(24px);
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .sub-name {
