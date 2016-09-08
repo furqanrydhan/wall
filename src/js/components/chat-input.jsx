@@ -83,9 +83,9 @@ class ChatInput extends React.Component {
   notifyUser(users, msg) {
     // TODO: "send you 3 messages ( text ...);
     // console.log('notifying user: ', users, msg);
-    Bebo.Notification.users('⚡️' + this.props.actingUser.username + ': ',
+    var message = _.truncate(msg, {lenght:60, omission:"..."});
+    Bebo.Notification.roster('{{{user.username}}} posted:',
       msg,
-      users,
       { rate_limit_key: "test_" + `${_.join(users, ":")}_${Math.floor(Date.now() / 1000 / 60 / 60)}` }
       , function(err, data) {
           if (err) {
@@ -109,6 +109,26 @@ class ChatInput extends React.Component {
 
   handleInputBlur() {
     this.refs.textarea.blur();
+  }
+
+  renderMenu() {
+    return (
+    <div className="post-edit-menu-long">
+      <div className="post-edit-menu-item-long">
+        <div className="post-edit-menu-item-icon">
+          <img src="./assets/img/icCamera.png"/>
+        </div>
+        <span>Upload or take a photo</span>
+      </div>
+      <div className="post-edit-menu-item-long">
+        <div className="post-edit-menu-item-icon">
+          <svg viewBox="1024 508 24 18" version="1.1">
+            <path d="M1024,511.994783 C1024,509.788525 1025.78429,508 1027.99005,508 L1044.00995,508 C1046.21359,508 1048,509.791716 1048,511.994783 L1048,522.005217 C1048,524.211475 1046.21571,526 1044.00995,526 L1027.99005,526 C1025.78641,526 1024,524.208284 1024,522.005217 L1024,511.994783 Z M1035.5,514 L1037,514 L1037,520 L1035.5,520 L1035.5,514 Z M1033,514 L1030,514 C1029.4,514 1029,514.5 1029,515 L1029,519 C1029,519.5 1029.4,520 1030,520 L1033,520 C1033.6,520 1034,519.5 1034,519 L1034,517 L1032.5,517 L1032.5,518.5 L1030.5,518.5 L1030.5,515.5 L1034,515.5 L1034,515 C1034,514.5 1033.6,514 1033,514 Z M1043,515.5 L1043,514 L1038.5,514 L1038.5,520 L1040,520 L1040,518 L1042,518 L1042,516.5 L1040,516.5 L1040,515.5 L1043,515.5 Z" id="Combined-Shape" stroke="none" fill="#FC5287" fillRule="evenodd"></path>
+          </svg>
+        </div>
+        <span>Post a giphy</span>
+      </div>
+    </div>);
   }
 
   renderQuote() {
@@ -162,6 +182,7 @@ class ChatInput extends React.Component {
           />
         </div>
         {this.renderQuote()}
+        {this.renderMenu()}
       </div>)
   }
 }

@@ -48,6 +48,38 @@
     // bottom: 0;
 }
 
+.post-edit-menu-long {
+    bottom: 0;
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+}
+
+.post-edit-menu-item-long {
+    border-top: 1px solid $color-light-grey;
+    margin: 0 0 0 calc-em(8px);
+    display: flex;
+    flex-direction: row;
+    .post-edit-menu-item-icon {
+      margin: calc-em(8px);
+      width: calc-em(20px);
+      height: calc-em(20px);
+      img {
+          height: 100%;
+          width: 100%;
+      }
+      svg {
+          height: 100%;
+          width: 100%;
+      }
+    }
+    span {
+      @extend .font-size-default;
+      line-height: 1;
+      margin: auto auto calc-em(8px) calc-em(8px);
+    }
+}
+
 .chat-lower {
   position:relative;
   width:100%;
