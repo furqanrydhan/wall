@@ -112,6 +112,8 @@ class ChatInput extends React.Component {
   }
 
   renderMenu() {
+    return;
+    // FIXME @fpn
     return (
     <div className="post-edit-menu-long">
       <div className="post-edit-menu-item-long">
