@@ -7,39 +7,14 @@ class Wall extends React.Component {
   constructor() {
     super();
     this.state = {
-      // mode: 'text',
-      // open: false,
-      // closing: false,
+
     };
-    // this.handleSwitchMode = this.handleSwitchMode.bind(this);
     this.onPost = this.onPost.bind(this);
     this.onReply = this.onReply.bind(this);
   }
 
   componentWillMount() {
   }
-
-  // blurInput() {
-  //   this.setState({ blurInput: true });
-  //   this.handleSwitchMode('text');
-  // }
-
-  // handleSwitchMode(mode) {
-  //   if (this.state.mode === 'gif') {
-  //     this.setState({ mode: 'text', closing: true, open: false }, () => {
-  //       setTimeout(() => {
-  //         this.setState({ closing: false });
-  //       }, 333);
-  //     });
-  //   }
-  //   if (this.state.mode === 'text' && mode !== 'text') {
-  //     this.setState({ mode }, () => {
-  //       setTimeout(() => {
-  //         this.setState({ open: true });
-  //       }, 5);
-  //     });
-  //   }
-  // }
 
   onPost() {
     console.log("Post clicked");
@@ -75,9 +50,5 @@ class Wall extends React.Component {
 }
 
 Wall.displayName = 'Wall';
-
-// Uncomment properties you need
-// App.propTypes = {};
-// App.defaultProps = {};
 
 export default Wall;
