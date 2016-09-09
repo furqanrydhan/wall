@@ -1,11 +1,8 @@
 import React from 'react';
 import uuid from 'node-uuid';
 import Remarkable from 'remarkable';
+import WallItem from './chat-item.jsx';
 
-var quoteMd = new Remarkable(
-  {html: false,
-  breaks: false,
-  linkify: true});
 
 class ChatInput extends React.Component {
 
@@ -179,44 +176,12 @@ class ChatInput extends React.Component {
     </div>);
   }
 
-  renderQuoteImages() {
-    if(!this.props.context.quote.images) {
-      return;
-    }
-    for (var i = 0 ; i< this.props.context.quote.images.length; i++) {
-      this.props.context.quote.images[i].key = i+1;
-    }
-    return (
-      <div className="chat-quote--inner--images">
-        {this.props.context.quote.images.map((i) =>
-          <div key={i.key} className={"image"}
-               style={{backgroundImage: "url(" + (i.url) + ")"}}></div>)}
-      </div>
-    )
-  };
-
   renderQuote() {
+
     if (!this.props.context.quote) {
       return "";
     }
-    var message = this.props.context.quote.message;
-    message = {__html: quoteMd.render(message)};
-    return (
-      <div className="post-edit-quote">
-        <div className="chat-quote-left">
-          <div className="chat-quote-avatar">
-            <img src={this.props.db.getImageUrl(this.props.context.quote.user_id)} role="presentation" />
-          </div>
-        </div>
-        <div className="chat-quote-right">
-          <div className="chat-quote--username">
-            {this.props.context.quote.username}
-          </div>
-          <div className="chat-quote--text" dangerouslySetInnerHTML={message}></div>
-          {this.renderQuoteImages()}
-        </div>
-      </div> 
-    )
+    return <WallItem type="quote" db={this.props.db} item={this.props.context.quote} />;
   }
 
   renderImages() {
