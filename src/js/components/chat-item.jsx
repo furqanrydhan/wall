@@ -53,6 +53,22 @@ class ChatItem extends React.Component {
     return moment(this.props.item.created_at).format('LT');
   }
 
+  renderQuoteImages() {
+    if(!this.props.item.quote.images) {
+      return;
+    }
+    for (var i = 0 ; i< this.props.item.quote.images.length; i++) {
+      this.props.item.quote.images[i].key = i+1;
+    }
+    return (
+      <div className="chat-quote--inner--images">
+        {this.props.item.quote.images.map((i) =>
+          <div key={i.key} className={"image"}
+               style={{backgroundImage: "url(" + (i.url) + ")"}}></div>)}
+      </div>
+    )
+  };
+
   renderQuote() {
     if (!this.props.item.quote) {
       return "";
@@ -71,6 +87,7 @@ class ChatItem extends React.Component {
             {this.props.item.quote.username}
           </div>
           <div className="chat-quote--text" dangerouslySetInnerHTML={message}></div>
+          {this.renderQuoteImages()}
         </div>
       </div> 
     )

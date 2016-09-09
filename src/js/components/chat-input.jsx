@@ -63,8 +63,8 @@ class ChatInput extends React.Component {
   submitPost(e) {
     var that = this;
     var text = this.state.messageText.trim();
-    var parent_id = (this.props.quote && this.props.quote.id) || null;
-    var thread_id = (this.props.quote && (this.props.quote.thread_id || this.props.quote.id)) || null;
+    var parent_id = (this.props.context.quote && this.props.context.quote.id) || null;
+    var thread_id = (this.props.context.quote && (this.props.context.quote.thread_id || this.props.context.quote.id)) || null;
     var id = uuid.v4();
     if (!thread_id) {
       thread_id = id;
@@ -79,7 +79,7 @@ class ChatInput extends React.Component {
         user_id: this.props.actingUser.user_id,
         images: this.props.context.photos,
         message: text,
-        quote: this.props.quote,
+        quote: this.props.context.quote,
       };
 
       // TODO mention stuff in users[]
