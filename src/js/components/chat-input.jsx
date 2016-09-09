@@ -1,11 +1,8 @@
 import React from 'react';
 import uuid from 'node-uuid';
 import Remarkable from 'remarkable';
+import WallItem from './chat-item.jsx';
 
-var quoteMd = new Remarkable(
-  {html: false,
-  breaks: false,
-  linkify: true});
 
 class ChatInput extends React.Component {
 
@@ -36,15 +33,12 @@ class ChatInput extends React.Component {
 		if (nextProps.context && nextProps.context.photos) {
 			for (var i; i < nextProps.context.photos.length ; i++) {
 				var p = nextProps.context.photos[i];
-				if (p.url) {
-					delete p.photo;
-				} else {
+				if (!p.url) {
 					uploaded = false;
 				}
 			}
 		}
-    this.setState({quote: nextProps.context.quote,
-                   messageText: nextProps.context.messageText,
+    this.setState({messageText: nextProps.context.messageText,
                    enabled: uploaded});
     // if (nextProps.blurChat === this.props.blurChat) {
     //   return
@@ -66,11 +60,13 @@ class ChatInput extends React.Component {
     var parent_id = (this.props.context.quote && this.props.context.quote.id) || null;
     var thread_id = (this.props.context.quote && (this.props.context.quote.thread_id || this.props.context.quote.id)) || null;
     var id = uuid.v4();
+
     if (!thread_id) {
       thread_id = id;
     }
-    if (text.length > 0) {
-      const message = {
+
+    if (text.length > 0 || this.props.context.photos) {
+      const post = {
         id: id,
         thread_id: thread_id,
         parent_id: parent_id,
@@ -83,15 +79,18 @@ class ChatInput extends React.Component {
       };
 
       // TODO mention stuff in users[]
+      console.log("saving post", post);
 
-      Bebo.Db.saveAsync('post', message)
+      Bebo.Db.saveAsync('post', post)
         .then(function(data) {
+          data = data.result[0];
 					that.broadcastChat(data);
+          that.notifyUsers(data);
           that.home();
       		// that.resetTextarea();
         });
     } else {
-      console.warn('no message, returning');
+      console.warn('no post, returning');
     }
   }
 
@@ -99,27 +98,43 @@ class ChatInput extends React.Component {
     this.setState({ messageText: '' });
   }
 
-  notifyUser(users, msg) {
+  notifyUsers(post) {
     // TODO: "send you 3 messages ( text ...);
     // console.log('notifying user: ', users, msg);
     // FIXME: rate limit
-    var message = _.truncate(msg, {lenght:60, omission:"..."});
-    Bebo.Notification.roster('{{{user.username}}} posted:',
-      message,
-      { rate_limit_key: "test_" +  Math.floor(Date.now() / 1000 / 60 / 60) }
-      , function(err, data) {
-          if (err) {
-            console.error('error sending notification', err);
-          }
+    console.log("POST", post);
+    var title = '{{{user.username}}}';
+    var body = "";
+
+    var message;
+    if (post.message) {
+      message = _.truncate(post.message, {lenght:60, omission:"..."});
+    }
+    
+    if (post.parent_id && post.message) {
+      body = "replied: " + message;
+    } else if (post.parent_id && post.images) {
+      body = "added a new image \uD83D\uDDBC";
+    } else if (post.message) {
+      body = "posted: " + message;
+    } else if (post.images) {
+      body = "posted a new image \uD83D\uDDBC";
+    } else {
+      console.error("UNKNOWN POST TYPE", post);
+			body = "posted a new topic";
+		}
+
+    Bebo.getRosterAsync()
+      .then(function(users) {
+          console.log("ROSTER", users);
+          var user_ids = _.map(users, "user_id");
+      		return Bebo.Notification.users(title, body, user_ids);
       });
   }
 
   broadcastChat(data) {
-    const m = data.result[0];
-    this.notifyUser(m.users, m.message);
-    // console.log("message from db", m);
-    Bebo.emitEvent({ message: {thread_id: this.props.thread_id, "newMsg": 1, "dm_id": m.id }});
-    // TODO check if any user is in str
+    // FIXME: this is still the old DM way
+    Bebo.emitEvent({ message: {thread_id: this.props.thread_id, "newMsg": 1, "dm_id": data.id }});
   }
 
   handleInputFocus() {
@@ -161,44 +176,12 @@ class ChatInput extends React.Component {
     </div>);
   }
 
-  renderQuoteImages() {
-    if(!this.props.context.quote.images) {
-      return;
-    }
-    for (var i = 0 ; i< this.props.context.quote.images.length; i++) {
-      this.props.context.quote.images[i].key = i+1;
-    }
-    return (
-      <div className="chat-quote--inner--images">
-        {this.props.context.quote.images.map((i) =>
-          <div key={i.key} className={"image"}
-               style={{backgroundImage: "url(" + (i.url) + ")"}}></div>)}
-      </div>
-    )
-  };
-
   renderQuote() {
+
     if (!this.props.context.quote) {
       return "";
     }
-    var message = this.props.context.quote.message;
-    message = {__html: quoteMd.render(message)};
-    return (
-      <div className="post-edit-quote">
-        <div className="chat-quote-left">
-          <div className="chat-quote-avatar">
-            <img src={this.props.db.getImageUrl(this.props.context.quote.user_id)} role="presentation" />
-          </div>
-        </div>
-        <div className="chat-quote-right">
-          <div className="chat-quote--username">
-            {this.props.context.quote.username}
-          </div>
-          <div className="chat-quote--text" dangerouslySetInnerHTML={message}></div>
-          {this.renderQuoteImages()}
-        </div>
-      </div> 
-    )
+    return <WallItem type="quote" db={this.props.db} item={this.props.context.quote} />;
   }
 
   renderImages() {
@@ -223,7 +206,7 @@ class ChatInput extends React.Component {
 	}
 
   render() {
-    var placeholder = this.props.quote ? "reply..." : "type a message..";
+    var placeholder = this.props.context.quote ? "reply..." : "type a message..";
     var userImgStyle = {backgroundImage: 'url(' + this.props.me.image_url + ')'};
 
     return (
