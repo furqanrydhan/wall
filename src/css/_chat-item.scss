@@ -145,3 +145,16 @@
   @extend .chat-item--inner--avatar ;
   margin: 0 calc-em(13px) 0 0;
 }
+
+.chat-quote--inner--images {
+  display: flex;
+  height: 20vh;
+  flex-direction: column;
+  padding-left: calc-em(50px);
+  .image {
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: left;
+    flex: 1 1 auto;
+  }
+}
