@@ -26,6 +26,8 @@ if (storageAvailable('localStorage')) {
   hasLocalStorage = true;
 }
 
+const POST_CNT = 10;
+
 class App extends React.Component {
 
   constructor() {
@@ -55,13 +57,13 @@ class App extends React.Component {
 
   online() {
     Bebo.onEvent(this.handleEventUpdate);
-    this.getOldMessages();
+    this.getOldMessages(undefined, POST_CNT, 0);
     this.getMe();
   }
 
   componentWillMount() {
     console.timeStamp && console.timeStamp("Main.componentWillMount");
-    this.getOldMessages();
+    this.getOldMessages(undefined, POST_CNT, 0);
     this.getMe();
   }
 
@@ -121,7 +123,7 @@ class App extends React.Component {
   }
 
   handleMessageEvent(message) {
-    this.getOldMessages(message.thread_id, 50, 0);
+    this.getOldMessages(message.thread_id, POST_CNT, 0);
   }
 
   getMe() {
@@ -211,6 +213,7 @@ class App extends React.Component {
           image_url = image_url.replace("null", "https://a.imgdropt-dev.com/image/");
           data.state = "done" ;
           data.url = image_url;
+          delete data.photo;
           that.setState({context: context});
         });
   }
