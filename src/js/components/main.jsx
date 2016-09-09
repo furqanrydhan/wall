@@ -2,11 +2,13 @@ import React from 'react';
 import Promise from 'bluebird';
 import ChatList from './chat-list.jsx';
 import ChatBackground from './chat-background.jsx';
-import ChatInput from './chat-input.jsx';
 import GiphyBrowser from './giphy-browser.jsx';
 import Helper from '../helper.js';
 import Wall from './wall.jsx';
-import PhotoModal from './PhotoModal.jsx';
+import PhotoEditor from './PhotoEditor.jsx';
+import Post from './chat-input.jsx';
+import DropZone from 'react-dropzone';
+import LoadImage from 'blueimp-load-image';
 
 function storageAvailable(type) {
 	try {
@@ -32,6 +34,7 @@ class App extends React.Component {
     super();
     this.state = {
       page: "home",
+      context: {},
       messages: [],
       me: {},
       threadName: ""
@@ -51,11 +54,13 @@ class App extends React.Component {
     this.incrUnreadMessage = this.incrUnreadMessage.bind(this);
     this.clearUnreadMessage = this.clearUnreadMessage.bind(this);
     this.getUnreadAndUpdate = this.getUnreadAndUpdate.bind(this);
+    this.onClosePhotoEditor = this.onClosePhotoEditor.bind(this);
+    this.onPhotoUpload = this.onPhotoUpload.bind(this);
+    this.onDrop = this.onDrop.bind(this);
     this.online = this.online.bind(this);
     this.roster = {};
     this.db.getImageUrl = this.getImageUrl.bind(this);
   }
-
 
   online() {
     var that = this;
@@ -333,18 +338,20 @@ class App extends React.Component {
     return Bebo.getImageUrl() + "image/user/" + user_id  + "?w=72&h=72";
   }
 
-  navigate(page, threadName) {
-    threadName === threadName || "";
-
-    var currentThread = [];
-    if (page !== 'home') {
-      this.getOldMessages(page, 50, 0);
-      if (this.store[page]) {
-        currentThread = this.store[page];
-      } 
-      this.clearUnreadMessage(page);
+  navigate(page, context) {
+    var update = {page: page};
+    if (context !== undefined) {
+      update.context = context;
     }
-    this.setState({page: page, threadName: threadName, currentThread: currentThread});
+    this.setState(update);
+
+    // if (page !== 'home') {
+    //   this.getOldMessages(page, 50, 0);
+    //   if (this.store[page]) {
+    //     currentThread = this.store[page];
+    //   } 
+    //   this.clearUnreadMessage(page);
+    // }
   }
 
   updateUser(options) {
@@ -363,22 +370,99 @@ class App extends React.Component {
       });
   }
 
-  renderModal() {
-    if (this.state.page === "photoUploader") {
-      return <Modal modal={this.state.page} closeModal={this.handleCloseModal} editPhoto={this.handleGoToEdit} savePhoto={this.handleSaveImage} photo={this.state.rawPhoto || {}} />;
-    }
-    return null;
+  renderPostEdit() {
+    if ( this.state.page === "post") {
+			return <Post me={this.state.me}
+									 navigate={this.navigate}
+									 context={this.state.context}
+									 uploadPhoto={this.onPhotoUpload}
+									 db={this.db}
+									 actingUser={this.props.me} />;
+		}
   }
-  render() {
+ 
+  onPhotoUpload() {
+    console.log("Photo Upload - open dropzone");
+    this.refs.dropZone.open();
+  }
+
+  renderPhotoLoader() {
+        return (<div className="initial-load-container">
+          <div className="loader">
+            <svg  id="Layer_1" x="0px" y="0px" viewBox="0 0 81 45">
+              <circle className="circle1" fill="#fe1263" cx="13.5" cy="22.5" r="4.5"/>
+              <circle className="circle2" fill="#fe1263" cx="31.5" cy="22.5" r="4.5"/>
+              <circle className="circle3" fill="#fe1263" cx="49.5" cy="22.5" r="4.5"/>
+              <circle className="circle4" fill="#fe1263" cx="67.5" cy="22.5" r="4.5"/>
+            </svg>
+          </div>
+        </div>);
+  }
+
+  onClosePhotoEditor(photo) {
+    var context = this.state.context;
+    if (photo) {
+      context.photo = photo;
+    }
+    this.navigate("post", context);
+  }
+
+  renderPhotoEditor() {
+    if (this.state.page === "photo-editor") {
+			return (<PhotoEditor photo={{base64: this.state.context.rawPhoto}} closeEditor={this.onClosePhotoEditor} savePhoto={this.onClosePhotoEditor} />);
+		}
+  }
+
+  onDrop(files) {
+    this.navigate("photo-loader");
+    const file = files[0];
+
+    LoadImage.parseMetaData(file, (data) => {
+      let orientation = 0;
+      if (data.exif) {
+        orientation = data.exif.get('Orientation');
+      }
+      LoadImage(
+        file,
+        (canvas) => {
+          const base64data = canvas.toDataURL('image/jpeg');
+          var context = this.state.context;
+          context.rawPhoto =  base64data;
+          this.navigate("photo-editor", context);
+        }, {
+          orientation,
+          canvas: true,
+          aspectRatio: window.innerWidth / window.innerHeight,
+          maxWidth: 500,
+          cover: true,
+        }
+      );
+    });
+  }
+
+  renderPhotoUpload () {
+    return (<DropZone multiple={false} inputProps={{ capture: 'camera' }} onDrop={this.onDrop} ref="dropZone" style={{ display: 'none' }} accept="image/*" />);
+  }
+
+
+  renderWall() {
     if (this.state.page === "home") {
-      return <Wall 
+      return (<Wall 
         messages = {this.state.messages}
         me={this.state.me}
         navigate={this.navigate}
-        db={this.db}/>
-    } else {
+        db={this.db}/>);
     }
-    // <DropZone multiple={false} inputProps={{ capture: 'camera' }} onDrop={this.onDrop} ref="dropZone" style={{ display: 'none' }} accept="image/*" />
+  }
+
+  render() {
+    return (
+      <div className="app-root">
+				{this.renderWall()}
+				{this.renderPostEdit()}
+				{this.renderPhotoEditor()}
+				{this.renderPhotoUpload()}
+      </div>);
   }
 }
 

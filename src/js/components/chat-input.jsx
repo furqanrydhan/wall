@@ -22,6 +22,7 @@ class ChatInput extends React.Component {
     this.resetTextarea = this.resetTextarea.bind(this);
     this.broadcastChat = this.broadcastChat.bind(this);
     this.submitPost = this.submitPost.bind(this);
+    this.onPhoto = this.onPhoto.bind(this);
   }
 
   componentWillMount() {
@@ -31,6 +32,7 @@ class ChatInput extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    this.setState({quote: nextProps.context.quote});
     // if (nextProps.blurChat === this.props.blurChat) {
     //   return
     // }
@@ -109,6 +111,10 @@ class ChatInput extends React.Component {
 
   handleInputBlur() {
     this.refs.textarea.blur();
+  }
+
+  onPhoto() {
+    this.props.uploadPhoto();
   }
 
   renderMenu() {

@@ -37,6 +37,10 @@ body, html {
   overflow-x: hidden;
   max-width: 100vw;
   -webkit-overflow-scrolling: touch;
+  .app-root {
+	  width:100%;
+	  height:100%;
+  }
 }
 
 .chat {

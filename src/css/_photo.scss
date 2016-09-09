@@ -1,0 +1,224 @@
+
+.take-photo{
+  height: 60px;
+  width: 60px;
+  //background: rgba(255, 255, 255, .3);
+  margin: auto;
+  border-radius: 50%;
+  border: 4px solid #fff;
+}
+
+
+  .editor{
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    .color-container {
+      position: absolute;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      height: 150px;
+      transition: all 200ms ease;
+      &--inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding: 0 10px;
+      }
+      .react-color-picker__hue-spectrum {
+        border: 1px solid #ffffff;
+        cursor: pointer;
+        border-radius: 50px;
+        position: relative;
+      }
+      .react-color-picker__hue-drag {
+        display: none!important;
+      }
+    }
+      .close-button {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 45px;
+        width: 45px;
+        z-index: 10;
+        display: flex;
+        transition: all 200ms ease;
+        svg{
+          margin: auto;
+          height: 50%;
+          width: 50%;
+        }
+      }
+
+    .hidden-input-field{
+      position: absolute;
+      left: -2000px;
+      width: 0;
+      height: 0;
+    }
+
+    .filterContainer{
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 16vh;
+      top: 102vw;
+      justify-items: flex-start;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      figure{
+        position: relative;
+        margin: 0 1vw;
+        width: calc(100vh - 102vw - 16vh);
+        flex-shrink: 0;
+        height: calc(100vh - 102vw - 16vh);
+        overflow: hidden;
+        img{
+          max-width: 100%;
+          width: 100%;
+        }
+      }
+    }
+
+    .cropperContainer{
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+
+      .canvas-container{
+        textarea{
+          left: -2000px!important;
+        }
+      }
+
+      .addText{
+        position: absolute;
+        top: 0;
+        right: 45px;
+        height: 45px;
+        width: 45px;
+        z-index: 10;
+        display: flex;
+        transition: all 200ms ease;
+        svg{
+          margin: auto;
+          height: 90%;
+          width: 90%;
+        }
+      }
+      .addDraw{
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 45px;
+        width: 45px;
+        z-index: 10;
+        display: flex;
+        transition: all 200ms ease;
+        svg{
+          margin: auto;
+          height: 75%;
+          width: 75%;
+        }
+      }
+      .undoDraw{
+        position: absolute;
+        top: 0;
+        right: 45px;
+        height: 45px;
+        width: 45px;
+        z-index: 10;
+        display: flex;
+        transition: all 200ms ease;
+        svg{
+          margin: auto;
+          height: 75%;
+          width: 75%;
+        }
+      }
+    }
+    .actionContainer{
+      position:absolute;
+      bottom:0;
+      width:100vw;
+      margin: 0 auto auto;
+      .saveImage{
+        height: 15vmin;
+        width: 15vmin;
+        background-color: #fe1263;
+        background-image: url(./assets/img/right-arrow.svg);
+        background-size: 55%;
+        background-repeat: no-repeat;
+        background-position: center;
+        border-radius: 50%;
+        color: #ffffff;
+        position:absolute;
+        right:2vh;
+        bottom:2vh;
+      }
+    }
+    .cropper-view-box{
+      outline: 3px solid #39f;
+    }
+  }
+
+//photo stuff
+.photo{
+  display: inline-block;
+  width: calc(100vw);
+  height: calc(100vh);
+  overflow: hidden;
+  position: relative;
+  z-index:1;
+  //flex: 0 0 33%;
+  cursor: pointer;
+  .user-handle {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position:absolute;
+    z-index: 110;
+    text-align: center;
+    background-color:#ffffff;
+    padding: 5px 15px;
+    color: #000000;
+  }
+
+  .photo-gradient {
+    bottom: 0;
+    width: 100%;
+    height: 20%;
+    position:absolute;
+    z-index: 110;
+    background: -moz-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 14%, rgba(0,0,0,0.65) 100%);
+    background: -webkit-linear-gradient(top, rgba(0,0,0,0) 0%,rgba(0,0,0,0) 14%,rgba(0,0,0,0.65) 100%)
+  }
+
+  .photo-likes-container {
+    display:flex;
+    flex-direction:row;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    align-items: center;
+    padding: 3px;
+
+    .photo-likes {
+      z-index: 120;
+      font-size:0.8em;
+      color: #ffffff;
+      margin-left: 3px;
+    }
+  }
+}

@@ -9,14 +9,11 @@ class Wall extends React.Component {
   constructor() {
     super();
     this.state = {
-      post: false,
-      quote: null,
-      mode: 'text',
-      open: false,
-      closing: false,
+      // mode: 'text',
+      // open: false,
+      // closing: false,
     };
     // this.handleSwitchMode = this.handleSwitchMode.bind(this);
-    this.home = this.home.bind(this);
     this.onPost = this.onPost.bind(this);
     this.onReply = this.onReply.bind(this);
   }
@@ -28,10 +25,6 @@ class Wall extends React.Component {
   //   this.setState({ blurInput: true });
   //   this.handleSwitchMode('text');
   // }
-
-  home() {
-    this.setState({post: false, quote: null});
-  }
 
   // handleSwitchMode(mode) {
   //   if (this.state.mode === 'gif') {
@@ -50,29 +43,18 @@ class Wall extends React.Component {
   //   }
   // }
 
-  renderPostEdit() {
-    return <Post me={this.props.me}
-                 home={this.home}
-                 quote={this.state.quote}
-                 db={this.props.db}
-                 actingUser={this.props.me} />;
-  }
-
   onPost() {
     console.log("Post clicked");
-    this.setState({post: true});
+    this.props.navigate("post");
   }
 
   onReply(quote) {
     console.log("Reply clicked", quote);
-    this.setState({post: true, quote: quote});
+    this.props.navigate("post", {quote: quote});
   }
 
   render() {
 
-    if (this.state.post) {
-      return this.renderPostEdit();
-    }
     return (
       <div className="chat">
         <div className="chat-new-post">
@@ -99,6 +81,5 @@ Wall.displayName = 'Wall';
 // Uncomment properties you need
 // App.propTypes = {};
 // App.defaultProps = {};
-
 
 export default Wall;
