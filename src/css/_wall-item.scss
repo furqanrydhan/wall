@@ -1,0 +1,62 @@
+
+// Wall Item
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+// -- Generic Item style 
+
+.wall-item {
+  width: 100%;
+  display: block;
+}
+
+.wall-item--inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.wall-item--inner--meta {
+  flex: 0 0 auto;
+}
+
+.wall-item--inner--body {
+  flex: 1 1 auto;
+}
+
+// -- Message 
+
+.wall-item--message {
+  width: 100%;
+}
+
+.wall-item--message p,
+.wall-item--message span {
+ @extend .font-size-small 
+ color: $text-dark;
+ display:inline;
+}
+
+// -- quote
+.wall-item--quote {
+
+}
+
+// -- images
+
+.wall-item--images {
+  list-style-type: none;
+  width: 100%;
+}
+
+// -- giphy
+
+.wall-item--giphy {
+
+}
+
+// -- sticker
+
+.wall-item--sticker {
+
+}
