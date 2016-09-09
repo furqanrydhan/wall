@@ -101,8 +101,6 @@ class ChatItem extends React.Component {
   }
 
   renderImages() {
-    console.log(this.props.item);
-
     if(!this.props.item.images) {
       return;
     }

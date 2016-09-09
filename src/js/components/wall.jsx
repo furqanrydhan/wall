@@ -42,8 +42,7 @@ class Wall extends React.Component {
   // }
 
   onPost() {
-    console.log("Post clicked");
-    this.props.navigate("post");
+    this.props.navigate("post", {});
   }
 
   onReply(quote) {
