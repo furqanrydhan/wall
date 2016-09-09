@@ -47,7 +47,6 @@ class App extends React.Component {
     this.getOldMessages = this.getOldMessages.bind(this);
     this.onThreadPresenceEvent = this.onThreadPresenceEvent.bind(this);
     this.updateUser = this.updateUser.bind(this);
-    this.uploadImage = this.uploadImage.bind(this);
     this.viewerUpdate= this.viewerUpdate.bind(this);
     this.getFullRoster = this.getFullRoster.bind(this);
     this.setRosterState = this.setRosterState.bind(this);
@@ -360,13 +359,6 @@ class App extends React.Component {
       });
   }
 
-  uploadImage(url) {
-    var that = this;
-    return Bebo.uploadImageAsync(url)
-      .then(function(image_url) {
-        return that.updateUser({image_url: image_url});
-      });
-  }
 
   renderPostEdit() {
     if ( this.state.page === "post") {
@@ -375,7 +367,7 @@ class App extends React.Component {
 									 context={this.state.context}
 									 uploadPhoto={this.onPhotoUpload}
 									 db={this.db}
-									 actingUser={this.props.me} />;
+									 actingUser={this.state.me} />;
 		}
   }
  
@@ -411,6 +403,8 @@ class App extends React.Component {
     this.navigate("post", context);
     return Bebo.uploadImageAsync(photo)
       .then(function(image_url) {
+					// FIXME not in prod?
+          image_url = image_url.replace("null", "https://a.imgdropt-dev.com/image/");
           data.state = "done" ;
           data.url = image_url;
           that.setState({context: context});

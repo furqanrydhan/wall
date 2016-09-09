@@ -108,6 +108,17 @@
   overflow: hidden;
 }
 
+.chat-item--inner--images {
+  display: flex;
+  height: 20vh;
+  flex-direction: column;
+  .image {
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: left;
+    flex: 1 1 auto;
+  }
+}
 .chat-item--inner--message--content--image div{
   background-size: contain;
   background-repeat: no-repeat;

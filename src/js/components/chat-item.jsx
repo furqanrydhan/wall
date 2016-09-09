@@ -82,16 +82,41 @@ class ChatItem extends React.Component {
       const { webp, url, width, height } = image;
       const ratio = 120 / height;
       const gifUrl = Bebo.getDevice() === 'android' ? webp || url : url;
-      return (<span className={`chat-item--inner--message--content ' ${this.state.imageLoaded ? 'is-loaded' : 'is-loading'}`}>
-        <div className="chat-item--inner--message--content--image">
-          <div style={{ backgroundImage: `url(${gifUrl.replace('http://', 'https://')})`, height: `${height * ratio}px`, width: `${width * ratio}px` }} />
+      return (
+        <div className="chat-item--inner--message">
+          <span className={`chat-item--inner--message--content ' ${this.state.imageLoaded ? 'is-loaded' : 'is-loading'}`}>
+            <div className="chat-item--inner--message--content--image">
+              <div style={{ backgroundImage: `url(${gifUrl.replace('http://', 'https://')})`, height: `${height * ratio}px`, width: `${width * ratio}px` }} />
+            </div>
+          </span>
         </div>
-      </span>);
+      );
     }
     var message = this.props.item.message;
     message = {__html: md.render(message)};
-    return <span className="chat-item--inner--message--content" dangerouslySetInnerHTML={message}></span>;
+    return (
+      <div className="chat-item--inner--message">
+       <span className="chat-item--inner--message--content" dangerouslySetInnerHTML={message}></span>
+      </div>)
   }
+
+  renderImages() {
+    console.log(this.props.item);
+
+    if(!this.props.item.images) {
+      return;
+    }
+    for (var i = 0 ; i< this.props.item.images.length; i++) {
+      this.props.item.images[i].key = i+1;
+    }
+    return (
+      <div className="chat-item--inner--images">
+        {this.props.item.images.map((i) =>
+          <div key={i.key} className={"image"}
+               style={{backgroundImage: "url(" + (i.url) + ")"}}></div>)}
+      </div>
+    )
+  };
 
   reply(e) {
     console.log("reply clicked");
@@ -114,9 +139,8 @@ class ChatItem extends React.Component {
             </span>
             <div className="chat-item--reply--button" data-post-id={this.props.item.id} onClick={this.reply}></div>
           </div>
-          <div className="chat-item--inner--message">
-            {this.renderContent()}
-          </div>
+          {this.renderContent()}
+          {this.renderImages()}
           {this.renderQuote()}
         </div>
       </div>
