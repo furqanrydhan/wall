@@ -226,10 +226,10 @@ $prefix-for-spec:      true !default; // required for keyframe mixin
 @mixin display($value) {
   // flex | inline-flex
   @if $value == "flex" {
-    // 2009
-    display: -webkit-box;
-    display: -moz-box;
-    display: box;
+    // // 2009
+    // display: -webkit-box;
+    // display: -moz-box;
+    // display: box;
 
     // 2012
     display: -webkit-flex;

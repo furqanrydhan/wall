@@ -1,14 +1,14 @@
+/* eslint-disable no-unused-expressions */
+
 import React from 'react';
 import Promise from 'bluebird';
-import ChatList from './chat-list.jsx';
-import ChatBackground from './chat-background.jsx';
-import GiphyBrowser from './giphy-browser.jsx';
 import Helper from '../helper.js';
 import Wall from './wall.jsx';
 import PhotoEditor from './PhotoEditor.jsx';
 import Post from './chat-input.jsx';
 import DropZone from 'react-dropzone';
 import LoadImage from 'blueimp-load-image';
+
 
 function storageAvailable(type) {
 	try {
@@ -75,7 +75,6 @@ class App extends React.Component {
 
   componentWillMount() {
     console.timeStamp && console.timeStamp("Main.componentWillMount");
-    var that = this;
     this.getOldMessages();
   }
 
@@ -162,7 +161,7 @@ class App extends React.Component {
       .then(function (data) {
       console.timeStamp && console.timeStamp("GotFullRosterData");
 
-      var me = that.state.me.user_id && that.state.me || data.me && data.me.user_id && data.me;
+      var me = (that.state.me.user_id && that.state.me) || (data.me && data.me.user_id && data.me);
       var roster = {};
       var l = data.roster.length;
       for (var i=0; i< l; i++) {
@@ -173,13 +172,13 @@ class App extends React.Component {
         roster[user.user_id].thread_id = Helper.mkThreadId(me, user.user_id);
       }
       l = data.stream.viewer_ids.length;
-      for (var i=0; i< l; i++) {
+      for (i=0; i< l; i++) {
         var viewer_id = data.stream.viewer_ids[i];
         roster[viewer_id].online = true;
       }
       if (data.unread) {
         l = data.unread.length;
-        for (var i=0; i< l; i++) {
+        for (i=0; i< l; i++) {
           var unread = data.unread[i];
           var user_id = Helper.getPartnerFromThreadId(me, unread.thread_id);
           if (roster[user_id]) {
@@ -200,8 +199,8 @@ class App extends React.Component {
       rosterList[i].online = false;
     }
     var roster = this.roster;
-    var l = viewer_ids.length;
-    for (var i=0; i< l; i++) {
+    l = viewer_ids.length;
+    for (i=0; i< l; i++) {
       var viewer_id = viewer_ids[i];
       if (viewer_id === this.state.me.user_id) {
         continue;
@@ -265,7 +264,7 @@ class App extends React.Component {
                   thread_id: thread_id,
                   unread_cnt: 0 };
         }
-        row.unread_cnt = row.unread_cnt + 1;
+        row.unread_cnt += row.unread_cnt;
         return Bebo.Db.saveAsync('unread', row);
       });
   }
@@ -285,7 +284,6 @@ class App extends React.Component {
       this.roster[user_id].unread = 0;
     }
     this.setRosterState(this.roster);
-    var that = this;
     return Bebo.Db.getAsync('unread', {user_id: this.state.me.user_id, thread_id: thread_id})
       .then(function(data) {
         var row;
@@ -460,7 +458,7 @@ class App extends React.Component {
   renderWall() {
     if (this.state.page === "home") {
       return (<Wall 
-        messages = {this.state.messages}
+        messages={this.state.messages}
         me={this.state.me}
         navigate={this.navigate}
         db={this.db}/>);

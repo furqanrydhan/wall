@@ -66,7 +66,7 @@ class ChatItem extends React.Component {
             <img src={this.props.db.getImageUrl(this.props.item.quote.user_id)} role="presentation" />
           </div>
         </div>
-        <div className = "chat-quote-right">
+        <div className="chat-quote-right">
           <div className="chat-quote--username">
             {this.props.item.quote.username}
           </div>

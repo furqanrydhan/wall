@@ -1,5 +1,4 @@
 import React from 'react';
-import Helper from '../helper.js';
 import uuid from 'node-uuid';
 import Remarkable from 'remarkable';
 
@@ -50,8 +49,8 @@ class ChatInput extends React.Component {
   submitPost(e) {
     var that = this;
     var text = this.state.messageText.trim();
-    var parent_id = this.props.quote && this.props.quote.id || null;
-    var thread_id = this.props.quote && (this.props.quote.thread_id || this.props.quote.id) || null;
+    var parent_id = (this.props.quote && this.props.quote.id) || null;
+    var thread_id = (this.props.quote && (this.props.quote.thread_id || this.props.quote.id)) || null;
     var id = uuid.v4();
     if (!thread_id) {
       thread_id = id;
@@ -85,10 +84,11 @@ class ChatInput extends React.Component {
   notifyUser(users, msg) {
     // TODO: "send you 3 messages ( text ...);
     // console.log('notifying user: ', users, msg);
+    // FIXME: rate limit
     var message = _.truncate(msg, {lenght:60, omission:"..."});
     Bebo.Notification.roster('{{{user.username}}} posted:',
-      msg,
-      { rate_limit_key: "test_" + `${_.join(users, ":")}_${Math.floor(Date.now() / 1000 / 60 / 60)}` }
+      message,
+      { rate_limit_key: "test_" +  Math.floor(Date.now() / 1000 / 60 / 60) }
       , function(err, data) {
           if (err) {
             console.error('error sending notification', err);
@@ -149,7 +149,7 @@ class ChatInput extends React.Component {
             <img src={this.props.db.getImageUrl(this.props.quote.user_id)} role="presentation" />
           </div>
         </div>
-        <div className = "chat-quote-right">
+        <div className="chat-quote-right">
           <div className="chat-quote--username">
             {this.props.quote.username}
           </div>

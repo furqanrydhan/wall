@@ -1,8 +1,6 @@
 import React from 'react';
 import ChatList from './chat-list.jsx';
 import ChatBackground from './chat-background.jsx';
-import Post from './chat-input.jsx';
-import GiphyBrowser from './giphy-browser.jsx';
 
 class Wall extends React.Component {
 

@@ -131,16 +131,16 @@ class ChatList extends React.Component {
   scrollChatToBottom() {
     return;
 
-    if (this.state.unloadedMessages.length > 0) {
-      this.addNewMessages(this.state.unloadedMessages);
-    }
-    if (this.refs.chatListInner) {
-      this.refs.chatListInner.scrollTop = this.refs.chatListInner.scrollHeight;
-    }
+    // if (this.state.unloadedMessages.length > 0) {
+    //   this.addNewMessages(this.state.unloadedMessages);
+    // }
+    // if (this.refs.chatListInner) {
+    //   this.refs.chatListInner.scrollTop = this.refs.chatListInner.scrollHeight;
+    // }
 
-    this.setState({
-      scrolledPastFirstMessage: false,
-    });
+    // this.setState({
+    //   scrolledPastFirstMessage: false,
+    // });
   }
 
   handleNewMessage() {

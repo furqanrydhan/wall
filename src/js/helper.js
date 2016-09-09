@@ -43,7 +43,7 @@ class Helper {
     will become
     ["0f3ca38a2c3545e08dff9fa0d5e30d21", "3ce12196cba745c4ae97e36f25dfb71e", "405ec4d48ae14b2da1c7b461b59b2c62", "a060a8da26e546f9a590af38646d893e", "b79293693a7f48228cf8972d6ee3d14d"]
      */
-    var users = new Array(from_user_id, to_user_id); // doesnt matter what order these are passed in, since were sorting
+    var users = [from_user_id, to_user_id]; // doesnt matter what order these are passed in, since were sorting
     users.sort(function(a, b){
       if(a < b) return -1;
       if(a > b) return 1;

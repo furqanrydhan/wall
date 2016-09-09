@@ -23,6 +23,11 @@ module.exports = {
     node: true
   },
 
+  globals: {
+    Bebo: true,
+    _: true,
+  },
+
   parserOptions: {
     ecmaVersion: 6,
     sourceType: 'module',
@@ -133,7 +138,7 @@ module.exports = {
     }],
     'no-with': 'warn',
     'no-whitespace-before-property': 'warn',
-    'operator-assignment': ['warn', 'always'],
+    // 'operator-assignment': ['warn', 'always'], DON"T FORCE THIS FOR STRING OPERATIONS += on STRING IS UGLY, USE += FOR INCREMENTS
     radix: 'warn',
     'require-yield': 'warn',
     'rest-spread-spacing': ['warn', 'never'],
