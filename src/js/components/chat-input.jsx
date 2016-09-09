@@ -22,6 +22,7 @@ class ChatInput extends React.Component {
     this.broadcastChat = this.broadcastChat.bind(this);
     this.submitPost = this.submitPost.bind(this);
     this.onPhoto = this.onPhoto.bind(this);
+    this.home = this.home.bind(this);
   }
 
   componentWillMount() {
@@ -31,7 +32,19 @@ class ChatInput extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({quote: nextProps.context.quote});
+	  var uploaded = true;
+		if (nextProps.context && nextProps.context.photos) {
+			for (var i; i < nextProps.context.photos.length ; i++) {
+				var p = nextProps.context.photos[i];
+				if (p.url) {
+					delete p.photo;
+				} else {
+					uploaded = false;
+				}
+			}
+		}
+		
+    this.setState({quote: nextProps.context.quote, enabled: uploaded});
     // if (nextProps.blurChat === this.props.blurChat) {
     //   return
     // }
@@ -63,6 +76,7 @@ class ChatInput extends React.Component {
         type: 'message',
         username: this.props.actingUser.username,
         user_id: this.props.actingUser.user_id,
+        images: this.props.context.photos,
         message: text,
         quote: this.props.quote,
       };
@@ -70,13 +84,16 @@ class ChatInput extends React.Component {
       // TODO mention stuff in users[]
 
       Bebo.Db.saveAsync('post', message)
-        .then(that.broadcastChat)
-        .then(that.props.home);
-      this.resetTextarea();
+        .then(function(data) {
+					that.broadcastChat(data);
+          that.home();
+      		that.resetTextarea();
+        });
     } else {
       console.warn('no message, returning');
     }
   }
+
   resetTextarea() {
     this.setState({ messageText: '' });
   }
@@ -160,18 +177,25 @@ class ChatInput extends React.Component {
   }
 
   renderImages() {
+
     if(!this.props.context.photos) {
       return;
     }
-               //FIXME  style={{backgroundImage: "url(" + (i.url || i.photo) + ")"}}></div>)}
+    for (var i = 0 ; i< this.props.context.photos.length; i++) {
+      this.props.context.photos[i].key = i+1;
+    }
     return (
       <div className="photos">
         {this.props.context.photos.map((i) =>
-          <div className={"photo " + i.state}
-               style={{backgroundImage: "url(" + (i.photo) + ")"}}></div>)}
+          <div key={i.key} className={"photo " + i.state}
+               style={{backgroundImage: "url(" + (i.url || i.photo) + ")"}}></div>)}
       </div>
     )
   };
+
+  home() {
+    this.props.navigate("home", null);
+	}
 
   render() {
     var placeholder = this.props.quote ? "reply..." : "type a message..";
@@ -180,7 +204,7 @@ class ChatInput extends React.Component {
     return (
       <div className="post-edit">
         <div className="sub-header">
-          <div onClick={this.props.home} className="sub-back-button"></div>
+          <div onClick={this.home} className="sub-back-button"></div>
           <div className="sub-name">Post to Bebo</div>
           <div className="sub-action" onClick={this.submitPost}>Post</div>
         </div>
