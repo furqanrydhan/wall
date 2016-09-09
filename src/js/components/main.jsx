@@ -400,11 +400,23 @@ class App extends React.Component {
   }
 
   onClosePhotoEditor(photo) {
+    var that = this;
     var context = this.state.context;
-    if (photo) {
-      context.photo = photo;
+    if (!photo) {
+     this.navigate("post", context);
     }
+    var data = { photo: photo, state: "uploading" };
+    if (! context.photos) {
+      context.photos = [];
+    } 
+    context.photos.push(data);
     this.navigate("post", context);
+    return Bebo.uploadImageAsync(photo)
+      .then(function(image_url) {
+          data.state = "done" ;
+          data.url = image_url;
+          that.setState({context: context});
+        });
   }
 
   renderPhotoEditor() {

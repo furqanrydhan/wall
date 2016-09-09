@@ -104,7 +104,6 @@ class PhotoEditor extends React.Component {
     });
     // eslint-disable-next-line
     fabric.Object.prototype.selectable = false;
-    debugger;
     this.canvas.setBackgroundImage(this.props.photo.base64, this.canvas.renderAll.bind(this.canvas), {
       originX: 'left',
       originY: 'top',

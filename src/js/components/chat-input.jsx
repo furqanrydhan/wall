@@ -159,8 +159,20 @@ class ChatInput extends React.Component {
     )
   }
 
-            // onFocus={this.handleInputFocus}
-            // onBlur={this.handleInputBlur}
+  renderImages() {
+    if(!this.props.context.photos) {
+      return;
+    }
+               //FIXME  style={{backgroundImage: "url(" + (i.url || i.photo) + ")"}}></div>)}
+    return (
+      <div className="photos">
+        {this.props.context.photos.map((i) =>
+          <div className={"photo " + i.state}
+               style={{backgroundImage: "url(" + (i.photo) + ")"}}></div>)}
+      </div>
+    )
+  };
+
   render() {
     var placeholder = this.props.quote ? "reply..." : "type a message..";
     var userImgStyle = {backgroundImage: 'url(' + this.props.me.image_url + ')'};
@@ -185,6 +197,7 @@ class ChatInput extends React.Component {
             onChange={this.handleInputChange}
             value={this.state.messageText}
           />
+          {this.renderImages()}
         </div>
         {this.renderQuote()}
         {this.renderMenu()}

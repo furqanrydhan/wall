@@ -18,6 +18,20 @@
   // justify-content: flex-start; align-items: flex-start;
 }
 
+.photos {
+	height: 30vh;
+	margin-left: calc-em(70px);
+    margin-right: calc-em(10px);
+    margin-bottom: calc-em(20px);
+    display: flex;
+    flex-direction: column;
+	.photo {
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: left;
+	}
+}
+
 .post-edit-header--image {
     margin: calc-em(16px) calc-em(16px);
     border-radius: 8px;
