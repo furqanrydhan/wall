@@ -30,9 +30,9 @@ class PostEdit extends React.Component {
 
   componentWillReceiveProps(nextProps) {
 	  var uploaded = true;
-		if (nextProps.context && nextProps.context.photos) {
-			for (var i; i < nextProps.context.photos.length ; i++) {
-				var p = nextProps.context.photos[i];
+		if (nextProps.context && nextProps.context.media) {
+			for (var i; i < nextProps.context.media.length ; i++) {
+				var p = nextProps.context.media[i];
 				if (!p.url) {
 					uploaded = false;
 				}
@@ -65,7 +65,7 @@ class PostEdit extends React.Component {
       thread_id = id;
     }
 
-    if (text.length > 0 || this.props.context.photos) {
+    if (text.length > 0 || this.props.context.media) {
       const post = {
         id: id,
         thread_id: thread_id,
@@ -73,7 +73,7 @@ class PostEdit extends React.Component {
         type: 'message',
         username: this.props.actingUser.username,
         user_id: this.props.actingUser.user_id,
-        images: this.props.context.photos,
+        media: this.props.context.media,
         message: text,
         quote: this.props.context.quote,
       };
@@ -113,11 +113,11 @@ class PostEdit extends React.Component {
     
     if (post.parent_id && post.message) {
       body = "replied: " + message;
-    } else if (post.parent_id && post.images) {
+    } else if (post.parent_id && post.media) {
       body = "added a new image \uD83D\uDDBC";
     } else if (post.message) {
       body = "posted: " + message;
-    } else if (post.images) {
+    } else if (post.media) {
       body = "posted a new image \uD83D\uDDBC";
     } else {
       console.error("UNKNOWN POST TYPE", post);
@@ -186,17 +186,17 @@ class PostEdit extends React.Component {
 
   renderImages() {
 
-    if(!this.props.context.photos) {
+    if(!this.props.context.media) {
       return;
     }
-    for (var i = 0 ; i< this.props.context.photos.length; i++) {
-      this.props.context.photos[i].key = i+1;
+    for (var i = 0 ; i< this.props.context.media.length; i++) {
+      this.props.context.media[i].key = i+1;
     }
     return (
-      <div className="photos">
-        {this.props.context.photos.map((i) =>
+      <div className="media">
+        {this.props.context.media.map((i) =>
           <div key={i.key} className={"photo " + i.state}
-               style={{backgroundImage: "url(" + (i.url || i.photo) + ")"}}></div>)}
+               style={{backgroundImage: "url(" + (i.url || i.base64) + ")"}}></div>)}
       </div>
     )
   };

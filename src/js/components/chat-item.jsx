@@ -87,16 +87,16 @@ class WallItem extends React.Component {
       </div>)
   }
 
-  renderImages() {
-    if(!this.props.item.images) {
+  renderMedia() {
+    if(!this.props.item.media) {
       return;
     }
-    for (var i = 0 ; i< this.props.item.images.length; i++) {
-      this.props.item.images[i].key = i+1;
+    for (var i = 0 ; i< this.props.item.media.length; i++) {
+      this.props.item.media[i].key = i+1;
     }
     return (
       <div className="chat-item--inner--images">
-        {this.props.item.images.map((i) =>
+        {this.props.item.media.map((i) =>
           <div key={i.key} className={"image"}
                style={{backgroundImage: "url(" + (i.url) + ")"}}></div>)}
       </div>
@@ -125,7 +125,7 @@ class WallItem extends React.Component {
             <div className="chat-item--reply--button" data-post-id={this.props.item.id} onClick={this.reply}></div>
           </div>
           {this.renderContent()}
-          {this.renderImages()}
+          {this.renderMedia()}
           {this.renderQuote()}
         </div>
       </div>

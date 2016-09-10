@@ -163,7 +163,6 @@ class App extends React.Component {
     // }
   }
 
-
   renderPostEditor() {
     if ( this.state.page === "post") {
 			return <PostEditor me={this.state.me}
@@ -196,24 +195,25 @@ class App extends React.Component {
 
   onClosePhotoEditor(photo) {
     console.log("onClosePhotoEditor", this.state.context);
+    var mimeType = photo.split(':')[1].split(';')[0];
     var that = this;
     var context = this.state.context;
     if (!photo) {
      this.navigate("post", context);
     }
-    var data = { photo: photo, state: "uploading" };
-    if (! context.photos) {
-      context.photos = [];
+    var data = { base64: photo,
+                 mimeType: mimeType,
+                 state: "uploading" };
+    if (! context.media) {
+      context.media = [];
     } 
-    context.photos.push(data);
+    context.media.push(data);
     this.navigate("post", context);
     return Bebo.uploadImageAsync(photo)
       .then(function(image_url) {
-					// FIXME not in prod?
-          image_url = image_url.replace("null", "https://a.imgdropt-dev.com/image/");
-          data.state = "done" ;
+          data.state = "done";
           data.url = image_url;
-          delete data.photo;
+          delete data.base64;
           that.setState({context: context});
         });
   }
