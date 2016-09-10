@@ -12,7 +12,7 @@ var quoteMd = new Remarkable(
   breaks: false,
   linkify: true});
 
-class ChatItem extends React.Component {
+class WallItem extends React.Component {
 
   constructor() {
     super();
@@ -53,44 +53,14 @@ class ChatItem extends React.Component {
     return moment(this.props.item.created_at).format('LT');
   }
 
-  renderQuoteImages() {
-    if(!this.props.item.quote.images) {
-      return;
-    }
-    for (var i = 0 ; i< this.props.item.quote.images.length; i++) {
-      this.props.item.quote.images[i].key = i+1;
-    }
-    return (
-      <div className="chat-quote--inner--images">
-        {this.props.item.quote.images.map((i) =>
-          <div key={i.key} className={"image"}
-               style={{backgroundImage: "url(" + (i.url) + ")"}}></div>)}
-      </div>
-    )
-  };
-
   renderQuote() {
     if (!this.props.item.quote) {
-      return "";
+      return;
     }
-    var message = this.props.item.quote.message;
-    message = {__html: quoteMd.render(message)};
-    return (
-      <div className="chat-quote">
-        <div className="chat-quote-left">
-          <div className="chat-quote-avatar">
-            <img src={this.props.db.getImageUrl(this.props.item.quote.user_id)} role="presentation" />
-          </div>
-        </div>
-        <div className="chat-quote-right">
-          <div className="chat-quote--username">
-            {this.props.item.quote.username}
-          </div>
-          <div className="chat-quote--text" dangerouslySetInnerHTML={message}></div>
-          {this.renderQuoteImages()}
-        </div>
-      </div> 
-    )
+    if (this.props.type === "quote") {
+      return;
+    }
+    return <WallItem type="quote" db={this.props.db} item={this.props.item.quote} />;
   }
 
   renderContent() {
@@ -163,13 +133,13 @@ class ChatItem extends React.Component {
   }
 }
 
-ChatItem.displayName = 'ChatItem';
+WallItem.displayName = 'WallItem';
 
 // Uncomment properties you need
-ChatItem.propTypes = {
+WallItem.propTypes = {
   item: React.PropTypes.object.isRequired,
   // handleNewMessage: React.PropTypes.func.isRequired,
 };
 // ChatItem.defaultProps = {};
 
-export default ChatItem;
+export default WallItem;
