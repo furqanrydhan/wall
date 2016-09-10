@@ -4,7 +4,7 @@ import Remarkable from 'remarkable';
 import WallItem from './chat-item.jsx';
 
 
-class ChatInput extends React.Component {
+class PostEdit extends React.Component {
 
   constructor() {
     super();
@@ -237,13 +237,13 @@ class ChatInput extends React.Component {
   }
 }
 
-ChatInput.displayName = 'ChatInput';
+PostEdit.displayName = 'PostEdit';
 
 // Uncomment properties you need
-ChatInput.propTypes = {
+PostEdit.propTypes = {
   // setChatInputState: React.PropTypes.func.isRequired,
   // switchMode: React.PropTypes.func.isRequired,
 };
 // ChatInput.defaultProps = {};
 
-export default ChatInput;
+export default PostEdit;

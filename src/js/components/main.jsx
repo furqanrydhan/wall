@@ -3,7 +3,7 @@
 import React from 'react';
 import Wall from './wall.jsx';
 import PhotoEditor from './PhotoEditor.jsx';
-import Post from './chat-input.jsx';
+import PostEditor from './post-editor.jsx';
 import DropZone from 'react-dropzone';
 import LoadImage from 'blueimp-load-image';
 
@@ -164,9 +164,9 @@ class App extends React.Component {
   }
 
 
-  renderPostEdit() {
+  renderPostEditor() {
     if ( this.state.page === "post") {
-			return <Post me={this.state.me}
+			return <PostEditor me={this.state.me}
 									 navigate={this.navigate}
 									 context={this.state.context}
 									 uploadPhoto={this.onPhotoUpload}
@@ -270,7 +270,7 @@ class App extends React.Component {
     return (
       <div className="app-root">
 				{this.renderWall()}
-				{this.renderPostEdit()}
+				{this.renderPostEditor()}
 				{this.renderPhotoEditor()}
 				{this.renderPhotoUpload()}
       </div>);
