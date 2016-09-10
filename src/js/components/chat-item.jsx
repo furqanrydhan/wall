@@ -12,7 +12,7 @@ var quoteMd = new Remarkable(
   breaks: false,
   linkify: true});
 
-class ChatItem extends React.Component {
+class WallItem extends React.Component {
 
   constructor() {
     super();
@@ -53,44 +53,14 @@ class ChatItem extends React.Component {
     return moment(this.props.item.created_at).format('LT');
   }
 
-  renderQuoteImages() {
-    if(!this.props.item.quote.images) {
-      return;
-    }
-    for (var i = 0 ; i< this.props.item.quote.images.length; i++) {
-      this.props.item.quote.images[i].key = i+1;
-    }
-    return (
-      <div className="chat-quote--inner--images">
-        {this.props.item.quote.images.map((i) =>
-          <div key={i.key} className={"image"}
-               style={{backgroundImage: "url(" + (i.url) + ")"}}></div>)}
-      </div>
-    )
-  };
-
   renderQuote() {
     if (!this.props.item.quote) {
-      return "";
+      return;
     }
-    var message = this.props.item.quote.message;
-    message = {__html: quoteMd.render(message)};
-    return (
-      <div className="chat-quote">
-        <div className="chat-quote-left">
-          <div className="chat-quote-avatar">
-            <img src={this.props.db.getImageUrl(this.props.item.quote.user_id)} role="presentation" />
-          </div>
-        </div>
-        <div className="chat-quote-right">
-          <div className="chat-quote--username">
-            {this.props.item.quote.username}
-          </div>
-          <div className="chat-quote--text" dangerouslySetInnerHTML={message}></div>
-          {this.renderQuoteImages()}
-        </div>
-      </div> 
-    )
+    if (this.props.type === "quote") {
+      return;
+    }
+    return <WallItem type="quote" db={this.props.db} item={this.props.item.quote} />;
   }
 
   renderContent() {
@@ -117,16 +87,16 @@ class ChatItem extends React.Component {
       </div>)
   }
 
-  renderImages() {
-    if(!this.props.item.images) {
+  renderMedia() {
+    if(!this.props.item.media) {
       return;
     }
-    for (var i = 0 ; i< this.props.item.images.length; i++) {
-      this.props.item.images[i].key = i+1;
+    for (var i = 0 ; i< this.props.item.media.length; i++) {
+      this.props.item.media[i].key = i+1;
     }
     return (
       <div className="chat-item--inner--images">
-        {this.props.item.images.map((i) =>
+        {this.props.item.media.map((i) =>
           <div key={i.key} className={"image"}
                style={{backgroundImage: "url(" + (i.url) + ")"}}></div>)}
       </div>
@@ -139,8 +109,8 @@ class ChatItem extends React.Component {
   }
 
   render() {
-    return (<li className="chat-item">
-      <div className="chat-item--inner">
+    return (
+      <div className="chat-item chat-item--inner">
         <div className="chat-item--inner--left">
           <div className="chat-item--inner--avatar">
             {this.renderAvatar()}
@@ -155,21 +125,21 @@ class ChatItem extends React.Component {
             <div className="chat-item--reply--button" data-post-id={this.props.item.id} onClick={this.reply}></div>
           </div>
           {this.renderContent()}
-          {this.renderImages()}
+          {this.renderMedia()}
           {this.renderQuote()}
         </div>
       </div>
-    </li>);
+    );
   }
 }
 
-ChatItem.displayName = 'ChatItem';
+WallItem.displayName = 'WallItem';
 
 // Uncomment properties you need
-ChatItem.propTypes = {
+WallItem.propTypes = {
   item: React.PropTypes.object.isRequired,
   // handleNewMessage: React.PropTypes.func.isRequired,
 };
 // ChatItem.defaultProps = {};
 
-export default ChatItem;
+export default WallItem;

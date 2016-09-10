@@ -1,5 +1,5 @@
 import React from 'react';
-import ChatList from './chat-list.jsx';
+import WallList from './wall-list.jsx';
 import ChatBackground from './chat-background.jsx';
 
 class Wall extends React.Component {
@@ -36,7 +36,7 @@ class Wall extends React.Component {
           </div>
         </div>
         <div className="chat-upper" >
-          <ChatList messages={this.props.messages}
+          <WallList messages={this.props.messages}
                     reply={this.onReply}
                     post={this.onPost}
                     actingUser={this.props.me}
