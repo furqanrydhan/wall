@@ -64,7 +64,7 @@ class Wall extends React.Component {
           <WallList messages={this.props.messages}
                     reply={this.onReply}
                     post={this.onPost}
-                    actingUser={this.props.me}
+                    me={this.props.me}
                     db={this.props.db} />
           <ChatBackground />
         </div>

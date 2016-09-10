@@ -76,11 +76,13 @@ class PostEdit extends React.Component {
         media: this.props.context.media,
         message: text,
         quote: this.props.context.quote,
+        edited: false,
+        viewed_ids: [],
+        viewed_cnt: 0,
       };
 
       // TODO mention stuff in users[]
       console.log("saving post", post);
-
       Bebo.Db.saveAsync('post', post)
         .then(function(data) {
           data = data.result[0];

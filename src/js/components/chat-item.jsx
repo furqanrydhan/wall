@@ -24,6 +24,7 @@ class WallItem extends React.Component {
     this.renderAvatar = this.renderAvatar.bind(this);
     this.renderTimestamp = this.renderTimestamp.bind(this);
     this.renderContent = this.renderContent.bind(this);
+    this.renderViewed = this.renderViewed.bind(this);
     this.reply = this.reply.bind(this);
   }
 
@@ -36,7 +37,11 @@ class WallItem extends React.Component {
   }
 
   componentDidMount() {
-    // this.props.handleNewMessage();
+    if (this.props.type === "post"
+      && this.props.item.user_id !== this.props.me.user_id
+      && !this.props.item.viewed_ids.has(this.props.me.user_id)) {
+        this.props.db.incrViewedPost(this.props.item);
+    }
   }
 
   handleImageLoaded() {
@@ -108,6 +113,10 @@ class WallItem extends React.Component {
     this.props.reply(this.state.item);
   }
 
+  renderViewed() {
+    return <div>{this.props.item.viewed_cnt}</div>;
+  }
+
   render() {
     return (
       <div className="chat-item chat-item--inner">
@@ -127,6 +136,7 @@ class WallItem extends React.Component {
           {this.renderContent()}
           {this.renderMedia()}
           {this.renderQuote()}
+          {this.renderViewed()}
         </div>
       </div>
     );

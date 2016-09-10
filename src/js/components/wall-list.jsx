@@ -106,7 +106,7 @@ class WallList extends React.Component {
 
   handlePresenceUpdates(user) {
 
-    if (user.started_typing === this.props.actingUser.user_id || user.stopped_typing === this.props.actingUser.user_id) {
+    if (user.started_typing === this.props.me.user_id || user.stopped_typing === this.props.me.user_id) {
       return;
     }
 
@@ -177,7 +177,10 @@ class WallList extends React.Component {
 
   renderWallList() {
     if (this.props.messages && this.props.messages.length > 0) {
-      var posts = this.props.messages.map((i) => ( <li className="chat-item" key={i.id}> <WallItem type="post" reply={this.props.reply} handleNewMessage={this.handleNewMessage} db={this.props.db} item={i}/></li>));
+      var posts = this.props.messages.map((i) => (
+        <li className="chat-item" key={i.id}>
+          <WallItem me={this.props.me} type="post" reply={this.props.reply} handleNewMessage={this.handleNewMessage} db={this.props.db} item={i}/>
+        </li>));
       return (<ul ref="chats" className="chat-list--inner--list">
                 {posts}
               </ul>);
@@ -206,7 +209,7 @@ WallList.displayName = 'WallList';
 // Uncomment properties you need
 WallList.propTypes = {
   // blurChat: React.PropTypes.func.isRequired,
-  actingUser: React.PropTypes.object.isRequired,
+  me: React.PropTypes.object.isRequired,
 };
 // WallList.defaultProps = {};
 

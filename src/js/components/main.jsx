@@ -45,14 +45,12 @@ class App extends React.Component {
     this.navigate = this.navigate.bind(this);
     this.handleEventUpdate = this.handleEventUpdate.bind(this);
     this.getOldMessages = this.getOldMessages.bind(this);
-    this.incrUnreadMessage = this.incrUnreadMessage.bind(this);
-    this.clearUnreadMessage = this.clearUnreadMessage.bind(this);
-    // this.getUnreadAndUpdate = this.getUnreadAndUpdate.bind(this);
     this.onClosePhotoEditor = this.onClosePhotoEditor.bind(this);
     this.onPhotoUpload = this.onPhotoUpload.bind(this);
     this.onDrop = this.onDrop.bind(this);
     this.online = this.online.bind(this);
     this.db.getImageUrl = this.getImageUrl.bind(this);
+    this.db.incrViewedPost = this.incrViewedPost.bind(this);
   }
 
   online() {
@@ -100,8 +98,11 @@ class App extends React.Component {
         return;
       }
       
-      // TODO merge and sort
       const list = data.result;
+      for (var i=0; i<list.length ; i++) {
+        list[i].viewed_ids = new Set(list[i].viewed_ids || []);
+      }
+      // TODO merge and sort
       that.store.wall = list;
       that.setState({ messages: list });
     });
@@ -115,11 +116,22 @@ class App extends React.Component {
     }
   }
 
+  incrViewedPost(postItem) {
+    var user_id = this.state.me.user_id;
 
-  incrUnreadMessage(thread_id, to_user_id) {
-  }
-
-  clearUnreadMessage(thread_id) {
+    return Bebo.Db.getAsync('post', {id: postItem.id})
+      .then(function(data) {
+        var row;
+        if (data && data.length > 0) {
+          row = data[0];
+        }
+        if (!row || row.viewed_ids.includes(user_id)) {
+          return;
+        }
+        row.viewed_ids.push(user_id);
+        row.viewed_cnt = row.viewed_ids.length;
+        return Bebo.Db.saveAsync('post', row);
+      });
   }
 
   handleMessageEvent(message) {
