@@ -109,8 +109,8 @@ class WallItem extends React.Component {
   }
 
   render() {
-    return (<li className="chat-item">
-      <div className="chat-item--inner">
+    return (
+      <div className="chat-item chat-item--inner">
         <div className="chat-item--inner--left">
           <div className="chat-item--inner--avatar">
             {this.renderAvatar()}
@@ -129,7 +129,7 @@ class WallItem extends React.Component {
           {this.renderQuote()}
         </div>
       </div>
-    </li>);
+    );
   }
 }
 

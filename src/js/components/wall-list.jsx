@@ -1,8 +1,8 @@
 import React from 'react';
-import ChatItem from './chat-item.jsx';
+import WallItem from './chat-item.jsx';
 
 
-class ChatList extends React.Component {
+class WallList extends React.Component {
 
   constructor() {
     super();
@@ -28,7 +28,7 @@ class ChatList extends React.Component {
     this.renderNoChatsMessage = this.renderNoChatsMessage.bind(this);
     this.renderMessagesBadge = this.renderMessagesBadge.bind(this);
     this.renderUsersAreTyping = this.renderUsersAreTyping.bind(this);
-    this.renderChatList = this.renderChatList.bind(this);
+    this.renderWallList = this.renderWallList.bind(this);
   }
 
   componentWillMount() {
@@ -175,11 +175,12 @@ class ChatList extends React.Component {
     </div>);
   }
 
-  renderChatList() {
+  renderWallList() {
     if (this.props.messages && this.props.messages.length > 0) {
+      var posts = this.props.messages.map((i) => ( <li className="chat-item" key={i.id}> <WallItem type="post" reply={this.props.reply} handleNewMessage={this.handleNewMessage} db={this.props.db} item={i}/></li>));
       return (<ul ref="chats" className="chat-list--inner--list">
-        {this.props.messages.map((i) => <ChatItem reply={this.props.reply} handleNewMessage={this.handleNewMessage} db={this.props.db} item={i} key={i.id} />)}
-      </ul>);
+                {posts}
+              </ul>);
     }
     return (<ul className="chat-list--inner--list">
       {this.renderNoChatsMessage}
@@ -192,7 +193,7 @@ class ChatList extends React.Component {
     return (<div className="chat-list">
       {this.renderMessagesBadge()}
       <div style={count > 0 ? { transform: 'translate3d(0,-37px,0)' } : {}} ref="chatListInner" className="chat-list--inner" onScroll={this.handleScroll} onClick={this.handleListClick}>
-        {this.renderChatList()}
+        {this.renderWallList()}
       </div>
       {this.renderUsersAreTyping()}
     </div>);
@@ -200,13 +201,13 @@ class ChatList extends React.Component {
 
 }
 
-ChatList.displayName = 'ChatList';
+WallList.displayName = 'WallList';
 
 // Uncomment properties you need
-ChatList.propTypes = {
+WallList.propTypes = {
   // blurChat: React.PropTypes.func.isRequired,
   actingUser: React.PropTypes.object.isRequired,
 };
-// ChatList.defaultProps = {};
+// WallList.defaultProps = {};
 
-export default ChatList;
+export default WallList;
