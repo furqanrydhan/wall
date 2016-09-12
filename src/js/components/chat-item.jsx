@@ -26,6 +26,7 @@ class WallItem extends React.Component {
     this.renderContent = this.renderContent.bind(this);
     this.renderViewed = this.renderViewed.bind(this);
     this.reply = this.reply.bind(this);
+    this.interceptHref = this.interceptHref.bind(this);
   }
 
   componentWillMount() {
@@ -68,6 +69,13 @@ class WallItem extends React.Component {
     return <WallItem type="quote" db={this.props.db} item={this.props.item.quote} />;
   }
 
+  interceptHref(e) {
+    if (e.target.href) {
+      Bebo.openURI(e.target.href);
+      e.preventDefault();
+    }
+  }
+
   renderContent() {
     const { type, image } = this.props.item;
     if (type === 'image') {
@@ -88,7 +96,7 @@ class WallItem extends React.Component {
     message = {__html: md.render(message)};
     return (
       <div className="chat-item--inner--message">
-       <span className="chat-item--inner--message--content" dangerouslySetInnerHTML={message}></span>
+       <span className="chat-item--inner--message--content" onClick={this.interceptHref} dangerouslySetInnerHTML={message}></span>
       </div>)
   }
 
