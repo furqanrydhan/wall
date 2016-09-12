@@ -125,7 +125,12 @@ class App extends React.Component {
         if (data && data.length > 0) {
           row = data[0];
         }
-        if (!row || row.viewed_ids.includes(user_id)) {
+
+        if (!row ) {
+          return;
+        } else if (!row.viewed_ids) {
+          row.viewed_ids = [];
+        } else if (row.viewed_ids.includes(user_id)) {
           return;
         }
         row.viewed_ids.push(user_id);
