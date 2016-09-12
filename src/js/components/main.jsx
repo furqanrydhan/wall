@@ -92,7 +92,7 @@ class App extends React.Component {
   getOldMessages(thread_id,  count, offset) {
     // handle thread Id later
     var that = this;
-    Bebo.Db.get('post', {count: count}, (err, data) => {
+    Bebo.Db.get('post', {count: count, sort_by:"created_dttm"}, (err, data) => {
       if (err) {
         console.error('error getting list');
         return;
