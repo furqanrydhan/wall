@@ -22,20 +22,23 @@
   position: relative;
   width: 100%;
   height: 100%;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+  // overflow-y: scroll;
+  // overflow-x: hidden;
+  // -webkit-overflow-scrolling: touch;
   transition: all 200ms ease;
   transform: translate3d(0,0,0);
 }
 
 .chat-list--inner--list {
   width: 100%;
-  max-height: 100vh;
+  height: 85vh;
   position: absolute;
   top: 0px;
   display: flex;
   flex-direction: column;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 // unseen messages
