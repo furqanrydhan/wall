@@ -27,6 +27,7 @@ class WallItem extends React.Component {
     this.renderViewed = this.renderViewed.bind(this);
     this.reply = this.reply.bind(this);
     this.interceptHref = this.interceptHref.bind(this);
+    this.viewPhoto = this.viewPhoto.bind(this);
   }
 
   componentWillMount() {
@@ -100,6 +101,12 @@ class WallItem extends React.Component {
       </div>)
   }
 
+  viewPhoto(e) {
+    // FIXME don't allow this on the edit page!
+    console.log("View Photo", e);
+    this.props.navigate("photo-viewer", {"mediaUrl": e.currentTarget.dataset.mediaUrl});
+  }
+
   renderMedia() {
     if(!this.props.item.media) {
       return;
@@ -111,7 +118,10 @@ class WallItem extends React.Component {
       <div className="chat-item--inner--images">
         {this.props.item.media.map((i) =>
           <div key={i.key} className={"image"}
-               style={{backgroundImage: "url(" + (i.url) + ")"}}></div>)}
+            style={{backgroundImage: "url(" + (i.url) + ")"}}
+            data-media-url={i.url}
+            onClick={this.viewPhoto}>
+          </div>)}
       </div>
     )
   };

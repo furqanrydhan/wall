@@ -4,6 +4,7 @@ import React from 'react';
 import Wall from './wall.jsx';
 import PhotoEditor from './PhotoEditor.jsx';
 import PostEditor from './post-editor.jsx';
+import PhotoViewer from './photo-viewer.jsx';
 import DropZone from 'react-dropzone';
 import LoadImage from 'blueimp-load-image';
 
@@ -290,6 +291,16 @@ class App extends React.Component {
   }
 
 
+  renderPhotoViewer() {
+    if (this.state.page === "photo-viewer") {
+      return (<PhotoViewer
+                   me={this.state.me}
+									 navigate={this.navigate}
+									 context={this.state.context}
+                   db={this.db}/>);
+    }
+  }
+
   renderWall() {
     if (this.state.page === "home") {
       return (<Wall 
@@ -308,6 +319,7 @@ class App extends React.Component {
       <div className="app-root">
 				{this.renderWall()}
 				{this.renderPostEditor()}
+				{this.renderPhotoViewer()}
 				{this.renderPhotoEditor()}
 				{this.renderPhotoUpload()}
       </div>);

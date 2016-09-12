@@ -66,6 +66,7 @@ class Wall extends React.Component {
                     hasMore={this.props.hasMore}
                     loadMore={this.props.loadMore}
                     reply={this.onReply}
+                    navigate={this.props.navigate}
                     post={this.onPost}
                     me={this.props.me}
                     db={this.props.db} />

@@ -181,7 +181,10 @@ class WallList extends React.Component {
     // if (this.props.messages && this.props.messages.length > 0) {
       var posts = this.props.messages.map((i) => (
         <li className="chat-item" key={i.id}>
-          <WallItem me={this.props.me} type="post" reply={this.props.reply} handleNewMessage={this.handleNewMessage} db={this.props.db} item={i}/>
+          <WallItem me={this.props.me}
+            type="post" reply={this.props.reply}
+            navigate={this.props.navigate}
+            handleNewMessage={this.handleNewMessage} db={this.props.db} item={i}/>
         </li>));
     return (<ul ref="chats" className="chat-list--inner--list">
               <InfiniteScroll pageStart={this.props.offset}
