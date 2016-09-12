@@ -207,7 +207,6 @@ class WallList extends React.Component {
         <div style={count > 0 ? { transform: 'translate3d(0,-37px,0)' } : {}} ref="chatListInner" className="chat-list--inner" onScroll={this.handleScroll} onClick={this.handleListClick}>
             {this.renderWallList()}
         </div>
-        {this.renderUsersAreTyping()}
     </div>);
   }
 }

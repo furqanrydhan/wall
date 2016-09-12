@@ -302,16 +302,15 @@ class App extends React.Component {
   }
 
   renderWall() {
-    if (this.state.page === "home") {
-      return (<Wall 
-        messages={this.state.messages}
-        hasMore={this.state.hasMore}
-        offset={this.state.offset}
-        loadMore={this.loadMore}
-        me={this.state.me}
-        navigate={this.navigate}
-        db={this.db}/>);
-    }
+    // always render wall in the background - the rest are all modals on top
+    return (<Wall 
+      messages={this.state.messages}
+      hasMore={this.state.hasMore}
+      offset={this.state.offset}
+      loadMore={this.loadMore}
+      me={this.state.me}
+      navigate={this.navigate}
+      db={this.db}/>);
   }
 
   render() {

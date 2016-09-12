@@ -1,4 +1,16 @@
 
+.modal {
+    position: absolute;
+    background-color:#FFF;
+    display: flex;
+	flex-direction: column;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100;
+}
+
 .sub-header {
 	background-color: $color-brand;
 	height: calc-em(50px);

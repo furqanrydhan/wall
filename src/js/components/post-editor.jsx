@@ -212,7 +212,7 @@ class PostEdit extends React.Component {
     var userImgStyle = {backgroundImage: 'url(' + this.props.me.image_url + ')'};
 
     return (
-      <div className="post-edit">
+      <div className="post-edit modal">
         <div className="sub-header">
           <div onClick={this.home} className="sub-back-button"></div>
           <div className="sub-name">Post to Bebo</div>

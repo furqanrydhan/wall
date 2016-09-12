@@ -303,7 +303,7 @@ class PhotoEditor extends React.Component {
 
 
   render() {
-    return (<div className="editor">
+    return (<div className="editor modal">
       <div className="drop-shadow" />
       <div className="cropperContainer">
         <div className="close-button" onClick={this.props.closeEditor} style={this.calculateCloseStyles()}>

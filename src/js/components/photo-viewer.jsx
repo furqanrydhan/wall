@@ -16,7 +16,7 @@ class PhotoViewer extends React.Component {
   render() {
     var bg = {backgroundImage: "url(" + this.props.context.mediaUrl + "?w=2048&h=2048)" };
     return (
-      <div className="photo-viewer">
+      <div className="photo-viewer modal">
         <div className="sub-header">
           <div onClick={this.home} className="sub-back-button"></div>
           <div className="sub-name"></div>
