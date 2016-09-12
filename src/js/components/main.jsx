@@ -182,6 +182,7 @@ class App extends React.Component {
   }
 
   navigate(page, context) {
+    console.log("navigate ->", page, context);
     var update = {page: page};
     if (context !== undefined) {
       update.context = context;

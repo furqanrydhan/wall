@@ -8,14 +8,10 @@
   border: 4px solid #fff;
 }
 
-
   .editor{
-    width: 100%;
-    height: 100%;
     margin: auto;
     display: flex;
     flex-direction: column;
-    position: relative;
 
     .color-container {
       position: absolute;
