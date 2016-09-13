@@ -97,6 +97,9 @@
     border-top: 1px solid #f4f4f4;
     margin-top: 8px;
     padding: 5px 0;
+    display: flex;
+    align-items:center;
+    justify-content: center;
 }
 
 .wall-item--footer--views {
@@ -105,6 +108,17 @@
     color:#828282;
 }
 
+.wall-item--footer--reply {
+  font-size: 14px;
+  color:red;
+  flex: 0 0 auto;
+  vertical-align:middle;
+}
+
+.wall-item--footer--reply svg {
+ display:inline-block;
+ vertical-align:middle;
+}
 
 // actions
 
@@ -129,6 +143,10 @@
 .wall-item--message span {
     color: $text-dark;
     display: inline;
+}
+
+.wall-item--message--text.quote {
+  @extend .font-size-tiny;
 }
 
 // -- quote
