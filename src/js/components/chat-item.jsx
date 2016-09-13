@@ -26,8 +26,8 @@ class WallItem extends React.Component {
     this.renderContent = this.renderContent.bind(this);
     this.renderViewed = this.renderViewed.bind(this);
     this.reply = this.reply.bind(this);
-    this.edit = this.edit.bind(this);
-    this.delete = this.delete.bind(this);
+    this.editPost = this.editPost.bind(this);
+    this.deletePost = this.deletePost.bind(this);
     this.interceptHref = this.interceptHref.bind(this);
     this.viewPhoto = this.viewPhoto.bind(this);
   }
@@ -122,8 +122,8 @@ class WallItem extends React.Component {
 
     var postReply, postDelete, postEdit;
     if (this.props.me.user_id === this.props.item.user_id) {
-        postEdit = <div className="chat-item--edit--button" data-post-id={this.props.item.id} onClick={this.edit}></div>
-        postDelete = <div className="chat-item--delete--button" data-post-id={this.props.item.id} onClick={this.delete}></div>
+        postEdit = <div className="chat-item--edit--button" data-post-id={this.props.item.id} onClick={this.editPost}></div>
+        postDelete = <div className="chat-item--delete--button" data-post-id={this.props.item.id} onClick={this.deletePost}></div>
     }
     postReply = (<button onClick={this.reply} className='wall-item-action'>
                    <svg width="22px" height="17px" viewBox="0 0 22 17" version="1.1">
@@ -205,16 +205,16 @@ class WallItem extends React.Component {
     return <WallItem me={this.props.me} type="quote" db={this.props.db} item={this.props.item.quote} />;
   } 
 
-  edit(e) {
-    this.props.reply(this.state.item);
+  editPost(e) {
+    this.props.editPost(this.state.item);
   }
 
-  delete(e) {
-    this.props.reply(this.state.item);
+  deletePost(e) {
+    this.props.deletePost(this.state.item);
   }
 
   render() {
-    console.log('render with', this.props);
+    // console.log('render with', this.props);
     return  <div className={"wall-item " + this.props.type }>
      {this.renderBar()}
       <div className='wall-item--inner'>

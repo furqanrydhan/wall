@@ -9,7 +9,7 @@ class PostEdit extends React.Component {
   constructor() {
     super();
     this.state = {
-      messageText: '',
+      message: '',
       // blurInput: false,
     };
     this.handleInputFocus = this.handleInputFocus.bind(this);
@@ -22,24 +22,40 @@ class PostEdit extends React.Component {
     this.home = this.home.bind(this);
   }
 
+  context2state(oldContext, nextContext) {
+    var update = {};
+
+	  var uploaded = true;
+		if (nextContext.media) {
+			for (var i; i < nextContext.media.length ; i++) {
+				var p = nextContext.media[i];
+				if (!p.url) {
+					uploaded = false;
+				}
+			}
+      update.uploaded = uploaded;
+		}
+
+    if (oldContext.message !== nextContext.message) {
+      update.message = nextContext.message;
+    }
+
+    this.setState(update);
+  }
+
   componentWillMount() {
+    if (this.props.context) {
+      this.context2state({}, this.props.context);
+    }
   }
 
   componentDidMount() {
   }
 
   componentWillReceiveProps(nextProps) {
-	  var uploaded = true;
-		if (nextProps.context && nextProps.context.media) {
-			for (var i; i < nextProps.context.media.length ; i++) {
-				var p = nextProps.context.media[i];
-				if (!p.url) {
-					uploaded = false;
-				}
-			}
-		}
-    this.setState({messageText: nextProps.context.messageText,
-                   enabled: uploaded});
+    if (nextProps.context) {
+      this.context2state(this.props.context, nextProps.context);
+    }
     // if (nextProps.blurChat === this.props.blurChat) {
     //   return
     // }
@@ -51,12 +67,12 @@ class PostEdit extends React.Component {
   }
 
   handleInputChange(e) {
-    this.setState({ messageText: e.target.value });
+    this.setState({ message: e.target.value });
   }
 
   submitPost(e) {
     var that = this;
-    var text = this.state.messageText.trim();
+    var text = this.state.message.trim();
     var parent_id = (this.props.context.quote && this.props.context.quote.id) || null;
     var thread_id = (this.props.context.quote && (this.props.context.quote.thread_id || this.props.context.quote.id)) || null;
     var id = uuid.v4();
@@ -100,7 +116,7 @@ class PostEdit extends React.Component {
   }
 
   resetTextarea() {
-    this.setState({ messageText: '' });
+    this.setState({ message: '' });
   }
 
   notifyUsers(post) {
@@ -153,7 +169,7 @@ class PostEdit extends React.Component {
 
   mergeContext() {
     var ctx = this.props.context;
-    ctx.messageText = this.state.messageText;
+    ctx.message = this.state.message;
     return ctx;
   }
 
@@ -211,6 +227,7 @@ class PostEdit extends React.Component {
 	}
 
   render() {
+    console.log("componentWillReceiveProps");
     var placeholder = this.props.context.quote ? "reply..." : "type a message..";
     var userImgStyle = {backgroundImage: 'url(' + this.props.me.image_url + ')'};
 
@@ -232,7 +249,7 @@ class PostEdit extends React.Component {
             ref="textarea"
             placeholder={placeholder}
             onChange={this.handleInputChange}
-            value={this.state.messageText}
+            value={this.state.message}
           />
           {this.renderImages()}
         </div>

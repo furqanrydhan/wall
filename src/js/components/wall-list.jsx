@@ -182,8 +182,8 @@ class WallList extends React.Component {
           <WallItem me={this.props.me}
             type="post"
             reply={this.props.reply}
-            delete={this.props.delete}
-            edit={this.props.edit}
+            deletePost={this.props.deletePost}
+            editPost={this.props.editPost}
             navigate={this.props.navigate}
             handleNewMessage={this.handleNewMessage} db={this.props.db} item={i}/>
         </li>));
