@@ -165,7 +165,7 @@ class WallItem extends React.Component {
     if (this.props.type !== 'quote') {
       return <div className="wall-item--meta">
         <div className='wall-item--meta--image'>
-          <img role='presentation' src={'test'}/>
+          <img src={this.props.db.getImageUrl(this.props.item.user_id)} role="presentation" />
         </div>
         <div className='wall-item--meta--text'>
           <span className='wall-item--meta--text--label'>Viktor </span>
@@ -180,7 +180,14 @@ class WallItem extends React.Component {
         </div>
       </div>
     } else {
-      return null
+      return <div className="wall-item--meta quote">
+        <div className='wall-item--meta--image'>
+          <img role='presentation' src={'test'}/>
+        </div>
+        <div className='wall-item--meta--text'>
+          <span className='wall-item--meta--text--label'>Viktor </span>
+        </div>
+      </div>
     }
   }
 
@@ -235,7 +242,8 @@ class WallItem extends React.Component {
   } 
 
   render() {
-    return  <div className="wall-item">
+    console.log('render with', this.props);
+    return  <div className={"wall-item " + this.props.type }>
      {this.renderBar()}
       <div className='wall-item--inner'>
         {this.renderMeta()}
