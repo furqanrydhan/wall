@@ -32,7 +32,7 @@
 
 .wall-item--message p,
 .wall-item--message span {
- @extend .font-size-small 
+  
  color: $text-dark;
  display:inline;
 }
