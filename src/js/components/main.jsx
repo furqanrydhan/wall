@@ -4,6 +4,7 @@ import React from 'react';
 import Wall from './wall.jsx';
 import PhotoEditor from './PhotoEditor.jsx';
 import PostEditor from './post-editor.jsx';
+import PhotoViewer from './photo-viewer.jsx';
 import DropZone from 'react-dropzone';
 import LoadImage from 'blueimp-load-image';
 
@@ -36,34 +37,35 @@ class App extends React.Component {
       page: "home",
       context: {},
       messages: [],
+      hasMore: true,
+      offset: 0,
       me: {},
       threadName: ""
     };
     this.db = {};
     this.stream_id = Bebo.getStreamId();
-    this.store = {};
+    this.store = {wall:[]};
     this.navigate = this.navigate.bind(this);
     this.handleEventUpdate = this.handleEventUpdate.bind(this);
     this.getOldMessages = this.getOldMessages.bind(this);
-    this.incrUnreadMessage = this.incrUnreadMessage.bind(this);
-    this.clearUnreadMessage = this.clearUnreadMessage.bind(this);
-    // this.getUnreadAndUpdate = this.getUnreadAndUpdate.bind(this);
     this.onClosePhotoEditor = this.onClosePhotoEditor.bind(this);
     this.onPhotoUpload = this.onPhotoUpload.bind(this);
     this.onDrop = this.onDrop.bind(this);
     this.online = this.online.bind(this);
+    this.loadMore = this.loadMore.bind(this);
     this.db.getImageUrl = this.getImageUrl.bind(this);
+    this.db.incrViewedPost = this.incrViewedPost.bind(this);
   }
 
   online() {
     Bebo.onEvent(this.handleEventUpdate);
-    this.getOldMessages(undefined, POST_CNT, 0);
+    // this.getOldMessages(undefined, POST_CNT, 0);
     this.getMe();
   }
 
   componentWillMount() {
     console.timeStamp && console.timeStamp("Main.componentWillMount");
-    this.getOldMessages(undefined, POST_CNT, 0);
+    // this.getOldMessages(undefined, POST_CNT, 0);
     this.getMe();
   }
 
@@ -91,19 +93,36 @@ class App extends React.Component {
     window.localStorage.setItem("dm:" + key + ":" + this.stream_id, json);
   }
 
+  loadMore(pageToLoad) {
+    // var offset = pageToLoad - 1; // infinite-scroller does + 1
+    var offset = Math.min(this.store.wall.length, (pageToLoad -1) * POST_CNT);
+    return this.getOldMessages(null, POST_CNT, offset);
+  }
+
   getOldMessages(thread_id,  count, offset) {
     // handle thread Id later
+    if (!offset) {
+      offset = 0;
+    }
     var that = this;
-    Bebo.Db.get('post', {count: count}, (err, data) => {
+    var options = {count: count, offset: offset, sort_by:"created_dttm"};
+    console.log("DB get post", count, offset);
+    Bebo.Db.get('post', options, (err, data) => {
+
       if (err) {
         console.error('error getting list');
         return;
       }
       
-      // TODO merge and sort
       const list = data.result;
-      that.store.wall = list;
-      that.setState({ messages: list });
+      for (var i=0; i<list.length ; i++) {
+        list[i].viewed_ids = new Set(list[i].viewed_ids || []);
+      }
+      var hasMore = list.length === count;
+      that.store.wall = _.unionBy(list, that.store.wall, "id");
+      that.store.wall = _.orderBy(that.store.wall, "created_dttm", "desc");
+      var pageToLoad = that.store.wall.length;
+      that.setState({ messages: that.store.wall, offset: offset, hasMore: hasMore, pageToLoad: pageToLoad});
     });
   }
 
@@ -115,11 +134,27 @@ class App extends React.Component {
     }
   }
 
+  incrViewedPost(postItem) {
+    var user_id = this.state.me.user_id;
 
-  incrUnreadMessage(thread_id, to_user_id) {
-  }
+    return Bebo.Db.getAsync('post', {id: postItem.id})
+      .then(function(data) {
+        var row;
+        if (data && data.length > 0) {
+          row = data[0];
+        }
 
-  clearUnreadMessage(thread_id) {
+        if (!row ) {
+          return;
+        } else if (!row.viewed_ids) {
+          row.viewed_ids = [];
+        } else if (row.viewed_ids.includes(user_id)) {
+          return;
+        }
+        row.viewed_ids.push(user_id);
+        row.viewed_cnt = row.viewed_ids.length;
+        return Bebo.Db.saveAsync('post', row);
+      });
   }
 
   handleMessageEvent(message) {
@@ -147,6 +182,7 @@ class App extends React.Component {
   }
 
   navigate(page, context) {
+    console.log("navigate ->", page, context);
     var update = {page: page};
     if (context !== undefined) {
       update.context = context;
@@ -256,14 +292,26 @@ class App extends React.Component {
   }
 
 
-  renderWall() {
-    if (this.state.page === "home") {
-      return (<Wall 
-        messages={this.state.messages}
-        me={this.state.me}
-        navigate={this.navigate}
-        db={this.db}/>);
+  renderPhotoViewer() {
+    if (this.state.page === "photo-viewer") {
+      return (<PhotoViewer
+                   me={this.state.me}
+									 navigate={this.navigate}
+									 context={this.state.context}
+                   db={this.db}/>);
     }
+  }
+
+  renderWall() {
+    // always render wall in the background - the rest are all modals on top
+    return (<Wall 
+      messages={this.state.messages}
+      hasMore={this.state.hasMore}
+      offset={this.state.offset}
+      loadMore={this.loadMore}
+      me={this.state.me}
+      navigate={this.navigate}
+      db={this.db}/>);
   }
 
   render() {
@@ -271,6 +319,7 @@ class App extends React.Component {
       <div className="app-root">
 				{this.renderWall()}
 				{this.renderPostEditor()}
+				{this.renderPhotoViewer()}
 				{this.renderPhotoEditor()}
 				{this.renderPhotoUpload()}
       </div>);

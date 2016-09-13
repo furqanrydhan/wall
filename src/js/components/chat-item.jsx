@@ -24,7 +24,10 @@ class WallItem extends React.Component {
     this.renderAvatar = this.renderAvatar.bind(this);
     this.renderTimestamp = this.renderTimestamp.bind(this);
     this.renderContent = this.renderContent.bind(this);
+    this.renderViewed = this.renderViewed.bind(this);
     this.reply = this.reply.bind(this);
+    this.interceptHref = this.interceptHref.bind(this);
+    this.viewPhoto = this.viewPhoto.bind(this);
   }
 
   componentWillMount() {
@@ -36,7 +39,11 @@ class WallItem extends React.Component {
   }
 
   componentDidMount() {
-    // this.props.handleNewMessage();
+    if (this.props.type === "post"
+      && this.props.item.user_id !== this.props.me.user_id
+      && !this.props.item.viewed_ids.has(this.props.me.user_id)) {
+        this.props.db.incrViewedPost(this.props.item);
+    }
   }
 
   handleImageLoaded() {
@@ -63,6 +70,13 @@ class WallItem extends React.Component {
     return <WallItem type="quote" db={this.props.db} item={this.props.item.quote} />;
   }
 
+  interceptHref(e) {
+    if (e.target.href) {
+      Bebo.openURI(e.target.href);
+      e.preventDefault();
+    }
+  }
+
   renderContent() {
     const { type, image } = this.props.item;
     if (type === 'image') {
@@ -83,8 +97,14 @@ class WallItem extends React.Component {
     message = {__html: md.render(message)};
     return (
       <div className="chat-item--inner--message">
-       <span className="chat-item--inner--message--content" dangerouslySetInnerHTML={message}></span>
+       <span className="chat-item--inner--message--content" onClick={this.interceptHref} dangerouslySetInnerHTML={message}></span>
       </div>)
+  }
+
+  viewPhoto(e) {
+    // FIXME don't allow this on the edit page!
+    console.log("View Photo", e);
+    this.props.navigate("photo-viewer", {"mediaUrl": e.currentTarget.dataset.mediaUrl});
   }
 
   renderMedia() {
@@ -98,7 +118,10 @@ class WallItem extends React.Component {
       <div className="chat-item--inner--images">
         {this.props.item.media.map((i) =>
           <div key={i.key} className={"image"}
-               style={{backgroundImage: "url(" + (i.url) + ")"}}></div>)}
+            style={{backgroundImage: "url(" + (i.url) + ")"}}
+            data-media-url={i.url}
+            onClick={this.viewPhoto}>
+          </div>)}
       </div>
     )
   };
@@ -106,6 +129,10 @@ class WallItem extends React.Component {
   reply(e) {
     console.log("reply clicked");
     this.props.reply(this.state.item);
+  }
+
+  renderViewed() {
+    return <div>{this.props.item.viewed_cnt}</div>;
   }
 
   render() {
@@ -127,6 +154,7 @@ class WallItem extends React.Component {
           {this.renderContent()}
           {this.renderMedia()}
           {this.renderQuote()}
+          {this.renderViewed()}
         </div>
       </div>
     );

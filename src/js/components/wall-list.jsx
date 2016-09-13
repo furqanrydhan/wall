@@ -1,5 +1,7 @@
 import React from 'react';
 import WallItem from './chat-item.jsx';
+import InfiniteScroll from 'react-infinite-scroller';
+
 
 
 class WallList extends React.Component {
@@ -15,7 +17,6 @@ class WallList extends React.Component {
       newMsgCnt: 0,
     };
     this.usersTyping = {};
-    // this.getOldMessages = this.getOldMessages.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
     // this.handleEventUpdate = this.handleEventUpdate.bind(this);
     // this.handleMessageEvent = this.handleMessageEvent.bind(this);
@@ -40,6 +41,7 @@ class WallList extends React.Component {
 
   componentDidMount() {
     this.handleNewMessage();
+    // this.registerUrlClickHandler(this.chatList);
   }
 
   componentWillUpdate(prevProps, prevState) {
@@ -106,7 +108,7 @@ class WallList extends React.Component {
 
   handlePresenceUpdates(user) {
 
-    if (user.started_typing === this.props.actingUser.user_id || user.stopped_typing === this.props.actingUser.user_id) {
+    if (user.started_typing === this.props.me.user_id || user.stopped_typing === this.props.me.user_id) {
       return;
     }
 
@@ -176,29 +178,37 @@ class WallList extends React.Component {
   }
 
   renderWallList() {
-    if (this.props.messages && this.props.messages.length > 0) {
-      var posts = this.props.messages.map((i) => ( <li className="chat-item" key={i.id}> <WallItem type="post" reply={this.props.reply} handleNewMessage={this.handleNewMessage} db={this.props.db} item={i}/></li>));
-      return (<ul ref="chats" className="chat-list--inner--list">
-                {posts}
-              </ul>);
-    }
-    return (<ul className="chat-list--inner--list">
-      {this.renderNoChatsMessage}
-    </ul>);
+    // if (this.props.messages && this.props.messages.length > 0) {
+      var posts = this.props.messages.map((i) => (
+        <li className="chat-item" key={i.id}>
+          <WallItem me={this.props.me}
+            type="post" reply={this.props.reply}
+            navigate={this.props.navigate}
+            handleNewMessage={this.handleNewMessage} db={this.props.db} item={i}/>
+        </li>));
+    return (<ul ref="chats" className="chat-list--inner--list">
+              <InfiniteScroll pageStart={this.props.offset}
+                hasMore={this.props.hasMore}
+                loadMore={this.props.loadMore}
+                useWindow={false}>
+                    {posts}
+              </InfiniteScroll>
+            </ul>);
+    // }
+    // return (<ul className="chat-list--inner--list">
+    //   {this.renderNoChatsMessage}
+    // </ul>);
   }
 
   render() {
-
     const count = this.state.usersTypingCount;
     return (<div className="chat-list">
-      {this.renderMessagesBadge()}
-      <div style={count > 0 ? { transform: 'translate3d(0,-37px,0)' } : {}} ref="chatListInner" className="chat-list--inner" onScroll={this.handleScroll} onClick={this.handleListClick}>
-        {this.renderWallList()}
-      </div>
-      {this.renderUsersAreTyping()}
+        {this.renderMessagesBadge()}
+        <div style={count > 0 ? { transform: 'translate3d(0,-37px,0)' } : {}} ref="chatListInner" className="chat-list--inner" onScroll={this.handleScroll} onClick={this.handleListClick}>
+            {this.renderWallList()}
+        </div>
     </div>);
   }
-
 }
 
 WallList.displayName = 'WallList';
@@ -206,7 +216,7 @@ WallList.displayName = 'WallList';
 // Uncomment properties you need
 WallList.propTypes = {
   // blurChat: React.PropTypes.func.isRequired,
-  actingUser: React.PropTypes.object.isRequired,
+  me: React.PropTypes.object.isRequired,
 };
 // WallList.defaultProps = {};
 

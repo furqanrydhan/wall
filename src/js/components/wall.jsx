@@ -37,9 +37,13 @@ class Wall extends React.Component {
         </div>
         <div className="chat-upper" >
           <WallList messages={this.props.messages}
+                    offset={this.props.offset}
+                    hasMore={this.props.hasMore}
+                    loadMore={this.props.loadMore}
                     reply={this.onReply}
+                    navigate={this.props.navigate}
                     post={this.onPost}
-                    actingUser={this.props.me}
+                    me={this.props.me}
                     db={this.props.db} />
           <ChatBackground />
         </div>
