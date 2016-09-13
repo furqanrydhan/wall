@@ -94,7 +94,8 @@
 .wall-item--footer {
     width: 100%;
     border-top: 1px solid #f4f4f4;
-    padding-top: 8px;
+    margin-top: 8px;
+    padding: 5px 0;
 }
 
 .wall-item--footer--views {
@@ -120,7 +121,7 @@
 // -- Message 
 .wall-item--message {
     width: 100%;
-    padding: 10px 0;
+    padding: 8px 0;
 }
 
 .wall-item--message p,
@@ -138,8 +139,23 @@
     width: 100%;
 }
 
+.wall-item--media-list{
+  list-style-type: none;
+  width: 100%;
+}
+
+.media-item {
+    height: 20vh;
+    width: 20vw;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
 // -- giphy
 .wall-item--giphy {}
 
 // -- sticker
-.wall-item--sticker {}
+
+.wall-item--sticker {
+
+}
