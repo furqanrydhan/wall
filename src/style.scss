@@ -81,6 +81,11 @@ button {
   border:none;
 }
 
+.chat-new-post {
+  background-color:#FFF;
+  border-bottom: 1px solid rgba(201, 198, 200,0.6);
+}
+
 .chat-fake-input {
     @extend .font-size-default;
     font-family: $chat-family;
