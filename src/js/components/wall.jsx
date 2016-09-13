@@ -30,8 +30,7 @@ class Wall extends React.Component {
 
   onDelete(post) {
     console.log("Delete clicked", post);
-    // FIXME: fix delete
-    // this.props.navigate("post", {quote: post});
+    this.props.navigate("post-delete", post);
   }
 
   onEdit(post) {

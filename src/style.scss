@@ -116,3 +116,16 @@ button {
       margin: auto calc-em(10px) auto auto;
     }
 }
+
+.post-delete--confirm {
+    margin-top: 1vh;
+    padding: 1vh;
+    justify-content: center;
+    flex: 0 0 auto;
+    button {
+        flex: 0 0 auto;
+        margin: auto;
+        @extend .font-size-huge;
+
+    }
+}

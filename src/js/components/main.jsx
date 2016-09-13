@@ -4,6 +4,7 @@ import React from 'react';
 import Wall from './wall.jsx';
 import PhotoEditor from './PhotoEditor.jsx';
 import PostEditor from './post-editor.jsx';
+import PostDelete from './post-delete.jsx';
 import PhotoViewer from './photo-viewer.jsx';
 import DropZone from 'react-dropzone';
 import LoadImage from 'blueimp-load-image';
@@ -55,6 +56,7 @@ class App extends React.Component {
     this.loadMore = this.loadMore.bind(this);
     this.db.getImageUrl = this.getImageUrl.bind(this);
     this.db.incrViewedPost = this.incrViewedPost.bind(this);
+    this.deletePost = this.deletePost.bind(this);
   }
 
   online() {
@@ -114,11 +116,12 @@ class App extends React.Component {
         return;
       }
       
-      const list = data.result;
+      var list = data.result;
       for (var i=0; i<list.length ; i++) {
         list[i].viewed_ids = new Set(list[i].viewed_ids || []);
       }
       var hasMore = list.length === count;
+      list = _.filter(list, function(i) { return !i.deleted_dttm});
       that.store.wall = _.unionBy(list, that.store.wall, "id");
       that.store.wall = _.orderBy(that.store.wall, "created_dttm", "desc");
       var pageToLoad = that.store.wall.length;
@@ -157,8 +160,28 @@ class App extends React.Component {
       });
   }
 
+  deletePost(postItem) {
+    var that = this;
+    if (!postItem.id) {
+      return;
+    }
+    var update = {id: postItem.id, message: "[deleted]", media: null, deleted_dttm: new Date()};
+    return Bebo.Db.saveAsync('post', update)
+      .then(function() {
+        Bebo.emitEvent({ message: {id: postItem.id, deleted_dttm: update.deleted_dttm}});
+      })
+      .then(function() {
+        that.navigate("home");
+      });
+  }
+
   handleMessageEvent(message) {
-    this.getOldMessages(message.thread_id, POST_CNT, 0);
+    if (message.deleted_dttm) {
+      this.store.wall = _.filter(this.store.wall, function(i) { return i.id !== message.id});
+      this.setState({ messages: this.store.wall });
+    } else {
+      this.getOldMessages(message.thread_id, POST_CNT, 0);
+    }
   }
 
   getMe() {
@@ -302,6 +325,17 @@ class App extends React.Component {
     }
   }
 
+  renderPostDelete() {
+    if (this.state.page === "post-delete") {
+      return (<PostDelete
+                   me={this.state.me}
+									 navigate={this.navigate}
+									 context={this.state.context}
+                   doDelete={this.deletePost}
+                   db={this.db}/>);
+    }
+  }
+
   renderWall() {
     // always render wall in the background - the rest are all modals on top
     return (<Wall
@@ -322,6 +356,7 @@ class App extends React.Component {
 				{this.renderPhotoViewer()}
 				{this.renderPhotoEditor()}
 				{this.renderPhotoUpload()}
+				{this.renderPostDelete()}
       </div>);
   }
 }
