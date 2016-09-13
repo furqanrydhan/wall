@@ -8,29 +8,6 @@ var Promise = require('bluebird');
 
 var App = require('./app.jsx');
 
-// var didReceiveData = Bebo.didReceiveData;
-// Bebo.didReceiveData = function(data) {
-//   console.timeStamp && console.timeStamp("Bebo.didReceiveData");
-//   return didReceiveData(data);
-// }
-
-
-// var app;
-// var online;
-// var t = setInterval(function() {
-//   if (app) {
-//     clearInterval(t);
-//   }
-//   if (Bebo && Bebo.getStreamId) {
-//     console.timeStamp && console.timeStamp("Bebo.getStreamId exists");
-//     app = App.init();
-//     if (online) {
-//       app.online();
-//     }
-//     clearInterval(t);
-//   }
-// }, 1);
-
 Bebo.onReady(function () {
   console.timeStamp && console.timeStamp("Bebo.onReady");
   Bebo.User.getAsync = Promise.promisify(Bebo.User.get);
@@ -51,7 +28,11 @@ Bebo.onReady(function () {
   };
 
   Bebo.Db.deleteAsync = Promise.promisify(Bebo.Db.delete);
-  Bebo.getStreamFullAsync = Promise.promisify(Bebo.getStreamFull);
+  if (Bebo.getStreamFull) {
+    Bebo.getStreamFullAsync = Promise.promisify(Bebo.getStreamFull);
+  } else {
+    Bebo.getStreamFullAsync = Promise.promisify(Bebo.getStream);
+  }
   var getRosterAsync = Promise.promisify(Bebo.getRoster);
   Bebo.getRosterAsync= function () {
     return getRosterAsync()
