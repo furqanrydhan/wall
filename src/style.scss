@@ -56,8 +56,15 @@ body, html {
   // position: relative;
   // top:0;
   // left:0;
-  background-color: $chat-bg;
+  background-color: #f7f8f6;
 }
+
+// minimized wall
+
+.chat.is-minimized {
+  transform: scale(0.9);
+}
+
 
 .chat-users {
   position:fixed;
