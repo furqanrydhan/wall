@@ -2,8 +2,6 @@ import React from 'react';
 import WallItem from './chat-item.jsx';
 import InfiniteScroll from 'react-infinite-scroller';
 
-
-
 class WallList extends React.Component {
 
   constructor() {
@@ -182,7 +180,10 @@ class WallList extends React.Component {
       var posts = this.props.messages.map((i) => (
         <li className="chat-item" key={i.id}>
           <WallItem me={this.props.me}
-            type="post" reply={this.props.reply}
+            type="post"
+            reply={this.props.reply}
+            delete={this.props.delete}
+            edit={this.props.edit}
             navigate={this.props.navigate}
             handleNewMessage={this.handleNewMessage} db={this.props.db} item={i}/>
         </li>));

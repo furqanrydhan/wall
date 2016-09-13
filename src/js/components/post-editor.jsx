@@ -60,6 +60,9 @@ class PostEdit extends React.Component {
     var parent_id = (this.props.context.quote && this.props.context.quote.id) || null;
     var thread_id = (this.props.context.quote && (this.props.context.quote.thread_id || this.props.context.quote.id)) || null;
     var id = uuid.v4();
+    if (this.props.context.id) {
+      id = this.props.context.id;
+    }
 
     if (!thread_id) {
       thread_id = id;

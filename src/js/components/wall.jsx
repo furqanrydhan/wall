@@ -1,6 +1,7 @@
 import React from 'react';
 import WallList from './wall-list.jsx';
 import ChatBackground from './chat-background.jsx';
+import assert from 'assert';
 
 class Wall extends React.Component {
 
@@ -11,6 +12,8 @@ class Wall extends React.Component {
     };
     this.onPost = this.onPost.bind(this);
     this.onReply = this.onReply.bind(this);
+    this.onEdit = this.onEdit.bind(this);
+    this.onDelete = this.onDelete.bind(this);
   }
 
   componentWillMount() {
@@ -25,7 +28,19 @@ class Wall extends React.Component {
     this.props.navigate("post", {quote: quote});
   }
 
+  onDelete(post) {
+    console.log("Delete clicked", post);
+    // FIXME: fix delete
+    // this.props.navigate("post", {quote: post});
+  }
+
+  onEdit(post) {
+    console.log("Edit clicked", post);
+    this.props.navigate("post", {context: context});
+  }
+
   render() {
+    assert(this.props.me);
 
     return (
       <div className="chat">
@@ -41,6 +56,8 @@ class Wall extends React.Component {
                     hasMore={this.props.hasMore}
                     loadMore={this.props.loadMore}
                     reply={this.onReply}
+                    delete={this.onDelete}
+                    edit={this.onEdit}
                     navigate={this.props.navigate}
                     post={this.onPost}
                     me={this.props.me}

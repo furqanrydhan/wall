@@ -107,6 +107,18 @@
   width: 100%;
 }
 
+.wall-item--media-list{
+  list-style-type: none;
+  width: 100%;
+}
+
+.media-item {
+    height: 20vh;
+    width: 20vw;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
 // -- giphy
 
 .wall-item--giphy {

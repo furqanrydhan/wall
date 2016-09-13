@@ -71,6 +71,37 @@
   position: relative;
 }
 
+.chat-item--delete--button {
+  cursor: pointer;
+  flex: 0 0 auto;
+  align-self: flex-end;
+  background-image: url('assets/img/delete.png');
+  background-size: calc-em(18px);
+  background-position: center;
+  background-repeat: no-repeat;
+  width: calc-em(32px);
+  height: calc-em(32px);
+  vertical-align: middle;
+  transform: translate3d(calc-em(8px), calc-em(-8px), 0);
+  position: relative;
+}
+
+.chat-item--edit--button {
+  cursor: pointer;
+  flex: 0 0 auto;
+  align-self: flex-end;
+  background-image: url('assets/img/edit.svg');
+  background-size: calc-em(18px);
+  background-position: center;
+  background-repeat: no-repeat;
+  width: calc-em(32px);
+  height: calc-em(32px);
+  vertical-align: middle;
+  transform: translate3d(calc-em(8px), calc-em(-8px), 0);
+  position: relative;
+}
+
+
 .chat-item--inner--meta--time {
   @extend .font-size-small;
   font-family: $chat-family;
