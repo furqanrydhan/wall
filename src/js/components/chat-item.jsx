@@ -109,8 +109,15 @@ class WallItem extends React.Component {
   }
 
   renderMeta(){
-    if (this.props.type !== 'post') {
-      return;
+    if (this.props.type === 'quote') {
+      return <div className="wall-item--meta quote">
+        <div className='wall-item--meta--image'>
+           <img src={this.props.db.getImageUrl(this.state.item.user_id)} role="presentation" />
+        </div>
+        <div className='wall-item--meta--text'>
+          <span className='wall-item--meta--text--label'>Viktor </span>
+        </div>
+      </div>
     }
 
     var postReply, postDelete, postEdit;
@@ -125,11 +132,11 @@ class WallItem extends React.Component {
                  </button>);
     return <div className="wall-item--meta">
       <div className='wall-item--meta--image'>
-        <img role='presentation' src={'test'}/>
+          <img src={this.props.db.getImageUrl(this.state.item.user_id)} role="presentation" />
       </div>
       <div className='wall-item--meta--text'>
-        <span className='wall-item--meta--text--label'>Viktor </span>
-        <span className='wall-item--meta--text--label'> 8 min</span>
+        <span className='wall-item--meta--text--name'>Viktor </span>
+        <span className='wall-item--meta--text--info'> 4 min ago</span>
       </div>
       <div className='wall-item--meta--actions'>
         {postReply}
@@ -207,7 +214,8 @@ class WallItem extends React.Component {
   }
 
   render() {
-    return  <div className="wall-item">
+    console.log('render with', this.props);
+    return  <div className={"wall-item " + this.props.type }>
      {this.renderBar()}
       <div className='wall-item--inner'>
         {this.renderMeta()}
