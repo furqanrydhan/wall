@@ -5,7 +5,6 @@
 // TYPEFACES
 
 
-
 $font-family-base: 'Open Sans', 'San Francisco', 'Roboto', 'Arial', sans-serif;
 $chat-family:  'Open Sans', 'San Francisco', 'Roboto', 'Arial', sans-serif;
 $chat-text-size: 16px;
@@ -29,6 +28,10 @@ $chat-input-size: 16px;
 .font-size-small {
   font-size: calc-em(14px);
 }
+.font-size-tiny {
+  font-size: calc-em(12px);
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // FONT STYLES

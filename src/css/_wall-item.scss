@@ -12,8 +12,12 @@
 
 .wall-item--inner {
   width: 100%;
+  padding:10px;
   display: flex;
   flex-direction: column;
+  border-top:1px solid #DBDBDB;
+  border-bottom:1px solid #DBDBDB;
+  background-color:#FFF;
 }
 
 .wall-item--inner--meta {
@@ -24,10 +28,64 @@
   flex: 1 1 auto;
 }
 
+
+// -- Meta
+
+.wall-item--meta {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:10px;
+}
+
+.wall-item--meta--image {
+  flex: 0 0 auto;
+
+}
+
+.wall-item--meta--image img {
+  width: 10vw;
+  background-color: grey;
+  border:none;
+  height: 10vw;
+  margin-right: 10px;
+  display: block;
+}
+
+.wall-item--meta-text {
+  flex: 0 0 auto;
+}
+
+.wall-item--meta--text--label {
+  display: inline-block;
+  @extend .font-size-medium;
+}
+
+// -- footer
+
+.wall-item--footer {
+  width: 100%;
+  border-top: 1px solid #f4f4f4;
+  padding-top:8px;
+}
+
+.wall-item--footer--views {
+  float:right;
+  @extend .font-size-tiny;
+}
+
+
+.wall-item--meta--actions {
+  flex: 1 1 auto;
+}
+
 // -- Message 
 
 .wall-item--message {
   width: 100%;
+  padding: 10px 0;
 }
 
 .wall-item--message p,
