@@ -158,6 +158,7 @@ class WallItem extends React.Component {
             {this.props.item.media.map((i) =>  <div className='media-item'
               key={i.key}
               data-media-url={i.url}
+              onClick={this.viewPhoto}
               style={{backgroundImage: "url(" + (i.url) + ")"}}></div>)}
           </ul>
         </div>
