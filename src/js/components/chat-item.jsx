@@ -148,7 +148,6 @@ class WallItem extends React.Component {
 
   renderMedia(){
     if(this.props.item.media && this.props.item.media.length){
-      console.log("media", this.props.item);
       for (var i = 0 ; i< this.props.item.media.length; i++) {
         this.props.item.media[i].key = i+1;
       }
