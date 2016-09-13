@@ -52,10 +52,10 @@
 }
 
 .wall-item--meta--image img {
-    width: 10vw;
+    width: 12vw;
     background-color: grey;
     border: none;
-    height: 10vw;
+    height: 12vw;
     margin-right: 10px;
     display: block;
     border-radius:1vw;
@@ -65,10 +65,17 @@
     flex: 0 0 auto;
 }
 
-.wall-item--meta--text--label {
-    display: inline-block;
+.wall-item--meta--text--name {
+    display: block;
     @extend .font-size-medium;
 }
+
+.wall-item--meta--text--info {
+    display: block;
+    @extend .font-size-small;
+    color:#CBCBCB;
+}
+
 
 // quote type.
 .wall-item--meta.quote {
@@ -96,8 +103,18 @@
     @extend .font-size-tiny;
 }
 
+
+// actions
+
 .wall-item--meta--actions {
     flex: 1 1 auto;
+}
+
+
+
+.wall-item--action {
+  float: right;
+  display: block;
 }
 
 // -- Message 
