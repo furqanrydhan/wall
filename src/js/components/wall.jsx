@@ -36,7 +36,7 @@ class Wall extends React.Component {
 
   onEdit(post) {
     console.log("Edit clicked", post);
-    this.props.navigate("post", {context: context});
+    this.props.navigate("post", post);
   }
 
   render() {
@@ -56,8 +56,8 @@ class Wall extends React.Component {
                     hasMore={this.props.hasMore}
                     loadMore={this.props.loadMore}
                     reply={this.onReply}
-                    delete={this.onDelete}
-                    edit={this.onEdit}
+                    deletePost={this.onDelete}
+                    editPost={this.onEdit}
                     navigate={this.props.navigate}
                     post={this.onPost}
                     me={this.props.me}
