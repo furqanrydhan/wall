@@ -304,7 +304,7 @@ class App extends React.Component {
 
   renderWall() {
     // always render wall in the background - the rest are all modals on top
-    return (<Wall 
+    return (<Wall
       messages={this.state.messages}
       hasMore={this.state.hasMore}
       offset={this.state.offset}
