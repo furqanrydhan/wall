@@ -17,7 +17,6 @@
 }
 
 .wall-item.post {
-    border-top: 1px solid #DBDBDB;
     border-bottom: 1px solid #DBDBDB;
 }
 
@@ -101,6 +100,7 @@
 .wall-item--footer--views {
     float: right;
     @extend .font-size-tiny;
+    color:#828282;
 }
 
 

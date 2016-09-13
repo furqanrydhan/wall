@@ -169,7 +169,7 @@ class WallItem extends React.Component {
         </div>
         <div className='wall-item--meta--text'>
           <span className='wall-item--meta--text--nanme'>Viktor </span>
-          <span className='wall-item--meta--text--info'>4 min ago</span>
+          <span className='wall-item--meta--text--info'>4m ago</span>
         </div>
         <div className='wall-item--meta--actions'>
           <button onClick={this.reply} className='wall-item--action'>
