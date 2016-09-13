@@ -185,7 +185,7 @@ class WallItem extends React.Component {
   }
 
   renderMedia(){
-    if(this.props.item.media && this.props.media.item.length){
+    if(this.props.item.media && this.props.item.media.length){
       <div className='wall-item--media'>
         <ul className='wall-item--media--list'>
            {this.props.item.media.map((i) =>  <div className='media-item'></div>)}
