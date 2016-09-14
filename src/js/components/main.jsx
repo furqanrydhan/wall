@@ -96,8 +96,7 @@ class App extends React.Component {
   }
 
   loadMore(pageToLoad) {
-    // var offset = pageToLoad - 1; // infinite-scroller does + 1
-    var offset = Math.min(this.store.wall.length, (pageToLoad -1) * POST_CNT);
+    var offset = (pageToLoad - 1) * POST_CNT; // infinite-scroller does + 1
     return this.getOldMessages(null, POST_CNT, offset);
   }
 
