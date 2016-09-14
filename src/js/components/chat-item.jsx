@@ -23,7 +23,6 @@ class WallItem extends React.Component {
     this.handleImageLoaded = this.handleImageLoaded.bind(this);
     this.renderAvatar = this.renderAvatar.bind(this);
     this.renderTimestamp = this.renderTimestamp.bind(this);
-    this.renderContent = this.renderContent.bind(this);
     this.renderMeta = this.renderMeta.bind(this);
     this.reply = this.reply.bind(this);
     this.edit = this.edit.bind(this);
@@ -63,34 +62,10 @@ class WallItem extends React.Component {
   }
 
   interceptHref(e) {
-    if (e.target.href) {z
+    if (e.target.href) {
       Bebo.openURI(e.target.href);
       e.preventDefault();
     }
-  }
-
-  renderContent() {
-    const { type, image } = this.props.item;
-    if (type === 'image') {
-      const { webp, url, width, height } = image;
-      const ratio = 120 / height;
-      const gifUrl = Bebo.getDevice() === 'android' ? webp || url : url;
-      return (
-        <div className="chat-item--inner--message">
-          <span className={`chat-item--inner--message--content ' ${this.state.imageLoaded ? 'is-loaded' : 'is-loading'}`}>
-            <div className="chat-item--inner--message--content--image">
-              <div style={{ backgroundImage: `url(${gifUrl.replace('http://', 'https://')})`, height: `${height * ratio}px`, width: `${width * ratio}px` }} />
-            </div>
-          </span>
-        </div>
-      );
-    }
-    var message = this.props.item.message;
-    message = {__html: md.render(message)};
-    return (
-      <div className="chat-item--inner--message">
-       <span className="chat-item--inner--message--content" onClick={this.interceptHref} dangerouslySetInnerHTML={message}></span>
-      </div>)
   }
 
   viewPhoto(e) {
@@ -167,6 +142,7 @@ class WallItem extends React.Component {
     message = {__html: md.render(message)};
     return <div className='wall-item--message'>
       <span className={'wall-item--message--text ' + this.props.type}
+        onClick={this.interceptHref}
         dangerouslySetInnerHTML={message}>
       </span>
     </div>
