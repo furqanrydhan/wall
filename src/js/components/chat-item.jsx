@@ -257,7 +257,6 @@ WallItem.displayName = 'WallItem';
 // Uncomment properties you need
 WallItem.propTypes = {
   item: React.PropTypes.object.isRequired,
-  // handleNewMessage: React.PropTypes.func.isRequired,
 };
 // ChatItem.defaultProps = {};
 

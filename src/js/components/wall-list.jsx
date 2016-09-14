@@ -2,70 +2,84 @@ import React from 'react';
 import WallItem from './chat-item.jsx';
 import InfiniteScroll from 'react-infinite-scroller';
 
+
 class WallList extends React.Component {
 
   constructor() {
     super();
     this.state = {
       maxCount: 50,
-      scrolledPastFirstMessage: false,
-      isScrolling: false,
       unloadedMessages: [],
       usersTypingCount: 0,
       newMsgCnt: 0,
+      newMsgPost: false,
     };
     this.usersTyping = {};
-    this.handleScroll = this.handleScroll.bind(this);
     // this.handleEventUpdate = this.handleEventUpdate.bind(this);
     // this.handleMessageEvent = this.handleMessageEvent.bind(this);
     // this.addNewMessages = this.addNewMessages.bind(this);
     this.handlePresenceUpdates = this.handlePresenceUpdates.bind(this);
-    this.scrollChatToBottom = this.scrollChatToBottom.bind(this);
-    this.handleNewMessage = this.handleNewMessage.bind(this);
+    this.scrollWallToTop = this.scrollWallToTop.bind(this);
     this.updatePresence = this.updatePresence.bind(this);
     // this.handleListClick = this.handleListClick.bind(this);
     this.renderNoChatsMessage = this.renderNoChatsMessage.bind(this);
+    this.onScroll = this.onScroll.bind(this);
     this.renderMessagesBadge = this.renderMessagesBadge.bind(this);
     this.renderUsersAreTyping = this.renderUsersAreTyping.bind(this);
     this.renderWallList = this.renderWallList.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.newMsg !== this.state.newMsgCnt) {
+      var update = {newMsgCnt: nextProps.newMsg};
+      if (this.refs.chats.scrollTop) {
+        update.newMsgPost = true;
+      }
+      this.setState(update);
+    }
+  }
+
   componentWillMount() {
-    // this.props.getOldMessages(this.props.thread_id, 50, 0);
-    // Bebo.onEvent(this.handleEventUpdate);
-    this.setState({scrolledPastFirstMessage: false, newMsgCnt: 0});
-    // this.props.onPresenceEvent(this.handlePresenceUpdates);
   }
 
   componentDidMount() {
-    this.handleNewMessage();
     // this.registerUrlClickHandler(this.chatList);
   }
 
   componentWillUpdate(prevProps, prevState) {
-    var newMsgCnt = prevProps.messages.length - this.props.messages.length;
-    if (prevProps.messages.length > 0 && this.state.newMsgCnt !== newMsgCnt) {
-      this.setState({newMsgCnt: newMsgCnt});
-    }
+    this.saveScrollPosition();
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.newMsgCnt > 0) {
-      this.handleNewMessage();
+    // this.refs.chats.scrollTop = this.scrollTop + ( this.refs.chats.scrollHeight - this.scrollHeight);
+    this.keepScrollPosition();
+
+    // if (this.state.newMsgCnt > 0) {
+    // }
+  }
+
+  saveScrollPosition() {
+    this.scrollTop = this.refs.chats.scrollTop;
+    this.scrollHeight = this.refs.chats.scrollHeight;
+  }
+
+  onScroll(e) {
+    // clear message if scroll, but not auto-scroll
+    if (this.state.newMsgPost && this.scrollTarget !== e.currentTarget.scrollTop ) {
+      this.setState({newMsgPost: false});
     }
   }
 
-  handleScroll() {
-    const list = this.refs.chatListInner;
-    const item = this.refs.chats.lastChild;
-
-    const diff = list.scrollHeight - list.offsetHeight - item.clientHeight;
-
-    if (list.scrollTop <= diff && !this.state.scrolledPastFirstMessage) {
-      this.setState({ scrolledPastFirstMessage: true , newMsgCnt: 0});
-    } else if (list.scrollTop >= diff && this.state.scrolledPastFirstMessage) {
-      this.scrollChatToBottom();
+  keepScrollPosition() {
+    if (this.scrollTop !== 0) {
+      this.scrollTarget = this.scrollTop + ( this.refs.chats.scrollHeight - this.scrollHeight);
+      this.refs.chats.scrollTop = this.scrollTarget;
     }
+  }
+
+  scrollWallToTop() {
+    this.refs.chats.scrollTop = 0;
+    this.setState({newMsgPost: false});
   }
 
   // componentWillReceiveProps(nextProps) {
@@ -128,26 +142,7 @@ class WallList extends React.Component {
     this.setState({ usersTypingCount });
   }
 
-  scrollChatToBottom() {
-    return;
 
-    // if (this.state.unloadedMessages.length > 0) {
-    //   this.addNewMessages(this.state.unloadedMessages);
-    // }
-    // if (this.refs.chatListInner) {
-    //   this.refs.chatListInner.scrollTop = this.refs.chatListInner.scrollHeight;
-    // }
-
-    // this.setState({
-    //   scrolledPastFirstMessage: false,
-    // });
-  }
-
-  handleNewMessage() {
-    if (!this.state.scrolledPastFirstMessage) {
-      this.scrollChatToBottom();
-    }
-  }
 
   // handleListClick() {
   //   this.props.blurChat();
@@ -160,9 +155,9 @@ class WallList extends React.Component {
   }
 
   renderMessagesBadge() {
-    if (this.state.newMsgCnt > 0) {
-      return (<div className="chat-list--unseen-messages" onClick={this.scrollChatToBottom}>
-        <span className="chat-list--unseen-messages--text">{`${this.state.newMsgCnt} New Messages`}</span>
+    if (this.state.newMsgPost) {
+      return (<div className="chat-list--unseen-messages" onClick={this.scrollWallToTop}>
+        <span className="chat-list--unseen-messages--text">New Posts above.</span>
       </div>);
     }
     return null;
@@ -185,9 +180,9 @@ class WallList extends React.Component {
             deletePost={this.props.deletePost}
             editPost={this.props.editPost}
             navigate={this.props.navigate}
-            handleNewMessage={this.handleNewMessage} db={this.props.db} item={i}/>
+            db={this.props.db} item={i}/>
         </li>));
-    return (<ul ref="chats" className="chat-list--inner--list">
+    return (<ul ref="chats" className="chat-list--inner--list" onScroll={this.onScroll}>
               <InfiniteScroll pageStart={this.props.offset}
                 hasMore={this.props.hasMore}
                 loadMore={this.props.loadMore}
@@ -205,7 +200,7 @@ class WallList extends React.Component {
     const count = this.state.usersTypingCount;
     return (<div className="chat-list">
         {this.renderMessagesBadge()}
-        <div style={count > 0 ? { transform: 'translate3d(0,-37px,0)' } : {}} ref="chatListInner" className="chat-list--inner" onScroll={this.handleScroll} onClick={this.handleListClick}>
+        <div style={count > 0 ? { transform: 'translate3d(0,-37px,0)' } : {}} ref="chatListInner" className="chat-list--inner"  onClick={this.handleListClick}>
             {this.renderWallList()}
         </div>
     </div>);

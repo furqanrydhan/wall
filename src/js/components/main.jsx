@@ -38,6 +38,7 @@ class App extends React.Component {
       page: "home",
       context: {},
       messages: [],
+      newMsg: 0,
       hasMore: true,
       offset: 0,
       me: {},
@@ -96,8 +97,7 @@ class App extends React.Component {
   }
 
   loadMore(pageToLoad) {
-    // var offset = pageToLoad - 1; // infinite-scroller does + 1
-    var offset = Math.min(this.store.wall.length, (pageToLoad -1) * POST_CNT);
+    var offset = (pageToLoad - 1) * POST_CNT; // infinite-scroller does + 1
     return this.getOldMessages(null, POST_CNT, offset);
   }
 
@@ -180,6 +180,7 @@ class App extends React.Component {
       this.store.wall = _.filter(this.store.wall, function(i) { return i.id !== message.id});
       this.setState({ messages: this.store.wall });
     } else {
+      this.setState({ newMsg: this.state.newMsg+1});
       this.getOldMessages(message.thread_id, POST_CNT, 0);
     }
   }
@@ -341,6 +342,7 @@ class App extends React.Component {
     return (<Wall
       minimized={this.state.page === 'post' ? true : false}
       messages={this.state.messages}
+      newMsg={this.state.newMsg}
       hasMore={this.state.hasMore}
       offset={this.state.offset}
       loadMore={this.loadMore}
