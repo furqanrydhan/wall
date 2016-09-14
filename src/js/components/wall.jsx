@@ -51,6 +51,7 @@ class Wall extends React.Component {
         </div>
         <div className="chat-upper" >
           <WallList messages={this.props.messages}
+                    newMsg={this.props.newMsg}
                     offset={this.props.offset}
                     hasMore={this.props.hasMore}
                     loadMore={this.props.loadMore}

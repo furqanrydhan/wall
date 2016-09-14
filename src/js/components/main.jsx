@@ -38,6 +38,7 @@ class App extends React.Component {
       page: "home",
       context: {},
       messages: [],
+      newMsg: 0,
       hasMore: true,
       offset: 0,
       me: {},
@@ -179,6 +180,7 @@ class App extends React.Component {
       this.store.wall = _.filter(this.store.wall, function(i) { return i.id !== message.id});
       this.setState({ messages: this.store.wall });
     } else {
+      this.setState({ newMsg: this.state.newMsg+1});
       this.getOldMessages(message.thread_id, POST_CNT, 0);
     }
   }
@@ -339,6 +341,7 @@ class App extends React.Component {
     // always render wall in the background - the rest are all modals on top
     return (<Wall 
       messages={this.state.messages}
+      newMsg={this.state.newMsg}
       hasMore={this.state.hasMore}
       offset={this.state.offset}
       loadMore={this.loadMore}
