@@ -102,7 +102,7 @@ class PostEdit extends React.Component {
 
       // TODO mention stuff in users[]
       console.log("saving post", post);
-      Bebo.Db.saveAsync('post', post)
+      Bebo.Db.save('post', post)
         .then(function(data) {
           data = data.result[0];
 					that.broadcastChat(data);
@@ -145,7 +145,7 @@ class PostEdit extends React.Component {
 			body = "posted a new topic";
 		}
 
-    Bebo.getRosterAsync()
+    Bebo.getRoster()
       .then(function(users) {
           console.log("ROSTER", users);
           var user_ids = _.map(users, "user_id");
