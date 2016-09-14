@@ -70,6 +70,7 @@ class PostEdit extends React.Component {
   }
 
   handleInputChange(e) {
+    this.scrollWindow();
     this.setState({ message: e.target.value });
   }
 
@@ -236,6 +237,12 @@ class PostEdit extends React.Component {
     this.props.navigate("home", null);
 	}
 
+  scrollWindow(){
+    setTimeout(function(){
+      window.scrollTo(0,1000)
+    },10);
+  }
+
 
   render() {
     console.log("componentWillReceiveProps");
@@ -244,7 +251,11 @@ class PostEdit extends React.Component {
 
     return <div className='modal'>
       <div className='post-edit'>
-        <button className='modal-close' onClick={this.home}></button>
+        <button className='modal-close' onClick={this.home}>
+          <svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" >
+              <polygon id="Shape" stroke="none" fill="#FFFFFF" fillRule="evenodd" points="14 1.4 12.6 0 7 5.6 1.4 0 0 1.4 5.6 7 0 12.6 1.4 14 7 8.4 12.6 14 14 12.6 8.4 7"></polygon>
+          </svg>
+        </button>
         <div className='wall-item'>
           <div className='wall-item--inner'>
           <div className="wall-item--meta">
@@ -258,7 +269,7 @@ class PostEdit extends React.Component {
         </div>
         <div className='wall-item--inner--body'>
           <div className='wall-item--message'>
-            <textarea onChange={this.handleInputChange}id='js-textarea' ref='textarea' className='wall-item--message--text' placeholder="what's happening ?"/>
+            <textarea  onFocus={this.scrollWindow} onChange={this.handleInputChange}id='js-textarea' ref='textarea' className='wall-item--message--text' placeholder="what's happening ?"/>
           </div>
           {this.renderQuote()}
         </div>
@@ -275,14 +286,14 @@ class PostEdit extends React.Component {
                 <svg width="25px" height="18px" viewBox="6833 3731 96 86" version="1.1">
                     <g id="noun_77833_cc" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(6833.000000, 3731.000000)">
                         <g id="Group" fill="#000000">
-                            <path d="M73.1,14.7 L72.1,10.8 C70.6,5 64.3,0.4 58.2,0.4 L37.9,0.4 C31.8,0.4 25.5,5.1 23.9,10.8 L22.9,14.7 L14.5,14.7 C6.7,14.7 0.5,20.8 0.5,28 L0.5,72.1 C0.5,79.5 6.8,85.6 14.5,85.6 L81.6,85.6 C89.2,85.6 95.5,79.5 95.5,72.1 L95.5,28 C95.5,20.8 89.2,14.7 81.6,14.7 L73.1,14.7 L73.1,14.7 Z M48,73.1 C33.8,73.1 22.3,61.8 22.3,48 C22.3,34.2 33.8,22.9 48,22.9 C62.3,22.9 73.9,34.2 73.9,48 C73.9,61.8 62.3,73.1 48,73.1 L48,73.1 Z M65,48 C65,38.8 57.4,31.4 48,31.4 C38.6,31.4 31,38.8 31,48 C31,57.2 38.6,64.6 48,64.6 C57.4,64.5 65,57.1 65,48 L65,48 Z" id="Shape"></path>
+                          <path d="M73.1,14.7 L72.1,10.8 C70.6,5 64.3,0.4 58.2,0.4 L37.9,0.4 C31.8,0.4 25.5,5.1 23.9,10.8 L22.9,14.7 L14.5,14.7 C6.7,14.7 0.5,20.8 0.5,28 L0.5,72.1 C0.5,79.5 6.8,85.6 14.5,85.6 L81.6,85.6 C89.2,85.6 95.5,79.5 95.5,72.1 L95.5,28 C95.5,20.8 89.2,14.7 81.6,14.7 L73.1,14.7 L73.1,14.7 Z M48,73.1 C33.8,73.1 22.3,61.8 22.3,48 C22.3,34.2 33.8,22.9 48,22.9 C62.3,22.9 73.9,34.2 73.9,48 C73.9,61.8 62.3,73.1 48,73.1 L48,73.1 Z M65,48 C65,38.8 57.4,31.4 48,31.4 C38.6,31.4 31,38.8 31,48 C31,57.2 38.6,64.6 48,64.6 C57.4,64.5 65,57.1 65,48 L65,48 Z" id="Shape"></path>
                         </g>
                     </g>
                 </svg>
               </button>
               <button className='post-edit--options--item'>
                 <svg width="25px" height="18px" viewBox="0 0 146 118" version="1.1">
-                    <path d="M145.8408,103.37677 L145.6,100.19077 L145.6,6.01002703 C145.6,3.73015541 143.8712,1.59459459 141.5844,1.59459459 L137.2792,1.59459459 C136.416,0.614317568 135.1224,0.0318918919 133.718,0.137135135 L114.2908,1.59459459 L17.2176,1.59459459 C14.934,1.59459459 13.2,3.73015541 13.2,6.01002703 L13.2,9.17888514 L4.3884,9.83984459 C2.0132,10.0180405 0.23,12.0878243 0.4096,14.4577905 L7.9072,113.724493 C8.0852,116.095257 10.1604,117.87602 12.5344,117.697824 L141.8648,107.995514 C144.242,107.817318 146.0196,105.747135 145.8408,103.37677 L145.8408,103.37677 Z M13.2,94.4430541 L7.3508,17.0007703 L13.2,16.5622568 L13.2,94.4430541 L13.2,94.4430541 Z M48.3352,24.1361824 C53.78,24.1361824 58.1956,28.5368649 58.1956,33.9620743 C58.1956,39.3856892 53.78,43.7851757 48.3352,43.7851757 C42.8936,43.7851757 38.4784,39.3860878 38.4784,33.9620743 C38.4784,28.5368649 42.8936,24.1361824 48.3352,24.1361824 L48.3352,24.1361824 Z M14.3884,110.175723 L13.9104,103.847973 C14.6244,104.926318 15.8168,105.641892 17.218,105.641892 L74.8224,105.641892 L14.3884,110.175723 L14.3884,110.175723 Z M130,89.2972973 L113.2368,89.2972973 L96.408,89.2972973 L62.7516,89.2972973 L29.2,89.2972973 L29.2,82.9819054 L54.386,64.0397162 L54.454,64.4766351 L71.1556,74.5955338 L96.3908,40.7578378 L117.408,53.3371959 L130,80.9591622 L130,89.2972973 L130,89.2972973 Z" id="Shape" stroke="none" fill="#000000" fillRule="evenodd"></path>
+                  <path d="M145.8408,103.37677 L145.6,100.19077 L145.6,6.01002703 C145.6,3.73015541 143.8712,1.59459459 141.5844,1.59459459 L137.2792,1.59459459 C136.416,0.614317568 135.1224,0.0318918919 133.718,0.137135135 L114.2908,1.59459459 L17.2176,1.59459459 C14.934,1.59459459 13.2,3.73015541 13.2,6.01002703 L13.2,9.17888514 L4.3884,9.83984459 C2.0132,10.0180405 0.23,12.0878243 0.4096,14.4577905 L7.9072,113.724493 C8.0852,116.095257 10.1604,117.87602 12.5344,117.697824 L141.8648,107.995514 C144.242,107.817318 146.0196,105.747135 145.8408,103.37677 L145.8408,103.37677 Z M13.2,94.4430541 L7.3508,17.0007703 L13.2,16.5622568 L13.2,94.4430541 L13.2,94.4430541 Z M48.3352,24.1361824 C53.78,24.1361824 58.1956,28.5368649 58.1956,33.9620743 C58.1956,39.3856892 53.78,43.7851757 48.3352,43.7851757 C42.8936,43.7851757 38.4784,39.3860878 38.4784,33.9620743 C38.4784,28.5368649 42.8936,24.1361824 48.3352,24.1361824 L48.3352,24.1361824 Z M14.3884,110.175723 L13.9104,103.847973 C14.6244,104.926318 15.8168,105.641892 17.218,105.641892 L74.8224,105.641892 L14.3884,110.175723 L14.3884,110.175723 Z M130,89.2972973 L113.2368,89.2972973 L96.408,89.2972973 L62.7516,89.2972973 L29.2,89.2972973 L29.2,82.9819054 L54.386,64.0397162 L54.454,64.4766351 L71.1556,74.5955338 L96.3908,40.7578378 L117.408,53.3371959 L130,80.9591622 L130,89.2972973 L130,89.2972973 Z" id="Shape" stroke="none" fill="#000000" fillRule="evenodd"></path>
                 </svg>
               </button>
             </div>
@@ -291,34 +302,6 @@ class PostEdit extends React.Component {
         </div>
         <div className='modal-overlay' onClick={this.home}></div>
     </div>
-    
-
-
-
-    // return (
-    //   <div className="post-edit modal">
-    //     <div className="sub-header">
-    //       <div onClick={this.home} className="sub-back-button"></div>
-    //       <div className="sub-name">Post to Bebo</div>
-    //       <div className="sub-action" onClick={this.submitPost}>Post</div>
-    //     </div>
-    //     <div className="post-edit-header">
-    //       <div className="post-edit-header--image" style={userImgStyle}></div>
-    //       <div className="post-edit-header--username">{this.props.me.username}</div>
-    //     </div>
-    //     <div className="post-edit-middle">
-    //       <textarea
-            // rows="8"
-            // ref="textarea"
-            // placeholder={placeholder}
-            // onChange={this.handleInputChange}
-            // value={this.state.message}
-    //       />
-    //       {this.renderImages()}
-    //     </div>
-    //     {this.renderQuote()}
-    //     {this.renderMenu()}
-    //   </div>)
   }
 }
 
