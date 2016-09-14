@@ -15,7 +15,7 @@
   right:10%;
   top:-19px;
   display:block;
-  background-color:#313338;
+  background-color:$color-brand;
   z-index: 2;
   padding:0;
 }
@@ -60,7 +60,7 @@
   position: absolute;
 }
 
-.post-edit .wall-item.quoute {
+.post-edit .wall-item.quote {
   height: auto;
 }
 

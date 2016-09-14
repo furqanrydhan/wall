@@ -43,11 +43,14 @@ class Wall extends React.Component {
     assert(this.props.me);
     return (
       <div className={ this.props.minimized ? ' chat is-minimized' : 'chat'}>
-        <div className="chat-new-post">
-          <div className="chat-fake-input" onClick={this.onPost}>
-            <div className="chat-fake-input--input">New Post...</div>
-            <div className="chat-fake-input--send-btn">Post</div>
-          </div>
+        <div className="chat-new-post" onClick={this.onPost}>
+          <svg viewBox="0 0 90 92" version="1.1">
+              <g id="pen" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                  <path d="M71.768,1.732 C70.792,0.755 69.208,0.755 68.233,1.732 L60,9.965 L81.035,31 L89.267,22.768 C90.244,21.791 90.244,20.209 89.267,19.233 L71.768,1.732 L71.768,1.732 Z" id="Shape" fill="#FFFFFF"></path>
+                  <path d="M0.732,90.268 C1.22,90.756 1.86,91 2.5,91 C3.14,91 3.78,90.756 4.268,90.268 L6.253,88.283 L26.703,83.738 L7.262,64.297 L2.718,84.747 L0.733,86.732 C-0.244,87.709 -0.244,89.291 0.732,90.268 L0.732,90.268 Z" id="Shape" fill="#FFFFFF"></path>
+                  <rect id="Rectangle-path" fill="#FFFFFF" transform="translate(43.750404, 47.248946) rotate(45.000000) translate(-43.750404, -47.248946) " x="28.8765462" y="14.3937615" width="29.7477147" height="65.7103698"></rect>
+              </g>
+          </svg>
         </div>
         <div className="chat-upper" >
           <WallList messages={this.props.messages}
