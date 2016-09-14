@@ -106,7 +106,7 @@ class PostEdit extends React.Component {
 
       // TODO mention stuff in users[]
       console.log("saving post", post);
-      Bebo.Db.saveAsync('post', post)
+      Bebo.Db.save('post', post)
         .then(function(data) {
           data = data.result[0];
 					that.broadcastChat(data);
@@ -149,12 +149,16 @@ class PostEdit extends React.Component {
 			body = "posted a new topic";
 		}
 
-    Bebo.getRosterAsync()
-      .then(function(users) {
-          console.log("ROSTER", users);
-          var user_ids = _.map(users, "user_id");
-      		return Bebo.Notification.users(title, body, user_ids);
-      });
+    if (post.parent_id && post.quote && post.quote.user_id) {
+      return Bebo.Notification.roster(title, body, [post.quote.user_id]);
+    } else {
+      Bebo.getRoster()
+        .then(function(users) {
+            console.log("ROSTER", users);
+            var user_ids = _.map(users, "user_id");
+            return Bebo.Notification.users(title, body, user_ids);
+        });
+    }
   }
 
   broadcastChat(data) {
@@ -206,7 +210,7 @@ class PostEdit extends React.Component {
     if (!this.props.context.quote) {
       return "";
     }
-    return <WallItem type="quote" db={this.props.db} item={this.props.context.quote} />;
+    return <WallItem type="quote" me={this.props.me} db={this.props.db} item={this.props.context.quote} />;
   }
 
   renderImages() {

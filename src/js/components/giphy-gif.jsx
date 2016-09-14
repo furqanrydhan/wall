@@ -50,7 +50,7 @@ class GiphyGif extends React.Component {
           users: [user_id],
           type: 'image',
         };
-        Bebo.Db.saveAsync('dm', message)
+        Bebo.Db.save('dm', message)
           .then(function(data) {
             return that.props.incrUnreadMessage(that.props.thread_id, user_id)
               .then(function() {

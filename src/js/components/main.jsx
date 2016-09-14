@@ -108,15 +108,9 @@ class App extends React.Component {
     }
     var that = this;
     var options = {count: count, offset: offset, sort_by:"created_dttm"};
-    console.log("DB get post", count, offset);
-    Bebo.Db.get('post', options, (err, data) => {
-
-      if (err) {
-        console.error('error getting list');
-        return;
-      }
+    Bebo.Db.get('post', options)
+    .then(function(list) {
       
-      var list = data.result;
       for (var i=0; i<list.length ; i++) {
         list[i].viewed_ids = new Set(list[i].viewed_ids || []);
       }
@@ -126,6 +120,8 @@ class App extends React.Component {
       that.store.wall = _.orderBy(that.store.wall, "created_dttm", "desc");
       var pageToLoad = that.store.wall.length;
       that.setState({ messages: that.store.wall, offset: offset, hasMore: hasMore, pageToLoad: pageToLoad});
+    }).catch(function(err) {
+      console.log("Can't get messages", err);
     });
   }
 
@@ -140,7 +136,7 @@ class App extends React.Component {
   incrViewedPost(postItem) {
     var user_id = this.state.me.user_id;
 
-    return Bebo.Db.getAsync('post', {id: postItem.id})
+    return Bebo.Db.get('post', {id: postItem.id})
       .then(function(data) {
         var row;
         if (data && data.length > 0) {
@@ -156,7 +152,7 @@ class App extends React.Component {
         }
         row.viewed_ids.push(user_id);
         row.viewed_cnt = row.viewed_ids.length;
-        return Bebo.Db.saveAsync('post', row);
+        return Bebo.Db.save('post', row);
       });
   }
 
@@ -166,7 +162,7 @@ class App extends React.Component {
       return;
     }
     var update = {id: postItem.id, message: "[deleted]", media: null, deleted_dttm: new Date()};
-    return Bebo.Db.saveAsync('post', update)
+    return Bebo.Db.save('post', update)
       .then(function() {
         Bebo.emitEvent({ message: {id: postItem.id, deleted_dttm: update.deleted_dttm}});
       })
@@ -188,7 +184,7 @@ class App extends React.Component {
   getMe() {
     var that = this;
     console.timeStamp && console.timeStamp("Bebo.User.me request");
-    return Bebo.User.getAsync("me")
+    return Bebo.User.get("me")
       .then(function(user) {
         console.timeStamp && console.timeStamp("Bebo.User.me response");
         user.image_url = user.image_url + "?w=144&h=144";
@@ -269,7 +265,7 @@ class App extends React.Component {
     } 
     context.media.push(data);
     this.navigate("post", context);
-    return Bebo.uploadImageAsync(photo)
+    return Bebo.uploadImage(photo)
       .then(function(image_url) {
           data.state = "done";
           data.url = image_url;
