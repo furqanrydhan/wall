@@ -24,7 +24,8 @@
     "react-router": "^2.7.0",
     "react-simple-fetch": "^0.1.1",
     "remarkable": "^1.6.2",
-    "request-promise": "^4.1.1"
+    "request-promise": "^4.1.1",
+    "react-textarea": "^1.0.4"
   },
   "devDependencies": {
     "autoprefixer": "6.4.0",
