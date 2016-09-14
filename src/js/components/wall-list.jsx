@@ -176,7 +176,7 @@ class WallList extends React.Component {
         <li className="chat-item" key={i.id}>
           <WallItem me={this.props.me}
             type="post"
-            reply={this.props.reply}
+            replyPost={this.props.reply}
             deletePost={this.props.deletePost}
             editPost={this.props.editPost}
             navigate={this.props.navigate}

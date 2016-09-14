@@ -25,8 +25,8 @@ class WallItem extends React.Component {
     this.renderTimestamp = this.renderTimestamp.bind(this);
     this.renderMeta = this.renderMeta.bind(this);
     this.reply = this.reply.bind(this);
-    this.edit = this.edit.bind(this);
-    this.delete = this.delete.bind(this);
+    this.editPost = this.editPost.bind(this);
+    this.deletePost = this.deletePost.bind(this);
     this.interceptHref = this.interceptHref.bind(this);
     this.viewPhoto = this.viewPhoto.bind(this);
   }
@@ -76,15 +76,24 @@ class WallItem extends React.Component {
 
   reply(e) {
     console.log("reply clicked");
-    this.props.reply(this.state.item);
+    this.props.replyPost(this.state.item);
   }
+
+  editPost(e) {
+    this.props.editPost(this.state.item);
+  }
+
+  deletePost(e) {
+    this.props.deletePost(this.state.item);
+  }
+
 
   renderMeta(){
     var postReply, postDelete, postEdit;
 
     if (this.props.me.user_id === this.props.item.user_id) {
-        postEdit = <div className="chat-item--edit--button" data-post-id={this.props.item.id} onClick={this.edit}></div>
-        postDelete = <div className="chat-item--delete--button" data-post-id={this.props.item.id} onClick={this.delete}></div>
+        postEdit = <div className="chat-item--edit--button" data-post-id={this.props.item.id} onClick={this.editPost}></div>
+        postDelete = <div className="chat-item--delete--button" data-post-id={this.props.item.id} onClick={this.deletePost}></div>
     }
 
     if (this.props.type === 'quote') {
@@ -201,14 +210,6 @@ class WallItem extends React.Component {
     }
     return <WallItem me={this.props.me} type="quote" db={this.props.db} item={this.props.item.quote} />;
   } 
-
-  edit(e) {
-    this.props.reply(this.state.item);
-  }
-
-  delete(e) {
-    this.props.reply(this.state.item);
-  }
 
   render() {
     return  <div className={"wall-item " + this.props.type }>
