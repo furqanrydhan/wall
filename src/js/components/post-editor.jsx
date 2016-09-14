@@ -1,6 +1,5 @@
 import React from 'react';
 import uuid from 'node-uuid';
-import Remarkable from 'remarkable';
 import WallItem from './chat-item.jsx';
 import TextArea from 'react-textarea-autosize';
 
