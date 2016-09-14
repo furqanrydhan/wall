@@ -43,7 +43,7 @@ class Wall extends React.Component {
     assert(this.props.me);
     return (
       <div className={ this.props.minimized ? ' chat is-minimized' : 'chat'}>
-        <div className="chat-new-post" onClick={this.onPost}>
+        <div className="chat-new-post" onTouchStart={this.onPost}>
           <svg viewBox="0 0 90 92" version="1.1">
               <g id="pen" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
                   <path d="M71.768,1.732 C70.792,0.755 69.208,0.755 68.233,1.732 L60,9.965 L81.035,31 L89.267,22.768 C90.244,21.791 90.244,20.209 89.267,19.233 L71.768,1.732 L71.768,1.732 Z" id="Shape" fill="#FFFFFF"></path>
