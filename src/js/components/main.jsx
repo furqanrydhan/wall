@@ -108,7 +108,6 @@ class App extends React.Component {
     }
     var that = this;
     var options = {count: count, offset: offset, sort_by:"created_dttm"};
-    console.log("DB get post", count, offset);
     Bebo.Db.get('post', options)
     .then(function(list) {
       

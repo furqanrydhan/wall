@@ -112,7 +112,6 @@ class WallItem extends React.Component {
         postDelete = <div className="chat-item--delete--button" data-post-id={this.props.item.id} onClick={this.delete}></div>
     }
 
-  
     if (this.props.type === 'quote') {
       return <div className="wall-item--meta quote">
         <div className='wall-item--meta--image'>
@@ -236,7 +235,6 @@ class WallItem extends React.Component {
   }
 
   render() {
-    console.log('render with', this.props);
     return  <div className={"wall-item " + this.props.type }>
      {this.renderBar()}
       <div className='wall-item--inner'>
