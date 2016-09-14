@@ -5,7 +5,10 @@
   left:0;
   top:0;
   background-color:transparent;
+  z-index: 1000000;
 }
+
+
 
 .modal-close {
   width: 38px;
@@ -60,7 +63,7 @@
   position: absolute;
 }
 
-.post-edit .wall-item.quote {
+.post-edit .wall-item.quoute {
   height: auto;
 }
 
@@ -91,7 +94,12 @@
   flex: 0 0 auto;
   margin: 0 10px;
   font-size: 16px;
-  color:red;
+  color:#FF4E75;
+  font-weight: 600;
+}
+
+.post-edit--send:disabled {
+  color:#8D8D8D;
 }
 
 .post-edit-middle {

@@ -19,29 +19,25 @@ class PostDelete extends React.Component {
   componentWillMount() {
   }
 
+
+
+
+  renderActions(){
+
+  }
+
   render() {
-    return (
-      <div className="post-delete modal">
-        <div className="sub-header">
-          <div onClick={this.home} className="sub-back-button">Delete Post</div>
-          <div className="sub-name"></div>
-          <div className="sub-action"></div>
-        </div>
-        <div className="post-delete--post">
-        <WallItem me={this.props.me}
-          type="quote"
-          db={this.props.db}
-          item={this.props.context}/>
-        </div>
-        <div className="post-delete--main">
-          <h1>Do you want to delete this post?</h1>
-          <div className="post-delete--confirm">
-            <button onClick={this.home} className="">Cancel</button>
-            <button onClick={this.doDelete} className="">Delete</button>
-          </div>
-        </div>
-      </div>
-    )
+    return <div className='modal modal-dialog'>
+    <div className='dialog'> 
+      <span className='dialog--haeder'>{this.props.title}</span>
+      <span className='dialog--body'>{this.props.body}</span>
+      <span className='dialog--actions'>
+        <button className='dialog--actions-btn' onClick={this.dbDelete}>{this.props.actionLabel1}</button>
+        <button className='dialog--actions-btn' onClick={this.dbDelete}>{this.props.actionLabel2}</button>
+      </span>
+    </div>
+    <div className='modal-overlay'></div>
+    </div>
   }
 }
 

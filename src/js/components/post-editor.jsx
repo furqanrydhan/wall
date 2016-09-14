@@ -2,7 +2,6 @@ import React from 'react';
 import uuid from 'node-uuid';
 import Remarkable from 'remarkable';
 import WallItem from './chat-item.jsx';
-import TextArea from 'react-textarea';
 
 
 class PostEdit extends React.Component {
@@ -70,8 +69,8 @@ class PostEdit extends React.Component {
   }
 
   handleInputChange(e) {
-    this.scrollWindow();
     this.setState({ message: e.target.value });
+    this.scrollWindow();
   }
 
   submitPost(e) {
@@ -238,15 +237,13 @@ class PostEdit extends React.Component {
 	}
 
   scrollWindow(){
-    setTimeout(function(){
-      window.scrollTo(0,1000)
-    },10);
+    window.scrollTo(0,1000)
   }
 
 
   render() {
     console.log("componentWillReceiveProps");
-    var placeholder = this.props.context.quote ? "reply..." : "type a message..";
+    var placeholder = this.props.context.quote ? "reply..." : "type a message...";
     var userImgStyle = {backgroundImage: 'url(' + this.props.me.image_url + ')'};
 
     return <div className='modal'>
@@ -269,7 +266,13 @@ class PostEdit extends React.Component {
         </div>
         <div className='wall-item--inner--body'>
           <div className='wall-item--message'>
-            <textarea  onFocus={this.scrollWindow} onChange={this.handleInputChange}id='js-textarea' ref='textarea' className='wall-item--message--text' placeholder="what's happening ?"/>
+            <textarea placeholder={placeholder}
+              onFocus={this.scrollWindow}
+              onChange={this.handleInputChange}
+              id='js-textarea' 
+              ref='textarea' 
+              className='wall-item--message--text'
+            />
           </div>
           {this.renderQuote()}
         </div>
@@ -284,7 +287,7 @@ class PostEdit extends React.Component {
               </button>
               <button className='post-edit--options--item'>
                 <svg width="25px" height="18px" viewBox="6833 3731 96 86" version="1.1">
-                    <g id="noun_77833_cc" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(6833.000000, 3731.000000)">
+                    <g id="noun_77833_cc" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd" transform="translate(6833.000000, 3731.000000)">
                         <g id="Group" fill="#000000">
                           <path d="M73.1,14.7 L72.1,10.8 C70.6,5 64.3,0.4 58.2,0.4 L37.9,0.4 C31.8,0.4 25.5,5.1 23.9,10.8 L22.9,14.7 L14.5,14.7 C6.7,14.7 0.5,20.8 0.5,28 L0.5,72.1 C0.5,79.5 6.8,85.6 14.5,85.6 L81.6,85.6 C89.2,85.6 95.5,79.5 95.5,72.1 L95.5,28 C95.5,20.8 89.2,14.7 81.6,14.7 L73.1,14.7 L73.1,14.7 Z M48,73.1 C33.8,73.1 22.3,61.8 22.3,48 C22.3,34.2 33.8,22.9 48,22.9 C62.3,22.9 73.9,34.2 73.9,48 C73.9,61.8 62.3,73.1 48,73.1 L48,73.1 Z M65,48 C65,38.8 57.4,31.4 48,31.4 C38.6,31.4 31,38.8 31,48 C31,57.2 38.6,64.6 48,64.6 C57.4,64.5 65,57.1 65,48 L65,48 Z" id="Shape"></path>
                         </g>
@@ -297,7 +300,7 @@ class PostEdit extends React.Component {
                 </svg>
               </button>
             </div>
-            <button onClick={this.submitPost} className='post-edit--send'>Send</button>
+            <button disabled={this.state.message.length > 1 ? false : true} onClick={this.submitPost} className='post-edit--send'>Send</button>
           </div>
         </div>
         <div className='modal-overlay' onClick={this.home}></div>
