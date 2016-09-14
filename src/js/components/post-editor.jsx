@@ -267,6 +267,7 @@ class PostEdit extends React.Component {
         <div className='wall-item--inner--body'>
           <div className='wall-item--message'>
             <textarea placeholder={placeholder}
+              value={this.state.message}
               onFocus={this.scrollWindow}
               onChange={this.handleInputChange}
               id='js-textarea' 
