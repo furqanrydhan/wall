@@ -202,7 +202,7 @@ class PostEdit extends React.Component {
     if (!this.props.context.quote) {
       return "";
     }
-    return <WallItem type="quote" db={this.props.db} item={this.props.context.quote} />;
+    return <WallItem type="quote" me={this.props.me} db={this.props.db} item={this.props.context.quote} />;
   }
 
   renderImages() {
