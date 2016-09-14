@@ -61,14 +61,11 @@ class WallList extends React.Component {
   saveScrollPosition() {
     this.scrollTop = this.refs.chats.scrollTop;
     this.scrollHeight = this.refs.chats.scrollHeight;
-    console.log("SCROLL", this.scrollTop, this.scrollHeight);
   }
 
   onScroll(e) {
-    console.log("onScroll", this.scrollTarget, e.currentTarget.scrollTop);
     // clear message if scroll, but not auto-scroll
     if (this.state.newMsgPost && this.scrollTarget !== e.currentTarget.scrollTop ) {
-      console.log("clearing new msg indication");
       this.setState({newMsgPost: false});
     }
   }
