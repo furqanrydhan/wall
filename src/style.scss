@@ -56,8 +56,15 @@ body, html {
   // position: relative;
   // top:0;
   // left:0;
-  background-color: $chat-bg;
+  background-color: #000;
 }
+
+// minimized wall
+
+.chat.is-minimized {
+  transform: scale(0.9);
+}
+
 
 .chat-users {
   position:fixed;
@@ -72,6 +79,11 @@ body, html {
 button {
   background-color:transparent;
   border:none;
+}
+
+.chat-new-post {
+  background-color:#FFF;
+  border-bottom: 1px solid rgba(201, 198, 200,0.6);
 }
 
 .chat-fake-input {

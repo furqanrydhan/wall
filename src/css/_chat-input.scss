@@ -25,7 +25,9 @@
     margin-bottom: calc-em(20px);
     display: flex;
     flex-direction: column;
-	.photo {
+	.photo { 
+    width: 20px;
+    height: 20px;
 		background-size: contain;
 		background-repeat: no-repeat;
 		background-position: left;
