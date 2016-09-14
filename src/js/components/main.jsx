@@ -152,7 +152,11 @@ class App extends React.Component {
         }
         row.viewed_ids.push(user_id);
         row.viewed_cnt = row.viewed_ids.length;
-        return Bebo.Db.save('post', row);
+        return Bebo.Db.save('post', row)
+					.then(function() {
+        		row.viewed_ids = new Set(row.viewed_ids);
+						return row;
+					});
       });
   }
 
