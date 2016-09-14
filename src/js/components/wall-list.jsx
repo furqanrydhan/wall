@@ -2,6 +2,7 @@ import React from 'react';
 import WallItem from './chat-item.jsx';
 import InfiniteScroll from 'react-infinite-scroller';
 
+
 class WallList extends React.Component {
 
   constructor() {
@@ -9,18 +10,16 @@ class WallList extends React.Component {
     this.state = {
       maxCount: 50,
       scrolledPastFirstMessage: false,
-      isScrolling: false,
       unloadedMessages: [],
       usersTypingCount: 0,
       newMsgCnt: 0,
     };
     this.usersTyping = {};
-    this.handleScroll = this.handleScroll.bind(this);
     // this.handleEventUpdate = this.handleEventUpdate.bind(this);
     // this.handleMessageEvent = this.handleMessageEvent.bind(this);
     // this.addNewMessages = this.addNewMessages.bind(this);
     this.handlePresenceUpdates = this.handlePresenceUpdates.bind(this);
-    this.scrollChatToBottom = this.scrollChatToBottom.bind(this);
+    this.scrollWallToTop = this.scrollWallToTop.bind(this);
     this.handleNewMessage = this.handleNewMessage.bind(this);
     this.updatePresence = this.updatePresence.bind(this);
     // this.handleListClick = this.handleListClick.bind(this);
@@ -47,27 +46,43 @@ class WallList extends React.Component {
     if (prevProps.messages.length > 0 && this.state.newMsgCnt !== newMsgCnt) {
       this.setState({newMsgCnt: newMsgCnt});
     }
+    this.saveScrollPosition();
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.newMsgCnt > 0) {
-      this.handleNewMessage();
+    // this.refs.chats.scrollTop = this.scrollTop + ( this.refs.chats.scrollHeight - this.scrollHeight);
+    this.keepScrollPosition();
+
+    // if (this.state.newMsgCnt > 0) {
+    //   this.handleNewMessage();
+    // }
+  }
+
+  saveScrollPosition() {
+    this.scrollTop = this.refs.chats.scrollTop;
+    this.scrollHeight = this.refs.chats.scrollHeight;
+  }
+
+  keepScrollPosition() {
+    if (this.scrollTop !== 0) {
+      this.refs.chats.scrollTop = this.scrollTop + ( this.refs.chats.scrollHeight - this.scrollHeight);
     }
   }
 
-  handleScroll() {
-    const list = this.refs.chatListInner;
-    const item = this.refs.chats.lastChild;
+  scrollWallToTop() {
+    return;
 
-    const diff = list.scrollHeight - list.offsetHeight - item.clientHeight;
+    // if (this.state.unloadedMessages.length > 0) {
+    //   this.addNewMessages(this.state.unloadedMessages);
+    // }
+    // if (this.refs.chatListInner) {
+    //   this.refs.chatListInner.scrollTop = this.refs.chatListInner.scrollHeight;
+    // }
 
-    if (list.scrollTop <= diff && !this.state.scrolledPastFirstMessage) {
-      this.setState({ scrolledPastFirstMessage: true , newMsgCnt: 0});
-    } else if (list.scrollTop >= diff && this.state.scrolledPastFirstMessage) {
-      this.scrollChatToBottom();
-    }
+    // this.setState({
+    //   scrolledPastFirstMessage: false,
+    // });
   }
-
   // componentWillReceiveProps(nextProps) {
   //   if (nextProps.newMessages) {
   //     for (var i=0; i< nextProps.newMessages.length; i++) {
@@ -128,24 +143,10 @@ class WallList extends React.Component {
     this.setState({ usersTypingCount });
   }
 
-  scrollChatToBottom() {
-    return;
-
-    // if (this.state.unloadedMessages.length > 0) {
-    //   this.addNewMessages(this.state.unloadedMessages);
-    // }
-    // if (this.refs.chatListInner) {
-    //   this.refs.chatListInner.scrollTop = this.refs.chatListInner.scrollHeight;
-    // }
-
-    // this.setState({
-    //   scrolledPastFirstMessage: false,
-    // });
-  }
 
   handleNewMessage() {
     if (!this.state.scrolledPastFirstMessage) {
-      this.scrollChatToBottom();
+      this.scrollWallToTop();
     }
   }
 
@@ -161,7 +162,7 @@ class WallList extends React.Component {
 
   renderMessagesBadge() {
     if (this.state.newMsgCnt > 0) {
-      return (<div className="chat-list--unseen-messages" onClick={this.scrollChatToBottom}>
+      return (<div className="chat-list--unseen-messages" onClick={this.scrollWallToTop}>
         <span className="chat-list--unseen-messages--text">{`${this.state.newMsgCnt} New Messages`}</span>
       </div>);
     }
@@ -205,7 +206,7 @@ class WallList extends React.Component {
     const count = this.state.usersTypingCount;
     return (<div className="chat-list">
         {this.renderMessagesBadge()}
-        <div style={count > 0 ? { transform: 'translate3d(0,-37px,0)' } : {}} ref="chatListInner" className="chat-list--inner" onScroll={this.handleScroll} onClick={this.handleListClick}>
+        <div style={count > 0 ? { transform: 'translate3d(0,-37px,0)' } : {}} ref="chatListInner" className="chat-list--inner"  onClick={this.handleListClick}>
             {this.renderWallList()}
         </div>
     </div>);
