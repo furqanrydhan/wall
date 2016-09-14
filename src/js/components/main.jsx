@@ -339,6 +339,7 @@ class App extends React.Component {
   renderWall() {
     // always render wall in the background - the rest are all modals on top
     return (<Wall
+      minimized={this.state.page === 'post' ? true : false}
       messages={this.state.messages}
       hasMore={this.state.hasMore}
       offset={this.state.offset}

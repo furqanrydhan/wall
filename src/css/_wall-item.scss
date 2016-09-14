@@ -1,3 +1,22 @@
+// fuck life let's just put all css in ehr
+.wall-header {
+    width: 100%;
+    height: 30vh;
+}
+
+.wall-header--title {
+    color: #FFF;
+    font-size: 18px;
+    text-align: center;
+    width: 100%;
+    display: block;
+    top: 10vh;
+}
+
+.chat-item:first-child {
+    margin-top: 15vh;
+}
+
 // Wall Item
 //////////////////////////////////////////////////////////////////////////////////////////
 // -- Generic Item style 
@@ -30,12 +49,11 @@
 }
 
 .wall-item--bar {
-  flex:0 0 auto;
-  width: 4px;
-  background-color:#BCBCBC;
-  border-radius:2px;
+    flex: 0 0 auto;
+    width: 4px;
+    background-color: #BCBCBC;
+    border-radius: 2px;
 }
-
 
 // -- Meta
 .wall-item--meta {
@@ -52,30 +70,36 @@
 }
 
 .wall-item--meta--image img {
-    width: 12vw;
+    width: 50px;
     background-color: grey;
     border: none;
-    height: 12vw;
+    height: 50px;
     margin-right: 10px;
     display: block;
-    border-radius:1vw;
+    border-radius: 1vw;
 }
 
 .wall-item--meta--text {
-    flex: 0 0 auto;
+    flex: 1 1 auto;
 }
 
 .wall-item--meta--text--name {
     display: block;
-    @extend .font-size-medium;
+    // font-weight: 600;
+    font-family: HelveticaNeue;
+    font-size: 16px;
+    color: #131313;
+    letter-spacing: 0.04px;
 }
 
 .wall-item--meta--text--info {
     display: block;
     @extend .font-size-small;
-    color:#CBCBCB;
+    font-family: HelveticaNeue;
+    font-size: 16px;
+    color: #CBCBCB;
+    letter-spacing: 0.04px;
 }
-
 
 // quote type.
 .wall-item--meta.quote {
@@ -87,50 +111,86 @@
     height: 7vw;
 }
 
-.wall-item--meta.quote .wall-item--meta--text--label {
-    @extend .font-size-small;
-}
+
 
 // -- footer
 .wall-item--footer {
     width: 100%;
-    border-top: 1px solid #f4f4f4;
+    border-top: 1px solid #e1e1e1;
     margin-top: 8px;
-    padding: 5px 0;
+    padding-top: 10px;
     display: flex;
-    align-items:center;
-    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .wall-item--footer--views {
     float: right;
     @extend .font-size-tiny;
-    color:#828282;
+    color: #828282;
 }
 
 .wall-item--footer--reply {
-  font-size: 14px;
-  color:red;
+    font-size: 16px;
+    color: #252525;
+    font-weight: 600;
+    flex: 0 0 auto;
+    vertical-align: middle;
+    padding: 0 6px;
+}
+
+.wall-item--footer--viewers {
   flex: 0 0 auto;
-  vertical-align:middle;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.wall-item--footer--viewers--profiles {
+  flex: 0 0 auto;
+}
+
+
+
+.viewers--profiles--item {
+  border-radius:50%;
+  overflow:hidden;
+  height: 24px;
+  display: inline-block;
+  width: 24px;
+  background-color:#D8D8D8;
+  border:2px solid #FFF;
+}
+
+.viewers--profiles--item:nth-child(2) {
+  transform: translate3d(-50%,0,0)
+}
+
+.viewers--profiles--item:nth-child(3) {
+  transform: translate3d(-100%,0,0)
+}
+
+.wall-item--footer--viewers--count {
+  font-size: 14px;
+  color:#AEAEAE;
+  transform: translate3d(-30%,0,0);
+  flex: 0 0 auto;
 }
 
 .wall-item--footer--reply svg {
- display:inline-block;
- vertical-align:middle;
+    display: inline-block;
+    margin-right: 10px;
+    vertical-align: middle;
 }
 
 // actions
-
 .wall-item--meta--actions {
     flex: 1 1 auto;
 }
 
-
-
 .wall-item--action {
-  float: right;
-  display: block;
+    float: right;
+    display: block;
 }
 
 // -- Message 
@@ -139,14 +199,36 @@
     padding: 8px 0;
 }
 
+.wall-item.quote .wall-item--message{
+  padding-bottom:4px;
+}
+
+.wall-item.quote .wall-item--inner{
+  padding-bottom:0px;
+}
+
 .wall-item--message p,
 .wall-item--message span {
     color: $text-dark;
     display: inline;
+    font-family: HelveticaNeue;
+    font-size: 16px;
+    color: #575757;
+    letter-spacing: 0.04px;
+    line-height: 21px;
+}
+
+.wall-item--meta.quote {
+  margin-bottom: 2px;
+}
+
+.wall-item.quote .wall-item--message p {
+  font-size: 14px;
+  line-height: 19px;
 }
 
 .wall-item--message--text.quote {
-  @extend .font-size-tiny;
+    @extend .font-size-tiny;
 }
 
 // -- quote
@@ -158,13 +240,13 @@
     width: 100%;
 }
 
-.wall-item--media-list{
-  list-style-type: none;
-  width: 100%;
+.wall-item--media-list {
+    list-style-type: none;
+    width: 100%;
 }
 
 .media-item {
-    height: 20vh;
+    height: 20vw;
     width: 20vw;
     background-size: cover;
     background-repeat: no-repeat;
@@ -174,7 +256,4 @@
 .wall-item--giphy {}
 
 // -- sticker
-
-.wall-item--sticker {
-
-}
+.wall-item--sticker {}

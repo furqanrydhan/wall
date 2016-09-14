@@ -216,7 +216,7 @@ class PostEdit extends React.Component {
     return (
       <div className="media">
         {this.props.context.media.map((i) =>
-          <div key={i.key} className={"photo " + i.state}
+          <div height='20px' width='20px' key={i.key} className={"photo " + i.state}
                style={{backgroundImage: "url(" + (i.url || i.base64) + ")"}}></div>)}
       </div>
     )

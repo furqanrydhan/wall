@@ -39,10 +39,10 @@ class Wall extends React.Component {
   }
 
   render() {
+    console.log('this.props.minimized', this.props.minimized);
     assert(this.props.me);
-
     return (
-      <div className="chat">
+      <div className={ this.props.minimized ? ' chat is-minimized' : 'chat'}>
         <div className="chat-new-post">
           <div className="chat-fake-input" onClick={this.onPost}>
             <div className="chat-fake-input--input">New Post...</div>
