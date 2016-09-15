@@ -242,6 +242,15 @@
 // -- quote
 .wall-item--quote {}
 
+
+// -- media 
+
+.wall-item--media {
+  padding-bottom:8px;
+}
+
+
+
 // -- images
 .wall-item--images {
     list-style-type: none;
@@ -255,11 +264,23 @@
 }
 
 .media-item {
-    height: 20vw;
-    width: 20vw;
     background-size: cover;
     background-repeat: no-repeat;
+    width: 22vw;
 }
+
+.wall-item--media--list.item-count-1 .media-item {
+  width: 100%;
+  @include aspect-ratio(1,1);
+}
+
+.wall-item--media--list.item-count-2 .media-item {
+  width: 50%;
+  @include aspect-ratio(1,1);
+}
+
+
+
 
 // -- giphy
 .wall-item--giphy {}

@@ -137,7 +137,7 @@ class WallItem extends React.Component {
       }
       return (
         <div className='wall-item--media'>
-          <ul className='wall-item--media--list'>
+          <ul className={'wall-item--media--list ' + 'item-count-' + this.props.item.media.length}>
             {this.props.item.media.map((i) =>  <div className='media-item'
               key={i.key}
               data-media-url={i.url}
