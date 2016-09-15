@@ -162,7 +162,7 @@ class ChatList extends React.Component {
   renderMessagesBadge() {
     if (this.state.newMsgCnt > 0) {
       return (<div className="chat-list--unseen-messages" onClick={this.scrollChatToBottom}>
-        <span className="chat-list--unseen-messages--text">{`${this.state.newMsgCnt} New Messages`}</span>
+        <span className="chat-list--unseen-messages--text">{`New Messages`}</span>
       </div>);
     }
     return null;
