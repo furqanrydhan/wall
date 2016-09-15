@@ -98,6 +98,7 @@ class App extends React.Component {
 
   loadMore(pageToLoad) {
     var offset = (pageToLoad - 1) * POST_CNT; // infinite-scroller does + 1
+    console.log("loading more posts", offset);
     return this.getOldMessages(null, POST_CNT, offset);
   }
 
