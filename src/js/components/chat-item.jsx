@@ -183,19 +183,21 @@ class WallItem extends React.Component {
 
 		var viewed, viewed_cnt;
     if (this.state.item.viewed_cnt) {
+      var viewers = [];
+      var iter = this.state.item.viewed_ids.values();
+      for (var i=0; i<3 ; i++) {
+        var next = iter.next().value;
+        if (next) {
+          viewers.push(
+						<div className='viewers--profiles--item' key={next}>
+							<div style={{backgroundImage: "url(" + this.props.db.getImageUrl(next) + ")"}} role='presentation'></div>
+						</div>)
+        }
+      }
 			viewed = (
 					<div className='wall-item--footer--viewers--profiles'>
-						<div className='viewers--profiles--item'>
-							<img src='' role='presentation'/>
-						</div>
-						<div className='viewers--profiles--item'>
-						 <img src='' role='presentation' />
-						</div>
-						<div className='viewers--profiles--item'>
-							 <img src='' role='presentation' />
-						</div>
+            {viewers}
 					</div>);
-
 			viewed_cnt = <div className='wall-item--footer--viewers--count'>{this.state.item.viewed_cnt} views</div>;
 
 		}
