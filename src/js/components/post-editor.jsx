@@ -69,7 +69,7 @@ class PostEdit extends React.Component {
   }
 
   handleInputChange(e) {
-    console.log('input Change');
+    console.log('input Change')
     this.scrollWindow();
     this.setState({ message: e.target.value });
   }
