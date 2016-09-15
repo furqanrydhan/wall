@@ -2,6 +2,7 @@ import React from 'react';
 import uuid from 'node-uuid';
 import Remarkable from 'remarkable';
 import WallItem from './chat-item.jsx';
+import TextArea from 'react-textarea-autosize'
 
 
 class PostEdit extends React.Component {
@@ -237,7 +238,9 @@ class PostEdit extends React.Component {
 	}
 
   scrollWindow(){
-    window.scrollTo(0,1000)
+    setTimeout(function(){
+      window.scrollTo(0,1000)
+    }, 20)
   }
 
 
@@ -266,7 +269,7 @@ class PostEdit extends React.Component {
         </div>
         <div className='wall-item--inner--body'>
           <div className='wall-item--message'>
-            <textarea placeholder={placeholder}
+            <TextArea placeholder={placeholder}
               value={this.state.message}
               onFocus={this.scrollWindow}
               onChange={this.handleInputChange}

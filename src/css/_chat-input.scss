@@ -15,7 +15,7 @@
   height: 38px;
   border-radius:50%;
   position:absolute;
-  right:10%;
+  right:7%;
   top:-19px;
   display:block;
   background-color:$color-brand;
@@ -32,7 +32,7 @@
   top:50%;
   margin-left: -6px;
   margin-top: -6px;
-  box-shadow: 1px 0p 0px 4px rgba(0,0,0,0.15);
+  box-shadow: 1px 0p 1px 8px rgba(0,0,0,0.15);
 }
 
 .modal-overlay {
@@ -47,7 +47,8 @@
 
 .post-edit {
   width:100%;
-  height:45vh;
+  max-height:45vh;
+  height: auto;
   flex: 0 0 auto;
   overflow: visible;
   position:absolute;
@@ -60,15 +61,19 @@
 .post-edit .wall-item {
   width: 100%;
   height: 100%;
-  position: absolute;
+  // position: absolute;
 }
 
-.post-edit .wall-item.quoute {
+.post-edit .wall-item.quote {
   height: auto;
 }
 
 .post-edit .wall-item--inner {
-  padding-bottom:0;
+  padding-bottom:60px;
+}
+
+.post-edit .wall-item--messsage {
+  height: 100%;
 }
 
 .post-edit--actions {
@@ -147,7 +152,7 @@
 
 .post-edit textarea {
   @extend .font-size-default;
-  color: $chat-input-placeholder;
+  color: $color-black;
   width:100%;
   height: 18px;
   border: 0;

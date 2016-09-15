@@ -327,15 +327,29 @@ class App extends React.Component {
   }
 
   renderPostDelete() {
+    var that = this;
+
+    function navigateHome(){
+      that.navigate('home');
+    }
+
+    function deletePost () {
+      that.deletePost(that.state.context);
+    }
+
     if (this.state.page === "post-delete") {
-      return (<PostDelete
-                   me={this.state.me}
-									 navigate={this.navigate}
-									 context={this.state.context}
-                   doDelete={this.deletePost}
-                   db={this.db}/>);
+      return <PostDelete
+        body={"Are you sure want to delete this post ?"}
+        title={''}
+        actionLabel1='cancel'
+        action1={navigateHome}
+        actionLabel2='delete'
+        action2={deletePost} 
+        action2color='#FC4E4E'
+      />
     }
   }
+
 
   renderWall() {
     // always render wall in the background - the rest are all modals on top

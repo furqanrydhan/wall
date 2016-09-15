@@ -53,7 +53,9 @@ class Wall extends React.Component {
           </svg>
         </div>
         <div className="chat-upper" >
-          <WallList messages={this.props.messages}
+          <WallList 
+                    disabledScroll={this.props.minimized}
+                    messages={this.props.messages}
                     newMsg={this.props.newMsg}
                     offset={this.props.offset}
                     hasMore={this.props.hasMore}
