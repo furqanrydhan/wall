@@ -54,7 +54,7 @@ class App extends React.Component {
     this.onPhotoUpload = this.onPhotoUpload.bind(this);
     this.onDrop = this.onDrop.bind(this);
     this.online = this.online.bind(this);
-    this.loadMore = _.throttle(this.loadMore.bind(this), 600);
+    this.loadMore = this.loadMore.bind(this);
     this.db.getImageUrl = this.getImageUrl.bind(this);
     this.db.incrViewedPost = this.incrViewedPost.bind(this);
     this.deletePost = this.deletePost.bind(this);
