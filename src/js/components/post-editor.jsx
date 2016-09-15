@@ -50,7 +50,7 @@ class PostEdit extends React.Component {
   }
 
   componentDidMount() {
-    console.log(this.refs.textarea)
+    console.log('focusing');
     document.getElementById('js-textarea').focus();
   }
 
@@ -69,6 +69,7 @@ class PostEdit extends React.Component {
   }
 
   handleInputChange(e) {
+    console.log('input Change');
     this.scrollWindow();
     this.setState({ message: e.target.value });
   }
@@ -218,6 +219,7 @@ class PostEdit extends React.Component {
 	}
 
   scrollWindow(){
+    console.log('scroll window');
     setTimeout(function(){
       window.scrollTo(0,1000)
     },10);
@@ -283,7 +285,7 @@ class PostEdit extends React.Component {
                 </svg>
               </button>
             </div>
-            <button disabled={(this.state.message.length || this.props.context.media) ? false : true}
+            <button disabled={(this.state.message.length || this.props.context.media) ? false : true }
              onClick={this.submitPost}
              className='post-edit--send'> Send
             </button>

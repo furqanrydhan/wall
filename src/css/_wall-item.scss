@@ -20,6 +20,23 @@
 // Wall Item
 //////////////////////////////////////////////////////////////////////////////////////////
 // -- Generic Item style 
+
+
+.wall-item--fake-overlay {
+  display: none;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left:0;
+  right: 0;
+  background-color:rgba(0,0,0,0.15);
+  z-index: 100;
+}
+
+.chat.is-minimized .wall-item--fake-overlay {
+  display: block;
+}
+
 .wall-item {
     width: 100%;
     display: flex;
@@ -139,6 +156,9 @@
     padding: 0 6px;
 }
 
+
+$viewer-img-size: 22px;
+
 .wall-item--footer--viewers {
   flex: 0 0 auto;
   display: flex;
@@ -147,22 +167,33 @@
 }
 
 .wall-item--footer--viewers--profiles {
+  width: auto;
   flex: 0 0 auto;
 }
 
+.wall-item--footer--viewers--profiles.count-1 {
+  width: $viewer-img-size*1;
+}
 
+.wall-item--footer--viewers--profiles.count-2 {
+  width: $viewer-img-size*2 + 4px;
+}
+
+.wall-item--footer--viewers--profiles.count-3 {
+  width: $viewer-img-size*3 + 8px;
+}
 
 .viewers--profiles--item {
   border-radius:50%;
   overflow:hidden;
-  height: 24px;
+  height: $viewer-img-size;
   display: inline-block;
-  width: 24px;
+  width: $viewer-img-size;
   background-color:#D8D8D8;
   border:2px solid #FFF;
   div {
-	height: 24px;
-	width: 24px;
+    width: 100%;
+    height: 100%;
     background-size: cover;
     background-repeat: no-repeat;
   }
@@ -279,7 +310,7 @@
   @include aspect-ratio(1,1);
 }
 
-
+// -- item
 
 
 // -- giphy

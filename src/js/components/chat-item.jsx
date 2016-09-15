@@ -189,21 +189,24 @@ class WallItem extends React.Component {
         if (next) {
           viewers.push(
 						<div className='viewers--profiles--item' key={next}>
-							<div style={{backgroundImage: "url(" + this.props.db.getImageUrl(next) + ")"}} role='presentation'></div>
+							<img src={this.props.db.getImageUrl(next)} role='presentation'/>
 						</div>)
         }
       }
+
 			viewed = (
-					<div className='wall-item--footer--viewers--profiles'>
+					<div className={'wall-item--footer--viewers--profiles count-' + this.state.item.viewed_cnt}>
             {viewers}
 					</div>);
-			viewed_cnt = <div className='wall-item--footer--viewers--count'>{this.state.item.viewed_cnt} views</div>;
+
+			viewed_cnt = <span className='wall-item--footer--viewers--count'>{this.state.item.viewed_cnt} views</span>;
 
 		}
 
     return <div className="wall-item--footer">
 							<div className='wall-item--footer--viewers'>
-								{viewed} {viewed_cnt}
+								{viewed}
+                {viewed_cnt}
 							</div>
 							 <button onClick={this.reply} className='wall-item--footer--reply'>
 							 <svg width="19px" height="15px" viewBox="0 0 22 17">
@@ -226,6 +229,7 @@ class WallItem extends React.Component {
 
   render() {
     return  <div className={"wall-item " + this.props.type }>
+    <div className='wall-item--fake-overlay'></div>
      {this.renderBar()}
       <div className='wall-item--inner'>
         {this.renderMeta()}
