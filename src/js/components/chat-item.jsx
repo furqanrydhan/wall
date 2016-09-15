@@ -94,8 +94,8 @@ class WallItem extends React.Component {
   }
 
 
-  renderMeta(){
-    var postReply, postDelete, postEdit;
+  renderMeta() {
+    var postDelete, postEdit;
 
     if (this.props.me.user_id === this.props.item.user_id) {
         postEdit = <div className="chat-item--edit--button" data-post-id={this.props.item.id} onClick={this.editPost}></div>
@@ -154,7 +154,11 @@ class WallItem extends React.Component {
 
   renderMessage(){
     var message = this.props.item.message;
-    message = {__html: md.render(message)};
+    if (this.props.type === 'post') {
+      message = {__html: md.render(message)};
+    } else {
+      message = {__html: quoteMd.render(message)};
+    }
     return <div className='wall-item--message'>
       <span className={'wall-item--message--text ' + this.props.type}
         onClick={this.interceptHref}
