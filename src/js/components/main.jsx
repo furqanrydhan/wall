@@ -113,11 +113,6 @@ class App extends React.Component {
       
       for (var i=0; i<list.length ; i++) {
         list[i].viewed_ids = new Set(list[i].viewed_ids || []);
-        if (list[i].viewed_cnt !== list[i].viewed_ids.size) {
-					console.error("INCR WTF", JSON.stringify(Array.from(list[i].viewed_ids)), list[i].viewed_cnt);
-				} else {
-				}
-				console.log("INCR STATE", list[i].message, JSON.stringify(Array.from(list[i].viewed_ids)), list[i].viewed_cnt);
       }
       var hasMore = list.length === count;
       list = _.filter(list, function(i) { return !i.deleted_dttm});
@@ -160,7 +155,6 @@ class App extends React.Component {
         } else if (row.viewed_ids.includes(user_id)) {
           return;
         }
-        console.log("INCR", JSON.stringify(row.viewed_ids), user_id);
         _.remove(row.viewed_ids, function(id) { return !id}); // remove null elements
         row.viewed_ids.push(user_id);
         row.viewed_cnt = row.viewed_ids.length;

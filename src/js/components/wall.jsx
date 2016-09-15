@@ -1,7 +1,6 @@
 import React from 'react';
 import WallList from './wall-list.jsx';
 import ChatBackground from './chat-background.jsx';
-import assert from 'assert';
 
 class Wall extends React.Component {
 
@@ -39,8 +38,6 @@ class Wall extends React.Component {
   }
 
   render() {
-    console.log('this.props.minimized', this.props.minimized);
-    assert(this.props.me);
     return (
       <div className={ this.props.minimized ? ' chat is-minimized' : 'chat'}>
         <div className="chat-new-post" onTouchStart={this.onPost}>
