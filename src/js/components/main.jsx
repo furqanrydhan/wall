@@ -41,11 +41,11 @@ class App extends React.Component {
       newMsg: 0,
       hasMore: true,
       offset: 0,
-      me: {},
+      me: {user_id: Bebo.User.getId()},
       threadName: ""
     };
     this.db = {};
-    this.stream_id = Bebo.getStreamId();
+    this.server_id = Bebo.Server.getId();
     this.store = {wall:[]};
     this.navigate = this.navigate.bind(this);
     this.handleEventUpdate = this.handleEventUpdate.bind(this);
@@ -81,7 +81,7 @@ class App extends React.Component {
     if (!hasLocalStorage) {
       return;
     }
-    var json = window.localStorage.getItem("dm:" + key + ":" + this.stream_id);
+    var json = window.localStorage.getItem("dm:" + key + ":" + this.server_id);
     if (!json) {
       return;
     }
@@ -93,7 +93,7 @@ class App extends React.Component {
       return;
     }
     var json = JSON.stringify(value);
-    window.localStorage.setItem("dm:" + key + ":" + this.stream_id, json);
+    window.localStorage.setItem("dm:" + key + ":" + this.server_id, json);
   }
 
   loadMore(pageToLoad) {
@@ -136,6 +136,11 @@ class App extends React.Component {
   incrViewedPost(postItem) {
     var user_id = this.state.me.user_id;
 
+		if (!user_id) {
+			console.error("NO USER ME");
+			return;
+    }
+
     return Bebo.Db.get('post', {id: postItem.id})
       .then(function(data) {
         var row;
@@ -150,6 +155,7 @@ class App extends React.Component {
         } else if (row.viewed_ids.includes(user_id)) {
           return;
         }
+        _.remove(row.viewed_ids, function(id) { return !id}); // remove null elements
         row.viewed_ids.push(user_id);
         row.viewed_cnt = row.viewed_ids.length;
         return Bebo.Db.save('post', row)

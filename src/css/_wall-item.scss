@@ -160,6 +160,12 @@
   width: 24px;
   background-color:#D8D8D8;
   border:2px solid #FFF;
+  div {
+	height: 24px;
+	width: 24px;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
 }
 
 .viewers--profiles--item:nth-child(2) {
@@ -173,7 +179,7 @@
 .wall-item--footer--viewers--count {
   font-size: 14px;
   color:#AEAEAE;
-  transform: translate3d(-30%,0,0);
+  // transform: translate3d(-30%,0,0);
   flex: 0 0 auto;
 }
 
