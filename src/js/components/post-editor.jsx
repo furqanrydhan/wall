@@ -225,7 +225,6 @@ class PostEdit extends React.Component {
 
 
   render() {
-    console.log("componentWillReceiveProps");
     var placeholder = this.props.context.quote ? "reply..." : "type a message..";
     var userImgStyle = {backgroundImage: 'url(' + this.props.me.image_url + ')'};
 
@@ -284,7 +283,10 @@ class PostEdit extends React.Component {
                 </svg>
               </button>
             </div>
-            <button onClick={this.submitPost} className='post-edit--send'>Send</button>
+            <button disabled={(this.state.message.length || this.props.context.media) ? false : true}
+             onClick={this.submitPost}
+             className='post-edit--send'> Send
+            </button>
           </div>
         </div>
         <div className='modal-overlay' onClick={this.home}></div>

@@ -85,7 +85,7 @@
 
 .wall-item--meta--text--name {
     display: block;
-    // font-weight: 600;
+    font-weight: 600;
     font-family: HelveticaNeue;
     font-size: 16px;
     color: #131313;
@@ -205,6 +205,7 @@
     padding: 8px 0;
 }
 
+
 .wall-item.quote .wall-item--message{
   padding-bottom:4px;
 }
@@ -245,6 +246,7 @@
 .wall-item--images {
     list-style-type: none;
     width: 100%;
+    padding: 0 10px;
 }
 
 .wall-item--media-list {

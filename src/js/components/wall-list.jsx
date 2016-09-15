@@ -157,7 +157,7 @@ class WallList extends React.Component {
   renderMessagesBadge() {
     if (this.state.newMsgPost) {
       return (<div className="chat-list--unseen-messages" onClick={this.scrollWallToTop}>
-        <span className="chat-list--unseen-messages--text">New Posts above.</span>
+        <span className="chat-list--unseen-messages--text">New Posts</span>
       </div>);
     }
     return null;
@@ -186,7 +186,8 @@ class WallList extends React.Component {
               <InfiniteScroll pageStart={this.props.offset}
                 hasMore={this.props.hasMore}
                 loadMore={this.props.loadMore}
-                useWindow={false}>
+                useWindow={false}
+                loader={<div style={{clear: 'both'}} className="loader">Loading ...</div>}>
                     {posts}
               </InfiniteScroll>
             </ul>);
