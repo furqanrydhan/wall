@@ -20,18 +20,6 @@ Bebo.onReady(function () {
       });
   };
 
-  var getRoster = Bebo.getRoster;
-  Bebo.getRoster = function () {
-    return getRoster()
-      .then(function(json) {
-        if (json.code != 200) {
-          throw new Error("Not 200");
-        } else {
-          return json.result;
-        }
-      });
-  };
-
   Bebo.UI.disableKeyboardDoneStrip();
   var app = App.init();
   if (app) {

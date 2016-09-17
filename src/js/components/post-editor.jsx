@@ -155,7 +155,7 @@ class PostEdit extends React.Component {
     if (post.parent_id && post.quote && post.quote.user_id) {
       return Bebo.Notification.roster(title, body, [post.quote.user_id]);
     } else {
-      Bebo.getRoster()
+      Bebo.Server.getRoster()
         .then(function(users) {
             console.log("ROSTER", users);
             var user_ids = _.map(users, "user_id");
