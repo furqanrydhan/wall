@@ -151,17 +151,8 @@ class PostEdit extends React.Component {
       console.error("UNKNOWN POST TYPE", post);
 			body = "posted a new topic";
 		}
-
-    if (post.parent_id && post.quote && post.quote.user_id) {
-      return Bebo.Notification.roster(title, body, [post.quote.user_id]);
-    } else {
-      Bebo.Server.getRoster()
-        .then(function(users) {
-            console.log("ROSTER", users);
-            var user_ids = _.map(users, "user_id");
-            return Bebo.Notification.users(title, body, user_ids);
-        });
-    }
+    const isQuote = post.parent_id && post.quote && post.quote.user_id;
+    return Bebo.Notification.roster(title, body, isQuote ? [post.quote.user_id] : []);
   }
 
   broadcastChat(data) {
