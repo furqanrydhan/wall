@@ -16,9 +16,9 @@
   border-radius:50%;
   position:absolute;
   right:7%;
-  top:-19px;
+  top: 10px;
   display:block;
-  background-color:$color-brand;
+  background-color:transparent;
   z-index: 2;
   padding:0;
 }
@@ -33,6 +33,10 @@
   margin-left: -6px;
   margin-top: -6px;
   box-shadow: 1px 0p 1px 8px rgba(0,0,0,0.15);
+
+  p {
+    
+  }
 }
 
 .modal-overlay {
@@ -47,8 +51,7 @@
 
 .post-edit {
   width:100%;
-  max-height:45vh;
-  height: auto;
+  height: 100%;
   flex: 0 0 auto;
   overflow: visible;
   position:absolute;
