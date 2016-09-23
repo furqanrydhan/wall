@@ -289,24 +289,35 @@ $viewer-img-size: 22px;
     padding: 0 10px;
 }
 
-.wall-item--media-list {
-    list-style-type: none;
+.wall-item--media--list {
+    display: flex;
+    // list-style-type: none;
+    flex-direction: row;
+    // flex-wrap: wrap;
     width: 100%;
+    // justify-content: flex-start;
+    // align-content: flex-start;
 }
 
 .media-item {
+    // margin: auto;
     background-size: cover;
     background-repeat: no-repeat;
     width: 22vw;
+    height: 22vw;
+    margin: 0.5vw;
 }
 
 .wall-item--media--list.item-count-1 .media-item {
-  width: 100%;
+  width: 33vw;
+  height: 33vw;
   @include aspect-ratio(1,1);
 }
 
 .wall-item--media--list.item-count-2 .media-item {
-  width: 50%;
+  // width: 50%;
+  width: 33vw;
+  height: 33vw;
   @include aspect-ratio(1,1);
 }
 

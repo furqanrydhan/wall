@@ -10,6 +10,7 @@ class PostEdit extends React.Component {
     super();
     this.state = {
       message: '',
+      focusMessage: false,
       // blurInput: false,
     };
     this.handleInputFocus = this.handleInputFocus.bind(this);
@@ -20,6 +21,20 @@ class PostEdit extends React.Component {
     this.submitPost = this.submitPost.bind(this);
     this.onPhoto = this.onPhoto.bind(this);
     this.home = this.home.bind(this);
+    this.handleResize = this.handleResize.bind(this);
+    this.onBlurMessage = this.onBlurMessage.bind(this);
+    this.onFocusMessage = this.onFocusMessage.bind(this);
+  }
+
+  onBlurMessage() {
+    this.setState({focusMessage: false});
+    setTimeout(function(){
+      window.scrollTo(0,1000)
+    },10);
+  }
+
+  onFocusMessage() {
+    this.setState({focusMessage: true});
   }
 
   context2state(oldContext, nextContext) {
@@ -44,9 +59,16 @@ class PostEdit extends React.Component {
   }
 
   componentWillMount() {
+
+    window.addEventListener('resize', this.handleResize);
+
     if (this.props.context) {
       this.context2state({}, this.props.context);
     }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
   }
 
   componentDidMount() {
@@ -68,9 +90,16 @@ class PostEdit extends React.Component {
     // }
   }
 
+  handleResize(e) {
+    // no onBlur event on android when keyboard goes down
+    console.log("resize", e.currentTarget.innerHeight, this.state.focusDescription, this.state.focusTitle);
+    if (this.windowHeight === e.currentTarget.innerHeight) {
+      this.setState({focusMessage: false});
+    }
+    this.windowHeight = Math.max(this.windowHeight, e.currentTarget.innerHeight);
+  }
+
   handleInputChange(e) {
-    console.log('input Change')
-    this.scrollWindow();
     this.setState({ message: e.target.value });
   }
 
@@ -216,10 +245,36 @@ class PostEdit extends React.Component {
     },10);
   }
 
+  renderMedia(){
+    if(this.props.context && this.props.context.media && this.props.context.media.length){
+      for (var i = 0 ; i< this.props.context.media.length; i++) {
+        this.props.context.media[i].key = i+1;
+      }
+      return (
+        <div className='wall-item--media'>
+          <ul className={'wall-item--media--list ' + 'item-count-' + this.props.context.media.length}>
+            {this.props.context.media.map((i) =>  <div className='media-item'
+              key={i.key}
+              data-media-url={i.url}
+              onClick={this.viewPhoto}
+              style={{backgroundImage: "url(" + (i.url) + ")"}}></div>)}
+          </ul>
+        </div>
+      )
+    } else {
+      return null
+    }
+  };
 
   render() {
     var placeholder = this.props.context.quote ? "reply..." : "type a message..";
     var userImgStyle = {backgroundImage: 'url(' + this.props.me.image_url + ')'};
+    var textAreaStyle = {};
+    if (Bebo.getDevice() === "ios") {
+      if (this.state.focusMessage) {
+        textAreaStyle = { maxHeight: "20vh", minHeight: "20vh"};
+      }
+    }
 
     return <div className='modal'>
       <div className='post-edit'>
@@ -243,13 +298,16 @@ class PostEdit extends React.Component {
           <div className='wall-item--message'>
             <TextArea placeholder={placeholder}
               value={this.state.message}
-              onFocus={this.scrollWindow}
+              onFocus={this.onFocusMessage}
+              onBlur={this.onBlurMessage}
               onChange={this.handleInputChange}
               id='js-textarea' 
               ref='textarea' 
               className='wall-item--message--text'
+              style={textAreaStyle}
             />
           </div>
+          {this.renderMedia()}
           {this.renderQuote()}
         </div>
         </div>
@@ -282,7 +340,7 @@ class PostEdit extends React.Component {
             </button>
           </div>
         </div>
-        <div className='modal-overlay' onClick={this.home}></div>
+        <div className='modal-overlay' onClick={function(){}}></div>
     </div>
   }
 }
