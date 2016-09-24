@@ -34,6 +34,7 @@ class Upload extends React.Component {
     }
     this.onClick = this.onClick.bind(this);
     this.onDrop = this.onDrop.bind(this);
+    this.newImage = this.newImage.bind(this);
   }
 
   componentWillMount() {
@@ -58,17 +59,44 @@ class Upload extends React.Component {
     }
   }
 
+  isAllDone(media) {
+    var test = function (m) { return m.state !== undefined && m.state !== "done" };
+    return _.findIndex(media, test) === -1
+  }
+
   newImage(image) {
     var media = this.state.media;
-    var test = function (m) { return m.state !== undefined  && m.state !== "done" };
-    if (_.findIndex(media, test) === -1) {
+    if (this.isAllDone(media)) {
       if (this.props.onBusy) {
         this.props.onBusy();
       }
     }
-    image.key = uuid.v4();
     media.push(image);
     this.setState({media: media});
+    this.uploadImage(image);
+  }
+
+  uploadImage(image) {
+    var that = this;
+    return Bebo.uploadImage(image.raw)
+      .then(function(image_url) {
+        image.state = "done";
+        image.url = image_url;
+        delete image.raw;
+        var media = that.state.media;
+        var idx = _.findIndex(that.state.media, {key: image.key});
+        if (idx === -1) {
+          console.log("Lost image", image, media);
+          return;
+        }
+        media[idx] = image;
+        if (that.isAllDone(media)) {
+          if(that.props.onChange) {
+            that.props.onChange(media);
+          }
+        }
+        that.setState({media: media});
+      });
   }
 
   onDrop(files) {
@@ -84,7 +112,11 @@ class Upload extends React.Component {
           file,
           (canvas) => {
             const base64data = canvas.toDataURL('image/jpeg');
-            that.newImage({'raw': base64data, state: "uploading"});
+            var mimeType = base64data.split(':')[1].split(';')[0];
+            that.newImage({raw: base64data,
+                           key: uuid.v4(),
+                           mimeType: mimeType,
+                           state: "uploading"});
           }, {
             orientation,
             canvas: true,
@@ -96,31 +128,6 @@ class Upload extends React.Component {
       });
     });
   }
-  // fileUpload(e) {
-  //   var that = this;
-  //   var file = e.target.files[0];
-  //   var reader = new FileReader();
-  //   reader.onloadend = function () {
-  //     var url = reader.result;
-  //     that.setState({editState: "uploading",
-  //                    image_url: url});
-  //     that.props.uploadImage(url)
-  //     .then(function() {
-  //       that.setState({editState: false,
-  //                      image_url: null});
-  //     }).catch(function(err) {
-  //       console.error("upload failed", err);
-  //       that.setState({editState: false,
-  //                      image_url: null});
-  //     });
-  //   }
-  //   reader.onerror = function(err) {
-  //     console.error("error reading file", err);
-  //     that.setState({editState: false,
-  //                    image_url: null});
-  //   }
-  //   reader.readAsDataURL(file);
-  // }
 
   renderButton() {
     // // var style = { backgroundImage: 'url(' + this.props.me.image_url + ')'};

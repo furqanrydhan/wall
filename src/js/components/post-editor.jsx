@@ -255,11 +255,13 @@ class PostEdit extends React.Component {
   }
 
   handleUploading() {
-    this.state({uploading: true});
+    console.log("editor uploading");
+    this.setState({uploading: true});
   }
 
   handleMedia(media) {
-    this.state({uploading: false, media: media});
+    console.log("editor got media");
+    this.setState({uploading: false, media: media});
   }
 
   renderMedia(){
@@ -276,7 +278,9 @@ class PostEdit extends React.Component {
           // </ul>
       return (
         <div className='wall-item--media'>
-          <Uploader ref="uploader" value={this.state.media} multiple={true} onChange={this.handleMedia} itemClassName="media-item" className="wall-item--media--list"/>;
+          <Uploader ref="uploader" value={this.state.media} multiple={true} 
+            onBusy={this.handleUploading}
+            onChange={this.handleMedia} itemClassName="media-item" className="wall-item--media--list"/>;
         </div>
       )
     // } else {
@@ -285,7 +289,6 @@ class PostEdit extends React.Component {
   };
 
   validateInput() {
-    return this.state.title && this.state.eventTime > new Date();
     if (this.state.uploading) {
       return false;
     }
