@@ -90,6 +90,11 @@ module.exports = {
         loader: 'babel',
         query: require('./babel.dev')
       },
+      {
+        test: /uploaderStyles.css$/,
+        loader: "style!css?modules&importLoaders=1"
+        // loader: "style!css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]"
+      },
       // "postcss" loader applies autoprefixer to our CSS.
       // "css" loader resolves paths in CSS and adds assets as dependencies.
       // "style" loader turns CSS into JS modules that inject <style> tags.

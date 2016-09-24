@@ -2,6 +2,7 @@ import React from 'react';
 import uuid from 'node-uuid';
 import WallItem from './chat-item.jsx';
 import TextArea from 'react-textarea-autosize'
+import Uploader from './uploader.jsx';
 
 
 class PostEdit extends React.Component {
@@ -11,6 +12,8 @@ class PostEdit extends React.Component {
     this.state = {
       message: '',
       focusMessage: false,
+      media: [],
+      uploading: false,
       // blurInput: false,
     };
     this.handleInputFocus = this.handleInputFocus.bind(this);
@@ -24,6 +27,9 @@ class PostEdit extends React.Component {
     this.handleResize = this.handleResize.bind(this);
     this.onBlurMessage = this.onBlurMessage.bind(this);
     this.onFocusMessage = this.onFocusMessage.bind(this);
+    this.validateInput = this.validateInput.bind(this);
+    this.handleMedia = this.handleMedia.bind(this);
+    this.handleUploading = this.handleUploading.bind(this);
   }
 
   onBlurMessage() {
@@ -49,6 +55,7 @@ class PostEdit extends React.Component {
 				}
 			}
       update.uploaded = uploaded;
+      update.media = nextContext.media;
 		}
 
     if (oldContext.message !== nextContext.message) {
@@ -120,7 +127,7 @@ class PostEdit extends React.Component {
 
 
 
-    if (text.length > 0 || this.props.context.media) {
+    if (text.length > 0 || this.state.media) {
       const post = {
         id: id,
         thread_id: thread_id,
@@ -128,7 +135,7 @@ class PostEdit extends React.Component {
         type: 'message',
         username: this.props.actingUser.username,
         user_id: this.props.actingUser.user_id,
-        media: this.props.context.media,
+        media: this.state.media,
         message: text,
         quote: this.props.context.quote,
         edited: false,
@@ -205,8 +212,9 @@ class PostEdit extends React.Component {
   }
 
   onPhoto() {
-    var ctx = this.mergeContext();
-    this.props.uploadPhoto(ctx);
+    // var ctx = this.mergeContext();
+    // this.props.uploadPhoto(ctx);
+    this.refs.uploader.addImage();
   }
 
   renderQuote() {
@@ -243,28 +251,46 @@ class PostEdit extends React.Component {
     setTimeout(function(){
       window.scrollTo(0,1000)
     },10);
+
+  }
+
+  handleUploading() {
+    this.state({uploading: true});
+  }
+
+  handleMedia(media) {
+    this.state({uploading: false, media: media});
   }
 
   renderMedia(){
-    if(this.props.context && this.props.context.media && this.props.context.media.length){
-      for (var i = 0 ; i< this.props.context.media.length; i++) {
-        this.props.context.media[i].key = i+1;
-      }
+    // if(this.props.context && this.props.context.media && this.props.context.media.length){
+      // for (var i = 0 ; i< this.props.context.media.length; i++) {
+      //   this.props.context.media[i].key = i+1;
+      // }
+          // <ul className={'wall-item--media--list ' + 'item-count-' + this.props.context.media.length}>
+          //   {this.props.context.media.map((i) =>  <div className='media-item'
+          //     key={i.key}
+          //     data-media-url={i.url}
+          //     onClick={this.viewPhoto}
+          //     style={{backgroundImage: "url(" + (i.url) + ")"}}></div>)}
+          // </ul>
       return (
         <div className='wall-item--media'>
-          <ul className={'wall-item--media--list ' + 'item-count-' + this.props.context.media.length}>
-            {this.props.context.media.map((i) =>  <div className='media-item'
-              key={i.key}
-              data-media-url={i.url}
-              onClick={this.viewPhoto}
-              style={{backgroundImage: "url(" + (i.url) + ")"}}></div>)}
-          </ul>
+          <Uploader ref="uploader" value={this.state.media} multiple={true} onChange={this.handleMedia} itemClassName="media-item" className="wall-item--media--list"/>;
         </div>
       )
-    } else {
-      return null
-    }
+    // } else {
+    //   return null
+    // }
   };
+
+  validateInput() {
+    return this.state.title && this.state.eventTime > new Date();
+    if (this.state.uploading) {
+      return false;
+    }
+    return this.state.message.length || this.state.media;
+  }
 
   render() {
     var placeholder = this.props.context.quote ? "reply..." : "type a message..";
@@ -334,7 +360,7 @@ class PostEdit extends React.Component {
                 </svg>
               </button>
             </div>
-            <button disabled={(this.state.message.length || this.props.context.media) ? false : true }
+            <button disabled={! this.validateInput() }
              onClick={this.submitPost}
              className='post-edit--send'> Send
             </button>
