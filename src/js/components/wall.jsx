@@ -41,15 +41,9 @@ class Wall extends React.Component {
     return (
       <div className={ this.props.minimized ? ' chat is-minimized' : 'chat'}>
         <div className="chat-new-post" onTouchStart={this.onPost}>
-          <svg viewBox="0 0 90 92" version="1.1">
-              <g id="pen" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                  <path d="M71.768,1.732 C70.792,0.755 69.208,0.755 68.233,1.732 L60,9.965 L81.035,31 L89.267,22.768 C90.244,21.791 90.244,20.209 89.267,19.233 L71.768,1.732 L71.768,1.732 Z" id="Shape" fill="#FFFFFF"></path>
-                  <path d="M0.732,90.268 C1.22,90.756 1.86,91 2.5,91 C3.14,91 3.78,90.756 4.268,90.268 L6.253,88.283 L26.703,83.738 L7.262,64.297 L2.718,84.747 L0.733,86.732 C-0.244,87.709 -0.244,89.291 0.732,90.268 L0.732,90.268 Z" id="Shape" fill="#FFFFFF"></path>
-                  <rect id="Rectangle-path" fill="#FFFFFF" transform="translate(43.750404, 47.248946) rotate(45.000000) translate(-43.750404, -47.248946) " x="28.8765462" y="14.3937615" width="29.7477147" height="65.7103698"></rect>
-              </g>
-          </svg>
-        </div>
-        <div className="chat-upper" >
+      <img src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDQyIDQyIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA0MiA0MjsiIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSI1MTJweCIgaGVpZ2h0PSI1MTJweCI+CjxwYXRoIGQ9Ik0zNy4wNTksMTZIMjZWNC45NDFDMjYsMi4yMjQsMjMuNzE4LDAsMjEsMHMtNSwyLjIyNC01LDQuOTQxVjE2SDQuOTQxQzIuMjI0LDE2LDAsMTguMjgyLDAsMjFzMi4yMjQsNSw0Ljk0MSw1SDE2djExLjA1OSAgQzE2LDM5Ljc3NiwxOC4yODIsNDIsMjEsNDJzNS0yLjIyNCw1LTQuOTQxVjI2aDExLjA1OUMzOS43NzYsMjYsNDIsMjMuNzE4LDQyLDIxUzM5Ljc3NiwxNiwzNy4wNTksMTZ6IiBmaWxsPSIjRkZGRkZGIi8+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+Cjwvc3ZnPgo=" />
+    </div>
+    <div className="chat-upper" >
           <WallList 
                     disabledScroll={this.props.minimized}
                     messages={this.props.messages}
@@ -57,7 +51,7 @@ class Wall extends React.Component {
                     offset={this.props.offset}
                     hasMore={this.props.hasMore}
                     loadMore={this.props.loadMore}
-                    reply={this.onReply}
+                    like={this.onLike}
                     deletePost={this.onDelete}
                     editPost={this.onEdit}
                     navigate={this.props.navigate}

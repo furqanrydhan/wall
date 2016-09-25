@@ -11,16 +11,16 @@ import LoadImage from 'blueimp-load-image';
 
 
 function storageAvailable(type) {
-	try {
-		var storage = window[type],
-			x = '__storage_test__';
-		storage.setItem(x, x);
-		storage.removeItem(x);
-		return true;
-	}
-	catch(e) {
-		return false;
-	}
+  try {
+    var storage = window[type],
+      x = '__storage_test__';
+    storage.setItem(x, x);
+    storage.removeItem(x);
+    return true;
+  }
+  catch(e) {
+    return false;
+  }
 }
 
 var hasLocalStorage = false;
@@ -110,20 +110,20 @@ class App extends React.Component {
     var that = this;
     var options = {count: count, offset: offset, sort_by:"created_dttm"};
     Bebo.Db.get('post', options)
-    .then(function(list) {
-      
-      for (var i=0; i<list.length ; i++) {
-        list[i].viewed_ids = new Set(list[i].viewed_ids || []);
-      }
-      var hasMore = list.length === count;
-      list = _.filter(list, function(i) { return !i.deleted_dttm});
-      that.store.wall = _.unionBy(list, that.store.wall, "id");
-      that.store.wall = _.orderBy(that.store.wall, "created_dttm", "desc");
-      var pageToLoad = that.store.wall.length;
-      that.setState({ messages: that.store.wall, offset: offset, hasMore: hasMore, pageToLoad: pageToLoad});
-    }).catch(function(err) {
-      console.log("Can't get messages", err);
-    });
+      .then(function(list) {
+
+        for (var i=0; i<list.length ; i++) {
+          list[i].viewed_ids = new Set(list[i].viewed_ids || []);
+        }
+        var hasMore = list.length === count;
+        list = _.filter(list, function(i) { return !i.deleted_dttm});
+        that.store.wall = _.unionBy(list, that.store.wall, "id");
+        that.store.wall = _.orderBy(that.store.wall, "created_dttm", "desc");
+        var pageToLoad = that.store.wall.length;
+        that.setState({ messages: that.store.wall, offset: offset, hasMore: hasMore, pageToLoad: pageToLoad});
+      }).catch(function(err) {
+        console.log("Can't get messages", err);
+      });
   }
 
   handleEventUpdate(data) {
@@ -137,9 +137,9 @@ class App extends React.Component {
   incrViewedPost(postItem) {
     var user_id = this.state.me.user_id;
 
-		if (!user_id) {
-			console.error("NO USER ME");
-			return;
+    if (!user_id) {
+      console.error("NO USER ME");
+      return;
     }
 
     return Bebo.Db.get('post', {id: postItem.id})
@@ -160,10 +160,10 @@ class App extends React.Component {
         row.viewed_ids.push(user_id);
         row.viewed_cnt = row.viewed_ids.length;
         return Bebo.Db.save('post', row)
-					.then(function() {
-        		row.viewed_ids = new Set(row.viewed_ids);
-						return row;
-					});
+          .then(function() {
+            row.viewed_ids = new Set(row.viewed_ids);
+            return row;
+          });
       });
   }
 
@@ -232,15 +232,15 @@ class App extends React.Component {
 
   renderPostEditor() {
     if ( this.state.page === "post") {
-			return <PostEditor me={this.state.me}
-									 navigate={this.navigate}
-									 context={this.state.context}
-									 uploadPhoto={this.onPhotoUpload}
-									 db={this.db}
-									 actingUser={this.state.me} />;
-		}
+      return <PostEditor me={this.state.me}
+        navigate={this.navigate}
+        context={this.state.context}
+        uploadPhoto={this.onPhotoUpload}
+        db={this.db}
+        actingUser={this.state.me} />;
+    }
   }
- 
+
   onPhotoUpload(context) {
     this.setState(context: context);
     console.log("Photo Upload - open dropzone", context);
@@ -248,16 +248,16 @@ class App extends React.Component {
   }
 
   renderPhotoLoader() {
-        return (<div className="initial-load-container">
-          <div className="loader">
-            <svg  id="Layer_1" x="0px" y="0px" viewBox="0 0 81 45">
-              <circle className="circle1" fill="#fe1263" cx="13.5" cy="22.5" r="4.5"/>
-              <circle className="circle2" fill="#fe1263" cx="31.5" cy="22.5" r="4.5"/>
-              <circle className="circle3" fill="#fe1263" cx="49.5" cy="22.5" r="4.5"/>
-              <circle className="circle4" fill="#fe1263" cx="67.5" cy="22.5" r="4.5"/>
-            </svg>
-          </div>
-        </div>);
+    return (<div className="initial-load-container">
+      <div className="loader">
+        <svg  id="Layer_1" x="0px" y="0px" viewBox="0 0 81 45">
+          <circle className="circle1" fill="#fe1263" cx="13.5" cy="22.5" r="4.5"/>
+          <circle className="circle2" fill="#fe1263" cx="31.5" cy="22.5" r="4.5"/>
+          <circle className="circle3" fill="#fe1263" cx="49.5" cy="22.5" r="4.5"/>
+          <circle className="circle4" fill="#fe1263" cx="67.5" cy="22.5" r="4.5"/>
+        </svg>
+      </div>
+    </div>);
   }
 
   onClosePhotoEditor(photo) {
@@ -266,11 +266,11 @@ class App extends React.Component {
     var that = this;
     var context = this.state.context;
     if (!photo) {
-     this.navigate("post", context);
+      this.navigate("post", context);
     }
     var data = { base64: photo,
-                 mimeType: mimeType,
-                 state: "uploading" };
+      mimeType: mimeType,
+      state: "uploading" };
     if (! context.media) {
       context.media = [];
     } 
@@ -278,17 +278,17 @@ class App extends React.Component {
     this.navigate("post", context);
     return Bebo.uploadImage(photo)
       .then(function(image_url) {
-          data.state = "done";
-          data.url = image_url;
-          delete data.base64;
-          that.setState({context: context});
-        });
+        data.state = "done";
+        data.url = image_url;
+        delete data.base64;
+        that.setState({context: context});
+      });
   }
 
   renderPhotoEditor() {
     if (this.state.page === "photo-editor") {
-			return (<PhotoEditor photo={{base64: this.state.context.rawPhoto}} closeEditor={this.onClosePhotoEditor} savePhoto={this.onClosePhotoEditor} />);
-		}
+      return (<PhotoEditor photo={{base64: this.state.context.rawPhoto}} closeEditor={this.onClosePhotoEditor} savePhoto={this.onClosePhotoEditor} />);
+    }
   }
 
   onDrop(files) {
@@ -326,10 +326,10 @@ class App extends React.Component {
   renderPhotoViewer() {
     if (this.state.page === "photo-viewer") {
       return (<PhotoViewer
-                   me={this.state.me}
-									 navigate={this.navigate}
-									 context={this.state.context}
-                   db={this.db}/>);
+        me={this.state.me}
+        navigate={this.navigate}
+        context={this.state.context}
+        db={this.db}/>);
     }
   }
 
@@ -375,12 +375,12 @@ class App extends React.Component {
   render() {
     return (
       <div className="app-root">
-				{this.renderWall()}
-				{this.renderPostEditor()}
-				{this.renderPhotoViewer()}
-				{this.renderPhotoEditor()}
-				{this.renderPhotoUpload()}
-				{this.renderPostDelete()}
+        {this.renderWall()}
+        {this.renderPostEditor()}
+        {this.renderPhotoViewer()}
+        {this.renderPhotoEditor()}
+        {this.renderPhotoUpload()}
+        {this.renderPostDelete()}
       </div>);
   }
 }
